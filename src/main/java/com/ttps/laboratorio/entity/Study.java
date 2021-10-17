@@ -39,7 +39,7 @@ public class Study implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "discharge_date", nullable = true)
+	@Column(name = "discharge_date")
 	private LocalDate dischargeDate;
 
 	@NotNull
