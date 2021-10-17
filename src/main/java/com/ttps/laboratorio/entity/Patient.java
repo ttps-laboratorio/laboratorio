@@ -64,14 +64,14 @@ public class Patient implements Serializable {
 	@Column(name = "clinic_history")
 	private String clinicHistory;
 
-	@Column(name = "afiliate_number", nullable = true)
+	@Column(name = "afiliate_number")
 	private String afiliateNumber;
 
 	@OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, optional = true, cascade = CascadeType.ALL)
 	private Contact contact;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "health_insurance_id", nullable = true)
+	@JoinColumn(name = "health_insurance_id")
 	private HealthInsurance healthInsurance;
 
 	@OneToMany(mappedBy = "patient", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
