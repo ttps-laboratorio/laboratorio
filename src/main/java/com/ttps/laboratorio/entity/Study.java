@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.sun.istack.NotNull;
@@ -43,11 +44,11 @@ public class Study implements Serializable {
 	private LocalDate dischargeDate;
 
 	@NotNull
-	@Column(name = "budget", precision = 2, nullable = false)
+	@Column(name = "budget", nullable = false)
 	private BigDecimal budget;
 
 	@NotNull
-	@Column(name = "extraction_amount", precision = 2, nullable = false)
+	@Column(name = "extraction_amount", nullable = false)
 	private BigDecimal extractionAmount;
 
 	@Column(name = "paid_extraction_amount")
@@ -67,5 +68,17 @@ public class Study implements Serializable {
 	 */
 	@ManyToOne(optional = false)
 	private Patient patient;
+
+	/**
+	 * An study may has one appointment
+	 */
+	@OneToOne(optional = true)
+	private Appointment appointment;
+
+	/**
+	 * Doctor who refers the patient
+	 */
+	@ManyToOne
+	private Doctor referingDoctor;
 
 }
