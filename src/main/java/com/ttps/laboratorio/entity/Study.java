@@ -2,14 +2,21 @@ package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.sun.istack.NotNull;
@@ -39,15 +46,15 @@ public class Study implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "discharge_date")
-	private LocalDate dischargeDate;
+	@Column(name = "created_at")
+	private LocalDateTime created_at;
 
 	@NotNull
-	@Column(name = "budget", precision = 2, nullable = false)
+	@Column(name = "budget", nullable = false)
 	private BigDecimal budget;
 
 	@NotNull
-	@Column(name = "extraction_amount", precision = 2, nullable = false)
+	@Column(name = "extraction_amount", nullable = false)
 	private BigDecimal extractionAmount;
 
 	@Column(name = "paid_extraction_amount")
@@ -67,5 +74,64 @@ public class Study implements Serializable {
 	 */
 	@ManyToOne(optional = false)
 	private Patient patient;
+
+	/**
+	 * An study may has one appointment
+	 */
+	@OneToOne(optional = true)
+	private Appointment appointment;
+
+	/**
+	 * Doctor who refers the patient
+	 */
+	@ManyToOne
+	private Doctor referingDoctor;
+
+	/**
+	 * Type of the study
+	 */
+	@ManyToOne
+	private StudyType type;
+
+	/**
+	 * Person who extract the sample from the extraction room
+	 */
+	@ManyToOne(optional = true)
+	private Extractionist extractionist;
+
+	/**
+	 * Presumptive diagnosis elaborated by refering doctor
+	 */
+	@NotNull
+	@ManyToOne(optional = false)
+	private PresumptiveDiagnosis presumptiveDiagnosis;
+
+	/**
+	 * Sample represents the blood extraction of the study
+	 */
+	@OneToOne(mappedBy = "study", optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
+	private Sample sample;
+
+	@Builder.Default
+	@OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<Checkpoint> checkpoints = new ArrayList<>();
+
+	/**
+	 * Get actual checkpoint or null
+	 * 
+	 * @return
+	 */
+	public Checkpoint getRecentCheckpoint() {
+		return checkpoints.stream().sorted(Checkpoint.CREATED_AT_COMPARATOR_DESC).findFirst().orElse(null);
+	}
+
+	/**
+	 * Get actual status or null
+	 * 
+	 * @return
+	 */
+	public StudyStatus getActualStatus() {
+		return Optional.ofNullable(getRecentCheckpoint()).map(Checkpoint::getStatus).orElse(null);
+	}
 
 }
