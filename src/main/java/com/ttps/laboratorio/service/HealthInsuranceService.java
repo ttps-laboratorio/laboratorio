@@ -2,6 +2,7 @@ package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.dto.HealthInsuranceDTO;
 import com.ttps.laboratorio.entity.HealthInsurance;
+import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IHealthInsuranceRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class HealthInsuranceService {
    */
   public void updateHealthInsurance(Long healthInsuranceID, HealthInsuranceDTO request) {
     HealthInsurance healthInsurance = healthInsuranceRepository.findById(healthInsuranceID)
-        .orElseThrow(() -> new RuntimeException("A health insurance with the id " + healthInsuranceID + " does not exist."));
+        .orElseThrow(() -> new NotFoundException("A health insurance with the id " + healthInsuranceID + " does not exist."));
     healthInsurance.setName(request.getName());
     healthInsurance.setPhoneNumber(request.getPhoneNumber());
     healthInsurance.setEmail(request.getEmail());

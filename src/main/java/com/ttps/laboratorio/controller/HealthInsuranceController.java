@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ public class HealthInsuranceController {
    * View a list of all health insurances.
    * @return  Returns a list of all health insurances with "200 OK".
    */
+  @PreAuthorize("hasRole('CONFIGURATOR')")
   @GetMapping(path = "/")
   public ResponseEntity<?> listHealthInsurance() {
     return ResponseEntity.ok(healthInsuranceService.getAllHealthInsurances());
@@ -39,18 +41,21 @@ public class HealthInsuranceController {
    * @param healthInsuranceDTO health insurance information
    * @return status
    */
+  @PreAuthorize("hasRole('CONFIGURATOR')")
   @PostMapping(path = "/create")
   public ResponseEntity<?> createHealthInsurance(@Valid @RequestBody HealthInsuranceDTO healthInsuranceDTO) {
     healthInsuranceService.createHealthInsurance(healthInsuranceDTO);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
+  @PreAuthorize("hasRole('CONFIGURATOR')")
   @PutMapping(path = "/update")
   public ResponseEntity<?> updateHealthInsurance(@RequestParam(name = "healthInsuranceId") @NonNull Long healthInsuranceID, @Valid @RequestBody @NonNull HealthInsuranceDTO healthInsuranceDTO) {
     healthInsuranceService.updateHealthInsurance(healthInsuranceID, healthInsuranceDTO);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
+  @PreAuthorize("hasRole('CONFIGURATOR')")
   @DeleteMapping(path = "/delete")
   public ResponseEntity<?> deleteHealthInsurance(@RequestParam(name = "healthInsuranceId") @NonNull Long healthInsuranceID) {
     healthInsuranceService.deleteHealthInsurance(healthInsuranceID);
