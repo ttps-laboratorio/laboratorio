@@ -37,7 +37,7 @@ public class HealthInsuranceController {
   }
 
   /**
-   * Registers a new Health Insurance on the data base.
+   * Registers a new Health Insurance on the database.
    * @param healthInsuranceDTO health insurance information
    * @return status
    */
