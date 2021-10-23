@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -29,6 +30,7 @@ import lombok.ToString;
 @Builder
 @Entity
 @Table(name = "doctors")
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Doctor implements Serializable {
 
 	private static final long serialVersionUID = 7604042034167642293L;
