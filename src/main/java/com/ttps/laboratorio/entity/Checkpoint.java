@@ -1,4 +1,4 @@
-package com.ttps.laboratorio.entity;
+                                                                                                                                                                                                                                                          package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

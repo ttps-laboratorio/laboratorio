@@ -65,7 +65,7 @@ public class Patient implements Serializable {
 	private String clinicHistory;
 
 	@Column(name = "afiliate_number")
-	private String afiliateNumber;
+	private String affiliateNumber;
 
 	@OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, optional = true, cascade = CascadeType.ALL)
 	private Contact contact;

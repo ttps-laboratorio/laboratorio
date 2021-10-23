@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Represents an appointment for extract blood to a pacient for a study
+ * Represents an appointment in which blood is extracted from a patient for a study
  *
  */
 @Data

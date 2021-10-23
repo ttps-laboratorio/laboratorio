@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Represents persons that extract the blood sample from extraction room
+ * Represents persons that extract the blood samples from extraction room
  *
  */
 @Data
