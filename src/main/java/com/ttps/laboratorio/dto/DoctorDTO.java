@@ -2,7 +2,7 @@ package com.ttps.laboratorio.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +28,7 @@ public class DoctorDTO {
 
   private Integer phoneNumber;
 
-  @NotEmpty(message = "Doctor last name is required")
+  @NotNull(message = "Doctor last name is required")
   private Integer licenseNumber;
 
 }

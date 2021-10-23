@@ -48,6 +48,11 @@ public class HealthInsuranceController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
+  /**
+   * Modifies a new Health Insurance on the database.
+   * @param healthInsuranceDTO health insurance information
+   * @return status
+   */
   @PreAuthorize("hasRole('CONFIGURATOR')")
   @PutMapping(path = "/update")
   public ResponseEntity<?> updateHealthInsurance(@RequestParam(name = "healthInsuranceId") @NonNull Long healthInsuranceID, @Valid @RequestBody @NonNull HealthInsuranceDTO healthInsuranceDTO) {

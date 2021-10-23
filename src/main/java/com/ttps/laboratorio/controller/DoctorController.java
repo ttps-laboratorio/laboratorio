@@ -47,6 +47,11 @@ public class DoctorController {
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
+  /**
+   * Modifies a new Doctor on the database.
+   * @param doctorDTO doctor information
+   * @return status
+   */
   @PreAuthorize("hasRole('CONFIGURATOR')")
   @PutMapping(path = "/update")
   public ResponseEntity<?> updateDoctor(@RequestParam(name = "doctorId") @NonNull Long doctorID, @Valid @RequestBody @NonNull DoctorDTO doctorDTO) {
