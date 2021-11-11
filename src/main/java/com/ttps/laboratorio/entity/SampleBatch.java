@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,9 +41,14 @@ public class SampleBatch implements Serializable {
 
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
 	private SampleBatchStatus status = SampleBatchStatus.IN_PROCESS;
 
 	@OneToMany(mappedBy = "sampleBatch", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@Column(name = "samples", nullable = false)
 	private List<Sample> samples = new ArrayList<>();
+
+	@Column(name = "final_report_url")
+	private String FinalReportsUrl;
 
 }
