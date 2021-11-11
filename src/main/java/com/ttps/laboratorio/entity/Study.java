@@ -46,9 +46,6 @@ public class Study implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "created_at")
-	private LocalDateTime created_at;
-
 	@NotNull
 	@Column(name = "budget", nullable = false)
 	private BigDecimal budget;
@@ -60,8 +57,9 @@ public class Study implements Serializable {
 	@Column(name = "paid_extraction_amount")
 	private Boolean paidExtractionAmount;
 
-	@Column(name = "positive_result")
-	private Boolean positiveResult;
+	@Column(name = "final_report")
+	@OneToOne(optional = true)
+	private FinalReport finalReport;
 
 	/**
 	 * Maybe this has to be deleted and calculated.
@@ -70,13 +68,13 @@ public class Study implements Serializable {
 	private Boolean delayed;
 
 	/**
-	 * An study has one patient and a patient may has many studies
+	 * A study has one patient and a patient may have many studies
 	 */
 	@ManyToOne(optional = false)
 	private Patient patient;
 
 	/**
-	 * An study may has one appointment
+	 * A study may have one appointment
 	 */
 	@OneToOne(optional = true)
 	private Appointment appointment;
@@ -85,7 +83,7 @@ public class Study implements Serializable {
 	 * Doctor who refers the patient
 	 */
 	@ManyToOne
-	private Doctor referingDoctor;
+	private Doctor referringDoctor;
 
 	/**
 	 * Type of the study
@@ -100,7 +98,7 @@ public class Study implements Serializable {
 	private Extractionist extractionist;
 
 	/**
-	 * Presumptive diagnosis elaborated by refering doctor
+	 * Presumptive diagnosis elaborated by referring doctor
 	 */
 	@NotNull
 	@ManyToOne(optional = false)
