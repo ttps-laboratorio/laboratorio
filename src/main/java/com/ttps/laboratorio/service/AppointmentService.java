@@ -70,10 +70,10 @@ public class AppointmentService {
 
   private void blockSaturdaysAndSundays(Calendar calendar, Integer year, Integer month, int daysInMonth, List<Boolean> freeDaysInMonth) {
     for (int day = 1; day <= daysInMonth; day++) {
-      calendar.set(year, month, day);
+      calendar.set(year, month - 1, day);
       int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
       if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-        freeDaysInMonth.set(day, Boolean.FALSE);
+        freeDaysInMonth.set(day - 1, Boolean.FALSE);
       }
     }
   }
@@ -86,9 +86,9 @@ public class AppointmentService {
 
   private void blockAppointmentFullDays(Calendar calendar, Integer year, Integer month, int daysInMonth, List<Boolean> freeDaysInMonth) {
     for (int day = 1; day <= daysInMonth; day++) {
-      calendar.set(year, month, day);
-      List<Appointment> appointmentsFromDate = getAppointmentsByDate(year, month, day);
-      if (appointmentsFromDate != null && appointmentsFromDate.isEmpty()) {
+      calendar.set(year, month - 1, day);
+      List<LocalTime> availableAppointmentsFromDate = getAvailableAppointmentsByDate(year, month, day);
+      if (availableAppointmentsFromDate != null && availableAppointmentsFromDate.isEmpty()) {
         freeDaysInMonth.set(day, Boolean.FALSE);
       }
     }

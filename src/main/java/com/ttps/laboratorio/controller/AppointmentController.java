@@ -35,7 +35,7 @@ public class AppointmentController {
    * @return  Returns a list of all appointments with "200 OK".
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/")
+  @GetMapping(path = "/free-appointments")
   public ResponseEntity<?> listFreeAppointmentDaysByMonth(@RequestParam(name = "year") @NonNull Integer year, @RequestParam(name = "month") @NonNull Integer month) {
     return ResponseEntity.ok(appointmentService.getFreeAppointmentDaysByMonth(year, month));
   }
@@ -45,7 +45,7 @@ public class AppointmentController {
    * @return  Returns a list of all appointments with "200 OK".
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/")
+  @GetMapping(path = "/appointments")
   public ResponseEntity<?> listAppointmentsByDate(@RequestParam(name = "year") @NonNull Integer year, @RequestParam(name = "month") @NonNull Integer month, @RequestParam(name = "day") @NonNull Integer day) {
     return ResponseEntity.ok(appointmentService.getAppointmentsByDate(year, month, day));
   }
@@ -55,7 +55,7 @@ public class AppointmentController {
    * @return  Returns a list of all appointments with "200 OK".
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/")
+  @GetMapping(path = "/available-appointments")
   public ResponseEntity<?> listAvailableAppointmentsByDate(@RequestParam(name = "year") @NonNull Integer year, @RequestParam(name = "month") @NonNull Integer month, @RequestParam(name = "day") @NonNull Integer day) {
     return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(year, month, day));
   }
