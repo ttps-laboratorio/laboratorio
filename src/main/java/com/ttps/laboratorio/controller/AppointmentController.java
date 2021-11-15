@@ -1,10 +1,16 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.AppointmentDTO;
+import com.ttps.laboratorio.dto.DoctorDTO;
 import com.ttps.laboratorio.service.AppointmentService;
+import javax.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +64,18 @@ public class AppointmentController {
   @GetMapping(path = "/available-appointments")
   public ResponseEntity<?> listAvailableAppointmentsByDate(@RequestParam(name = "year") @NonNull Integer year, @RequestParam(name = "month") @NonNull Integer month, @RequestParam(name = "day") @NonNull Integer day) {
     return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(year, month, day));
+  }
+
+  /**
+   * Registers a new Appointment on the database.
+   * @param appointmentDTO appointment information
+   * @return status
+   */
+  @PreAuthorize("hasRole('CONFIGURATOR')")
+  @PostMapping(path = "/")
+  public ResponseEntity<?> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
+    appointmentService.createAppointment(appointmentDTO);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
 }

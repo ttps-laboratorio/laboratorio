@@ -1,8 +1,12 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.dto.AppointmentDTO;
+import com.ttps.laboratorio.dto.DoctorDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.BlockedDay;
+import com.ttps.laboratorio.entity.Doctor;
 import com.ttps.laboratorio.entity.ScheduleConfigurator;
+import com.ttps.laboratorio.exception.LaboratoryException;
 import com.ttps.laboratorio.repository.IAppointmentRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -66,6 +70,27 @@ public class AppointmentService {
       appointmentsFromDate.forEach(appointment -> appointmentList.removeIf(a -> a.equals(appointment.getTime())));
     }
     return appointmentList;
+  }
+
+  /**
+   * Creates new appointment.
+   * @param request appointment information
+   */
+  public void createAppointment(AppointmentDTO request) {
+    ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
+    if (request.getTime().isBefore(scheduleConfigurator.getOpeningTime())
+        || request.getTime().isAfter(scheduleConfigurator.getClosingTime())
+        || request.getTime().equals(scheduleConfigurator.getClosingTime())) {
+      throw new LaboratoryException("The appointment must be requested within business hours.");
+    }
+    List<LocalTime> availableAppointments = getAvailableAppointmentsByDate(request.getDate().getYear(), request.getDate().getMonthValue(), request.getDate().getDayOfMonth());
+    if (!availableAppointments.contains(request.getTime())) {
+      throw new LaboratoryException("Appointment not available.");
+    }
+    Appointment appointment = new Appointment();
+    appointment.setDate(request.getDate());
+    appointment.setTime(request.getTime());
+    appointmentRepository.save(appointment);
   }
 
   private void blockSaturdaysAndSundays(Calendar calendar, Integer year, Integer month, int daysInMonth, List<Boolean> freeDaysInMonth) {
