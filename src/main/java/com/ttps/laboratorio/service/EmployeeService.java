@@ -52,7 +52,7 @@ public class EmployeeService {
 
 	public EmployeeResponseDTO update(Long employeeId, EmployeeRequestDTO request) {
 		Employee employee = employeeRepository.findById(employeeId)
-				.orElseThrow(() -> new NotFoundException("A employee with the id " + employeeId + " does not exist."));
+				.orElseThrow(() -> new NotFoundException("No existe un empleado con el id " + employeeId + "."));
 		employee.setFirstName(request.getFirstName());
 		employee.setLastName(request.getLastName());
 		UserRequestDTO userDTO = request.getUser();

@@ -49,7 +49,7 @@ public class HealthInsuranceService {
    */
   public void updateHealthInsurance(Long healthInsuranceID, HealthInsuranceDTO request) {
     HealthInsurance healthInsurance = healthInsuranceRepository.findById(healthInsuranceID)
-        .orElseThrow(() -> new NotFoundException("A health insurance with the id " + healthInsuranceID + " does not exist."));
+        .orElseThrow(() -> new NotFoundException("No existe una obra social con el id " + healthInsuranceID + "."));
     healthInsurance.setName(request.getName());
     healthInsurance.setPhoneNumber(request.getPhoneNumber());
     healthInsurance.setEmail(request.getEmail());
@@ -62,7 +62,7 @@ public class HealthInsuranceService {
    */
   public void deleteHealthInsurance(Long healthInsuranceID) {
     healthInsuranceRepository.delete(healthInsuranceRepository.findById(healthInsuranceID)
-        .orElseThrow(() -> new RuntimeException("A health insurance with the id " + healthInsuranceID + " does not exist.")));
+        .orElseThrow(() -> new NotFoundException("No existe una obra social con el id " + healthInsuranceID + ".")));
   }
 
 }

@@ -52,7 +52,7 @@ public class DoctorService {
    */
   public void updateDoctor(Long doctorID, DoctorDTO request) {
     Doctor doctor = doctorRepository.findById(doctorID)
-        .orElseThrow(() -> new NotFoundException("A doctor with the id " + doctorID + " does not exist."));
+        .orElseThrow(() -> new NotFoundException("No existe un doctor con el id " + doctorID + "."));
     doctor.setFirstName(request.getFirstName());
     doctor.setLastName(request.getLastName());
     doctor.setEmail(request.getEmail());

@@ -75,16 +75,16 @@ public class AppointmentService {
     ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
     List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(request.getDate().getYear(), request.getDate().getMonthValue());
     if (!booleanMonthList.get(request.getDate().getDayOfMonth() - 1)) {
-      throw new BadRequestException("The laboratory is closed or no longer has shifts available on the selected day.");
+      throw new BadRequestException("El laboratorio está cerrado o ya no tiene turnos disponibles el día seleccionado.");
     }
     if (request.getTime().isBefore(scheduleConfigurator.getOpeningTime())
         || request.getTime().isAfter(scheduleConfigurator.getClosingTime())
         || request.getTime().equals(scheduleConfigurator.getClosingTime())) {
-      throw new BadRequestException("The appointment must be requested within business hours.");
+      throw new BadRequestException("El turno debe solicitarse dentro del horario de atencion.");
     }
     List<LocalTime> availableAppointments = getAvailableAppointmentsByDate(request.getDate().getYear(), request.getDate().getMonthValue(), request.getDate().getDayOfMonth());
     if (!availableAppointments.contains(request.getTime())) {
-      throw new BadRequestException("Appointment not available.");
+      throw new BadRequestException("Turno no disponible.");
     }
     Appointment appointment = new Appointment();
     appointment.setDate(request.getDate());
@@ -98,7 +98,7 @@ public class AppointmentService {
    */
   public void deleteAppointment(Long appointmentID) {
     appointmentRepository.delete(appointmentRepository.findById(appointmentID)
-        .orElseThrow(() -> new NotFoundException("An appointment with the id " + appointmentID + " does not exist.")));
+        .orElseThrow(() -> new NotFoundException("No existe un turno con el id " + appointmentID + ".")));
   }
 
   private List<Boolean> getBooleanFreeAppointmentDaysByMonth(Integer year, Integer month) {
