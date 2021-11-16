@@ -7,7 +7,9 @@ import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IPatientRepository;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PatientService {
 
   private final IPatientRepository patientRepository;
