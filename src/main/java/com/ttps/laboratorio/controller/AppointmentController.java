@@ -1,9 +1,10 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.AppointmentDTO;
-import com.ttps.laboratorio.dto.DateDTO;
 import com.ttps.laboratorio.service.AppointmentService;
+import java.time.LocalDate;
 import javax.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -43,8 +44,8 @@ public class AppointmentController {
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
   @GetMapping(path = "/free-appointments")
-  public ResponseEntity<?> listFreeAppointmentDaysByMonth(@Valid @RequestBody DateDTO dateDTO) {
-    return ResponseEntity.ok(appointmentService.getFreeAppointmentDaysByMonth(dateDTO.getDate().getYear(), dateDTO.getDate().getMonthValue()));
+  public ResponseEntity<?> listFreeAppointmentDaysByMonth(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    return ResponseEntity.ok(appointmentService.getFreeAppointmentDaysByMonth(date.getYear(), date.getMonthValue()));
   }
 
   /**
@@ -53,8 +54,8 @@ public class AppointmentController {
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
   @GetMapping(path = "/appointments")
-  public ResponseEntity<?> listAppointmentsByDate(@Valid @RequestBody DateDTO dateDTO) {
-    return ResponseEntity.ok(appointmentService.getAppointmentsByDate(dateDTO.getDate().getYear(), dateDTO.getDate().getMonthValue(), dateDTO.getDate().getDayOfMonth()));
+  public ResponseEntity<?> listAppointmentsByDate(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
   }
 
   /**
@@ -63,8 +64,8 @@ public class AppointmentController {
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
   @GetMapping(path = "/available-appointments")
-  public ResponseEntity<?> listAvailableAppointmentsByDate(@Valid @RequestBody DateDTO dateDTO) {
-    return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(dateDTO.getDate().getYear(), dateDTO.getDate().getMonthValue(), dateDTO.getDate().getDayOfMonth()));
+  public ResponseEntity<?> listAvailableAppointmentsByDate(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
   }
 
   /**
