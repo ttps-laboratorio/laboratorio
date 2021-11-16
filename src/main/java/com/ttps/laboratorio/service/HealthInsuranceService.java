@@ -1,12 +1,14 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.ttps.laboratorio.dto.HealthInsuranceDTO;
 import com.ttps.laboratorio.entity.HealthInsurance;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IHealthInsuranceRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
 
 @Service
 public class HealthInsuranceService {
@@ -17,6 +19,9 @@ public class HealthInsuranceService {
     this.healthInsuranceRepository = healthInsuranceRepository;
   }
 
+	public HealthInsurance getHealthInsurance(Long id) {
+		return this.healthInsuranceRepository.findById(id).orElseThrow();
+	}
   /**
    * Gets all health insurances registered.
    * @return List of all the health insurances

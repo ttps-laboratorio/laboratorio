@@ -76,4 +76,9 @@ public class Patient implements Serializable {
 
 	@OneToMany(mappedBy = "patient", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Study> studies;
+
+	public boolean addStudy(Study study) {
+		study.setPatient(this);
+		return studies.add(study);
+	}
 }

@@ -19,6 +19,7 @@
 		<postgres.version>42.2.24</postgres.version>
 		<jjwt.version>0.9.1</jjwt.version>
 		<validation-api.version>2.0.1.Final</validation-api.version>
+		<modelmapper.version>2.4.2</modelmapper.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -52,7 +53,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-<!-- 			<version>${postgresql.version}</version> -->
+			<!-- <version>${postgresql.version}</version> -->
 		</dependency>
 
 		<dependency>
@@ -76,9 +77,13 @@
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-<!-- 			<version>${validation-api.version}</version> -->
+			<!-- <version>${validation-api.version}</version> -->
 		</dependency>
-
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>${modelmapper.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

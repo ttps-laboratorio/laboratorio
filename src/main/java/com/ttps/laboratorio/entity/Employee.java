@@ -2,6 +2,7 @@ package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,6 +47,6 @@ public class Employee implements Serializable {
 	@Column(name = "last_name", unique = true, nullable = false)
 	protected String lastName;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	protected User user;
 }

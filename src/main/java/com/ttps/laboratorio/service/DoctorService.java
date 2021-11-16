@@ -1,12 +1,14 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.ttps.laboratorio.dto.DoctorDTO;
 import com.ttps.laboratorio.entity.Doctor;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IDoctorRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
 
 @Service
 public class DoctorService {
@@ -16,6 +18,10 @@ public class DoctorService {
   public DoctorService (IDoctorRepository doctorRepository) {
     this.doctorRepository = doctorRepository;
   }
+
+	public Doctor getDoctor(Long id) {
+		return this.doctorRepository.findById(id).orElseThrow();
+	}
 
   /**
    * Gets all doctors registered.
