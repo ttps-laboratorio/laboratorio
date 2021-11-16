@@ -2,8 +2,6 @@ package com.ttps.laboratorio.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,15 +14,10 @@ import org.springframework.validation.annotation.Validated;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppointmentDTO {
+public class DateDTO {
 
-  @NotNull(message = "Appointment date is required")
+  @NotNull(message = "Date is required")
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Argentina/Buenos_Aires")
-  @FutureOrPresent(message = "The date entered must be later than the current one")
   private LocalDate date;
-
-  @NotNull(message = "Appointment time is required")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "America/Argentina/Buenos_Aires")
-  private LocalTime time;
 
 }

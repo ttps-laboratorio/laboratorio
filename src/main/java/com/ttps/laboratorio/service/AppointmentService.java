@@ -1,12 +1,11 @@
 package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.dto.AppointmentDTO;
-import com.ttps.laboratorio.dto.DoctorDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.BlockedDay;
-import com.ttps.laboratorio.entity.Doctor;
 import com.ttps.laboratorio.entity.ScheduleConfigurator;
-import com.ttps.laboratorio.exception.LaboratoryException;
+import com.ttps.laboratorio.exception.BadRequestException;
+import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IAppointmentRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -42,19 +41,15 @@ public class AppointmentService {
     return new ArrayList<>(appointmentRepository.findAll());
   }
 
-  public List<Boolean> getFreeAppointmentDaysByMonth(Integer year, Integer month) {
-    int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
-    List<Boolean> freeDaysInMonth = new ArrayList<>(Arrays.asList(new Boolean[daysInMonth]));
-    Collections.fill(freeDaysInMonth, Boolean.TRUE);
-    Calendar calendar = Calendar.getInstance();
-    // filters weekends
-    blockSaturdaysAndSundays(calendar, year, month, daysInMonth, freeDaysInMonth);
-    List<BlockedDay> blockedDaysFromMonth = blockedDayService.getBlockedDaysByMonth(month);
-    // filters blocked days
-    blockedDaysFromMonth.forEach(blockedDay -> blockBlockedDays(blockedDay, freeDaysInMonth));
-    // filters appointment full days
-    blockAppointmentFullDays(calendar, year, month, daysInMonth, freeDaysInMonth);
-    return freeDaysInMonth;
+  public List<LocalDate> getFreeAppointmentDaysByMonth(Integer year, Integer month) {
+    List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(year, month);
+    List<LocalDate> freeAppointmentDaysByMonth = new ArrayList<>();
+    for (int i = 0; i < booleanMonthList.size(); i++) {
+      if (booleanMonthList.get(i)) {
+        freeAppointmentDaysByMonth.add(LocalDate.of(year, month, i+1));
+      }
+    }
+    return freeAppointmentDaysByMonth;
   }
 
   public List<Appointment> getAppointmentsByDate(Integer year, Integer month, Integer day) {
@@ -78,19 +73,47 @@ public class AppointmentService {
    */
   public void createAppointment(AppointmentDTO request) {
     ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
+    List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(request.getDate().getYear(), request.getDate().getMonthValue());
+    if (!booleanMonthList.get(request.getDate().getDayOfMonth() - 1)) {
+      throw new BadRequestException("The laboratory is closed or no longer has shifts available on the selected day.");
+    }
     if (request.getTime().isBefore(scheduleConfigurator.getOpeningTime())
         || request.getTime().isAfter(scheduleConfigurator.getClosingTime())
         || request.getTime().equals(scheduleConfigurator.getClosingTime())) {
-      throw new LaboratoryException("The appointment must be requested within business hours.");
+      throw new BadRequestException("The appointment must be requested within business hours.");
     }
     List<LocalTime> availableAppointments = getAvailableAppointmentsByDate(request.getDate().getYear(), request.getDate().getMonthValue(), request.getDate().getDayOfMonth());
     if (!availableAppointments.contains(request.getTime())) {
-      throw new LaboratoryException("Appointment not available.");
+      throw new BadRequestException("Appointment not available.");
     }
     Appointment appointment = new Appointment();
     appointment.setDate(request.getDate());
     appointment.setTime(request.getTime());
     appointmentRepository.save(appointment);
+  }
+
+  /**
+   * Deletes a appointment.
+   * @param appointmentID id from the appointment to delete
+   */
+  public void deleteAppointment(Long appointmentID) {
+    appointmentRepository.delete(appointmentRepository.findById(appointmentID)
+        .orElseThrow(() -> new NotFoundException("An appointment with the id " + appointmentID + " does not exist.")));
+  }
+
+  private List<Boolean> getBooleanFreeAppointmentDaysByMonth(Integer year, Integer month) {
+    int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+    List<Boolean> freeDaysInMonth = new ArrayList<>(Arrays.asList(new Boolean[daysInMonth]));
+    Collections.fill(freeDaysInMonth, Boolean.TRUE);
+    Calendar calendar = Calendar.getInstance();
+    // filters weekends
+    blockSaturdaysAndSundays(calendar, year, month, daysInMonth, freeDaysInMonth);
+    List<BlockedDay> blockedDaysFromMonth = blockedDayService.getBlockedDaysByMonth(month);
+    // filters blocked days
+    blockedDaysFromMonth.forEach(blockedDay -> blockBlockedDays(blockedDay, freeDaysInMonth));
+    // filters appointment full days
+    blockAppointmentFullDays(calendar, year, month, daysInMonth, freeDaysInMonth);
+    return freeDaysInMonth;
   }
 
   private void blockSaturdaysAndSundays(Calendar calendar, Integer year, Integer month, int daysInMonth, List<Boolean> freeDaysInMonth) {
