@@ -22,6 +22,18 @@ INSERT INTO public.study_statuses (name,num_order) VALUES ('Esperando interpreta
 INSERT INTO public.study_statuses (name,num_order) VALUES ('Esperando ser entregado a médico derivante',10);
 INSERT INTO public.study_statuses (name,num_order) VALUES ('Resultado entregado',11);
 
+UPDATE public.study_statuses SET next_id=2 WHERE id=1;
+UPDATE public.study_statuses SET next_id=3,previous_id=1 WHERE id=2;
+UPDATE public.study_statuses SET next_id=4,previous_id=2 WHERE id=3;
+UPDATE public.study_statuses SET next_id=5,previous_id=3 WHERE id=4;
+UPDATE public.study_statuses SET next_id=6,previous_id=4 WHERE id=5;
+UPDATE public.study_statuses SET next_id=7,previous_id=5 WHERE id=6;
+UPDATE public.study_statuses SET next_id=8,previous_id=6 WHERE id=7;
+UPDATE public.study_statuses SET next_id=9,previous_id=7 WHERE id=8;
+UPDATE public.study_statuses SET next_id=10,previous_id=8 WHERE id=9;
+UPDATE public.study_statuses SET next_id=11,previous_id=9 WHERE id=10;
+UPDATE public.study_statuses SET previous_id=10 WHERE id=11;
+
 INSERT INTO public.presumptive_diagnoses (description) VALUES ('Acidez de estómago');
 INSERT INTO public.presumptive_diagnoses (description) VALUES ('Acné');
 INSERT INTO public.presumptive_diagnoses (description) VALUES ('Acúfenos');
