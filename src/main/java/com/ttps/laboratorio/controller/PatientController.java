@@ -26,7 +26,7 @@ public class PatientController {
     this.patientService = patientService;
   }
 
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+  @PreAuthorize("hasRole('EMPLOYEE')")
   @GetMapping("/{id}")
   public ResponseEntity<Patient> getPatient(@PathVariable(name = "id") @NonNull Long patientId) {
     Patient patient = patientService.getPatient(patientId);
@@ -37,7 +37,7 @@ public class PatientController {
    * View a list of all patients.
    * @return  Returns a list of all patients with "200 OK".
    */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+  @PreAuthorize("hasRole('EMPLOYEE')")
   @GetMapping()
   public ResponseEntity<?> listPatients() {
     return ResponseEntity.ok(patientService.getAllPatients());
@@ -48,7 +48,7 @@ public class PatientController {
    * @param patientDTO patient information
    * @return status
    */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+  @PreAuthorize("hasRole('EMPLOYEE')")
   @PostMapping()
   public ResponseEntity<?> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
     patientService.createPatient(patientDTO);
@@ -60,7 +60,7 @@ public class PatientController {
    * @param patientDTO patient information
    * @return status
    */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+  @PreAuthorize("hasRole('EMPLOYEE')")
   @PutMapping("/{id}")
   public ResponseEntity<?> updatePatient(@PathVariable(name = "id") @NonNull Long patientID,
                                         @Valid @RequestBody @NonNull PatientDTO patientDTO) {
