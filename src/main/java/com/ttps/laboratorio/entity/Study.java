@@ -59,8 +59,7 @@ public class Study implements Serializable {
 	@Column(name = "paid_extraction_amount")
 	private Boolean paidExtractionAmount;
 
-	@Column(name = "final_report")
-	@OneToOne(optional = true)
+	@OneToOne(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private FinalReport finalReport;
 
 	/**

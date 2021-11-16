@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.ExceptionDTO;
+import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,5 +68,13 @@ public class RESTControllerAdvice {
         }});
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    private ResponseEntity<?> generalBadRequestExceptionHandler(BadRequestException e) {
+      e.printStackTrace();
+      return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO() {{
+        this.setName(e.getClass().getSimpleName());
+        this.setMessage(e.getMessage());
+      }});
+    }
 
 }
