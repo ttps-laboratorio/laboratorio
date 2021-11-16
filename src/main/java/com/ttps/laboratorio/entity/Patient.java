@@ -48,6 +48,10 @@ public class Patient implements Serializable {
 	private Long id;
 
 	@NotNull
+	@Column(name = "dni", length = 10, nullable = false)
+	private String dni;
+
+	@NotNull
 	@Column(name = "first_name", length = 50, nullable = false)
 	private String firstName;
 
@@ -64,10 +68,10 @@ public class Patient implements Serializable {
 	@Column(name = "clinic_history")
 	private String clinicHistory;
 
-	@Column(name = "afiliate_number")
-	private String afiliateNumber;
+	@Column(name = "affiliate_number")
+	private String affiliateNumber;
 
-	@OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, optional = true, cascade = CascadeType.ALL)
+	@OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
 	private Contact contact;
 
 	@ManyToOne(fetch = FetchType.EAGER)
