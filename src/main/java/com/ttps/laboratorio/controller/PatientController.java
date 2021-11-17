@@ -1,8 +1,10 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.PatientDTO;
+import com.ttps.laboratorio.dto.StudyDTO;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.service.PatientService;
+import com.ttps.laboratorio.service.StudyService;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +24,11 @@ public class PatientController {
 
   private final PatientService patientService;
 
-  public PatientController(PatientService patientService) {
+  private final StudyService studyService;
+
+  public PatientController(PatientService patientService, StudyService studyService) {
     this.patientService = patientService;
+    this.studyService = studyService;
   }
 
   @PreAuthorize("hasRole('EMPLOYEE')")
@@ -66,6 +71,19 @@ public class PatientController {
                                         @Valid @RequestBody @NonNull PatientDTO patientDTO) {
     patientService.updatePatient(patientID, patientDTO);
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  /**
+   * Registers a new Study on the database.
+   * @param studyDTO study information
+   * @return status
+   */
+  @PreAuthorize("hasRole('EMPLOYEE')")
+  @PostMapping("/{id}/study")
+  public ResponseEntity<?> createStudy(@PathVariable(name = "id") @NonNull Long patientID,
+                                       @Valid @RequestBody StudyDTO studyDTO) {
+    studyService.createStudy(patientID, studyDTO);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
 }

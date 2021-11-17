@@ -57,7 +57,7 @@ public class Study implements Serializable {
 	private BigDecimal extractionAmount;
 
 	@Column(name = "paid_extraction_amount")
-	private Boolean paidExtractionAmount;
+	private Boolean paidExtractionAmount = false;
 
 	@OneToOne(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private FinalReport finalReport;
@@ -66,7 +66,7 @@ public class Study implements Serializable {
 	 * Maybe this has to be deleted and calculated.
 	 */
 	@Column(name = "delayed")
-	private Boolean delayed;
+	private Boolean delayed = false;
 
 	/**
 	 * A study has one patient and a patient may have many studies

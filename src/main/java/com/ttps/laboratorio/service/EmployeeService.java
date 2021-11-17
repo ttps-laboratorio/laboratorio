@@ -64,4 +64,8 @@ public class EmployeeService {
 		return new ModelMapper().map(employee, EmployeeResponseDTO.class);
 	}
 
+	public Employee getByUser(User user) {
+		return this.employeeRepository.findByUser(user);
+	}
+
 }
