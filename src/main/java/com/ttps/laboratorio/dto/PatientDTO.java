@@ -1,14 +1,15 @@
 package com.ttps.laboratorio.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Validated
 @Getter
@@ -17,14 +18,18 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PatientDTO {
 
+    @NotBlank(message = "Patient dni is required")
+    private String dni;
+
     @NotBlank(message = "Patient name is required")
     private String firstName;
 
     @NotBlank(message = "Patient lastname is required")
     private String lastName;
 
-    @NotNull(message = "Patient birthdate is required")
-    private LocalDate birthDate;
+    @NotNull(message = "Patient birth date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Argentina/Buenos_Aires")
+    private LocalDate birthDate;  
 
     @NotBlank(message = "Patient clinic history is required")
     private String clinicHistory;
@@ -35,10 +40,11 @@ public class PatientDTO {
 
     private HealthInsuranceDTO healthInsurance;
 
-    private StudyDTO studies;
+    
 
 
 
 
 
 }
+

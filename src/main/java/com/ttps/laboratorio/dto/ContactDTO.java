@@ -20,7 +20,7 @@ public class ContactDTO {
     private String name;
 
     @NotNull(message = "Contact phone number is required")
-    private Integer phoneNumber;
+    private String phoneNumber;
 
     @NotBlank(message = "Contact email is required")
     private String email;

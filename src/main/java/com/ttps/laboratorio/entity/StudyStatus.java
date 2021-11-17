@@ -45,7 +45,7 @@ public class StudyStatus implements Serializable {
 	@Column(name = "num_order", nullable = false)
 	private Integer order;
 
-	// TODO: maybe this is not necesary
+	// TODO: maybe this is not necessary
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "next_id", referencedColumnName = "id")
 	private StudyStatus next;

@@ -22,7 +22,7 @@ public class StudyController {
      * View a list of all studies.
      * @return  Returns a list of all studies with "200 OK".
      */
-    @PreAuthorize("hasRole('CONFIGURATOR')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping
     public ResponseEntity<?> listStudies() {
         return ResponseEntity.ok(studyService.getAllStudies());

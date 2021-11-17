@@ -28,7 +28,7 @@ public class StudyDTO {
 
     private Boolean paidExtractionAmount;
 
-    private Boolean positiveResult;
+    //private Boolean positiveResult;
 
     private Boolean delay;
 
@@ -45,7 +45,7 @@ public class StudyDTO {
     @NotNull(message = "Study's presumptive diagnosis is required")
     private PresumptiveDiagnosisDTO presumptiveDiagnosis;
 
-    private Sample sample;
+    private SampleDTO sample;
 
     //checkpoints que no sé
 

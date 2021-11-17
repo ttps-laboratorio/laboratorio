@@ -15,6 +15,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "patient")
@@ -33,7 +40,7 @@ public class PatientController {
      *
      * @return Returns a list of all patients with "200 OK".
      */
-    @PreAuthorize("hasRole('CONFIGURATOR')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping
     public ResponseEntity<?> listPatients() {
         return ResponseEntity.ok(patientService.getAllPatients());
@@ -45,7 +52,7 @@ public class PatientController {
      * @param patientDTO patient information
      * @return status
      */
-    @PreAuthorize("hasRole('CONFIGURATOR')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping
     public ResponseEntity<?> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
         patientService.createPatient(patientDTO);
@@ -58,7 +65,7 @@ public class PatientController {
      * @param patientDTO patient information
      * @return status
      */
-    @PreAuthorize("hasRole('CONFIGURATOR')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping
     public ResponseEntity<?> updatePatient(@RequestParam(name = "patientId") @NonNull Long patientID, @Valid @RequestBody @NonNull PatientDTO patientDTO) {
         patientService.updatePatient(patientID, patientDTO);
@@ -71,7 +78,7 @@ public class PatientController {
      * @param request Study information
      * @return status
      */
-    @PreAuthorize("hasRole('CONFIGURATOR')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping(path = "/{patientID}/study")
     public ResponseEntity<?> createStudy(@PathVariable long patientID, @Valid @RequestBody StudyDTO request) {
         patientService.createStudy(patientID, request);

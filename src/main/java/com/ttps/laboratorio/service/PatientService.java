@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.ttps.laboratorio.repository.IPatientRepository;
 
 @Service
 public class PatientService {
@@ -25,8 +26,6 @@ public class PatientService {
   ContactService contactService;
   @Autowired
   IStudyTypeRepository studyTypeRepository;
-  @Autowired
-  HealthInsuranceService healthInsuranceService;
 
   @Autowired
   private IStudyRepository studyRepository;
@@ -37,6 +36,10 @@ public class PatientService {
 
   public PatientService (IPatientRepository patientRepository) {
     this.patientRepository = patientRepository;
+  }
+
+  public Patient getPatient(Long id) {
+    return this.patientRepository.findById(id).orElseThrow();
   }
 
   /**
@@ -59,7 +62,8 @@ public class PatientService {
     patient.setClinicHistory(request.getClinicHistory());
     patient.setAffiliateNumber(request.getAffiliateNumber());
     patient.setContact(contactService.createContact(request.getContact()));
-    patient.setHealthInsurance(healthInsuranceService.createHealthInsurance(request.getHealthInsurance()));
+    patient.setHealthInsurance(healthInsuranceRepository.findById(request.getHealthInsurance().getId())
+            .orElseThrow(() -> new NotFoundException("A health insurance with the id " + request.getHealthInsurance().getId() + " does not exist.")));
     patientRepository.save(patient);
   }
 
@@ -77,7 +81,8 @@ public class PatientService {
     patient.setClinicHistory(request.getClinicHistory());
     patient.setAffiliateNumber(request.getAffiliateNumber());
     patient.setContact(contactService.createContact(request.getContact()));
-    patient.setHealthInsurance(healthInsuranceRepository.findById(patient.getHealthInsurance().getId()).orElseThrow(() -> new NotFoundException("A Health Insurance with the id " + patient.getHealthInsurance().getId() + " does not exist.")));
+    patient.setHealthInsurance(healthInsuranceRepository.findById(request.getHealthInsurance().getId())
+            .orElseThrow(() -> new NotFoundException("A health insurance with the id " + request.getHealthInsurance().getId() + " does not exist.")));
     patientRepository.save(patient);
   }
 
@@ -94,7 +99,7 @@ public class PatientService {
     study.setBudget(request.getBudget());
     study.setExtractionAmount(request.getExtractionAmount());
     study.setPaidExtractionAmount(request.getPaidExtractionAmount());
-    study.setPositiveResult(request.getPositiveResult());
+    //study.setPositiveResult(request.getPositiveResult());
     study.setDelay(request.getDelay());
     study.setPatient(patient);
     study.setType(studyTypeRepository.findById(request.getType().getId())

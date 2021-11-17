@@ -42,9 +42,10 @@ public class Contact implements Serializable {
 
 	@NotNull
 	@Column(name = "phone_number", nullable = false)
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@NotNull
 	@Column(name = "email", length = 30, nullable = false)
 	private String email;
+
 }

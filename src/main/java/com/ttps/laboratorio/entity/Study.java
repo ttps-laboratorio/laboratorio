@@ -7,10 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +46,7 @@ public class Study implements Serializable {
 	private Long id;
 
 	@Column(name = "created_at")
-	private LocalDateTime created_at;
+	private LocalDateTime created_at = LocalDateTime.now();
 
 	@NotNull
 	@Column(name = "budget", nullable = false)
@@ -51,8 +59,8 @@ public class Study implements Serializable {
 	@Column(name = "paid_extraction_amount")
 	private Boolean paidExtractionAmount;
 
-	@Column(name = "positive_result")
-	private Boolean positiveResult;
+	@OneToOne(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private FinalReport finalReport;
 
 	/**
 	 * Maybe this has to be deleted and calculated.
@@ -67,7 +75,7 @@ public class Study implements Serializable {
 	private Patient patient;
 
 	/**
-	 * A study has one appointment
+	 * A study may have one appointment
 	 */
 	@OneToOne(optional = true)
 	private Appointment appointment;
