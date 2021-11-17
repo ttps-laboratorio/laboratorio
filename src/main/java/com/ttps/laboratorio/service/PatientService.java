@@ -1,18 +1,25 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.ttps.laboratorio.dto.PatientDTO;
 import com.ttps.laboratorio.dto.StudyDTO;
 import com.ttps.laboratorio.entity.Contact;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
-import com.ttps.laboratorio.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.ttps.laboratorio.repository.IDoctorRepository;
+import com.ttps.laboratorio.repository.IExtractionistRepository;
+import com.ttps.laboratorio.repository.IHealthInsuranceRepository;
 import com.ttps.laboratorio.repository.IPatientRepository;
+import com.ttps.laboratorio.repository.IPresumptiveDiagnosisRepository;
+import com.ttps.laboratorio.repository.IStudyRepository;
+import com.ttps.laboratorio.repository.IStudyTypeRepository;
 
 @Service
 public class PatientService {
@@ -51,25 +58,31 @@ public class PatientService {
     return new ArrayList<>(patientRepository.findAll());
   }
 
-  /**
-   * Creates new patient.
-   * @param request patient information
-   */
-  public void createPatient(PatientDTO request) {
-    Patient patient = new Patient();
-    setPatient(patient, request);
-  }
+	/**
+	 * Creates new patient.
+	 * 
+	 * @param request patient information
+	 */
+	public void createPatient(PatientDTO request) {
+		if (patientRepository.existsByDni(request.getDni()))
+			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
+		Patient patient = new Patient();
+		setPatient(patient, request);
+	}
 
-  /**
-   * Updates an existing patient.
-   * @param patientID id from the patient to search
-   * @param request new data to change
-   */
-  public void updatePatient(Long patientID, PatientDTO request) {
-    Patient patient = patientRepository.findById(patientID)
-        .orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + patientID + "."));
-    setPatient(patient, request);
-  }
+	/**
+	 * Updates an existing patient.
+	 * 
+	 * @param patientID id from the patient to search
+	 * @param request   new data to change
+	 */
+	public void updatePatient(Long patientID, PatientDTO request) {
+		Patient patient = patientRepository.findById(patientID)
+				.orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + patientID + "."));
+		if (patientRepository.existsByDniAndIdNot(request.getDni(), patientID))
+			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
+		setPatient(patient, request);
+	}
 
   private void setPatient(Patient patient, PatientDTO request) {
     Contact contact = new Contact();
@@ -113,8 +126,9 @@ public class PatientService {
     study.setPresumptiveDiagnosis(presumptiveDiagnosisRepository.findById(request.getPresumptiveDiagnosis().getId())
             .orElseThrow(() -> new NotFoundException("A presumptive diagnosis with the id " + request.getPresumptiveDiagnosis().getId() + " does not exist.")));
     // Tema de samples y sample batch ?????????
-    studyRepository.save(study);
+	// studyRepository.save(study);
     patient.addStudy(study); //Necesario?
+	patientRepository.save(patient);
 
 
   }
