@@ -52,9 +52,9 @@ public class PatientService {
 
   private void setPatient(Patient patient, PatientDTO request) {
     Contact contact = new Contact();
-    contact.setName(request.getContactName());
-    contact.setEmail(request.getContactEmail());
-    contact.setPhoneNumber(request.getContactPhoneNumber());
+    contact.setName(request.getContact().getName());
+    contact.setEmail(request.getContact().getEmail());
+    contact.setPhoneNumber(request.getContact().getPhoneNumber());
     patient.setDni(request.getDni());
     patient.setFirstName(request.getFirstName());
     patient.setLastName(request.getLastName());
