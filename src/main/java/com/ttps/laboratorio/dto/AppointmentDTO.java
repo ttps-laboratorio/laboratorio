@@ -22,13 +22,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AppointmentDTO {
 
-  @NotNull(message = "Appointment date is required")
+	@NotNull(message = "Appointment date is required")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, timezone = "America/Argentina/Buenos_Aires")
-  @FutureOrPresent(message = "The date entered must be later than the current one")
-  private LocalDate date;
+	@FutureOrPresent(message = "The date entered must be later than the current one")
+	private LocalDate date;
 
-  @NotNull(message = "Appointment time is required")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "America/Argentina/Buenos_Aires")
-  private LocalTime time;
+	@NotNull(message = "Appointment time is required")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "America/Argentina/Buenos_Aires")
+	private LocalTime time;
 
 }

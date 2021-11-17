@@ -16,16 +16,16 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class HealthInsuranceDTO {
 
-  @NotNull(message = "Health insurance id is required")
-  private long id;
+	@NotNull(message = "Health insurance id is required")
+	private long id;
 
-  @NotBlank(message = "Health insurance name is required")
-  private String name;
+	@NotBlank(message = "Health insurance name is required")
+	private String name;
 
-  @NotBlank(message = "Health insurance phone number is required")
-  private String phoneNumber;
+	@NotBlank(message = "Health insurance phone number is required")
+	private String phoneNumber;
 
-  @NotBlank(message = "Health insurance email is required")
-  private String email;
+	@NotBlank(message = "Health insurance email is required")
+	private String email;
 
 }

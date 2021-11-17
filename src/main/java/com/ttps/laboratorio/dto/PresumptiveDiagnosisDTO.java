@@ -16,9 +16,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PresumptiveDiagnosisDTO {
 
-    private long id;
+	private long id;
 
-    @NotNull(message = "Diagnosis description is required")
-    private String description;
+	@NotNull(message = "Diagnosis description is required")
+	private String description;
 
 }

@@ -18,36 +18,35 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class StudyDTO {
 
-    private LocalDateTime created_at;
+	private LocalDateTime created_at;
 
-    @NotNull(message = "Study budget is required")
-    private BigDecimal budget;
+	@NotNull(message = "Study budget is required")
+	private BigDecimal budget;
 
-    @NotNull(message = "Study's extraction amount is required")
-    private BigDecimal extractionAmount;
+	@NotNull(message = "Study's extraction amount is required")
+	private BigDecimal extractionAmount;
 
-    private Boolean paidExtractionAmount;
+	private Boolean paidExtractionAmount;
 
-    //private Boolean positiveResult;
+	// private Boolean positiveResult;
 
-    private Boolean delay;
+	private Boolean delay;
 
-    private PatientDTO patient;
+	private PatientDTO patient;
 
-    private AppointmentDTO appointment;
+	private AppointmentDTO appointment;
 
-    private DoctorDTO referringDoctor;
+	private DoctorDTO referringDoctor;
 
-    private StudyTypeDTO type;
+	private StudyTypeDTO type;
 
-    private ExtractionistDTO extractionist;
+	private ExtractionistDTO extractionist;
 
-    @NotNull(message = "Study's presumptive diagnosis is required")
-    private PresumptiveDiagnosisDTO presumptiveDiagnosis;
+	@NotNull(message = "Study's presumptive diagnosis is required")
+	private PresumptiveDiagnosisDTO presumptiveDiagnosis;
 
-    private SampleDTO sample;
+	private SampleDTO sample;
 
-    //checkpoints que no sé
-
+	// checkpoints que no sé
 
 }

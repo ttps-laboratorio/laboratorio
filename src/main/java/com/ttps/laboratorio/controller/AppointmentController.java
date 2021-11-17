@@ -21,70 +21,81 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "appointment")
 public class AppointmentController {
 
-  private final AppointmentService appointmentService;
+	private final AppointmentService appointmentService;
 
-  public AppointmentController (AppointmentService appointmentService) {
-    this.appointmentService = appointmentService;
-  }
+	public AppointmentController(AppointmentService appointmentService) {
+		this.appointmentService = appointmentService;
+	}
 
-  /**
-   * View a list of all appointments.
-   * @return  Returns a list of all appointments with "200 OK".
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/")
-  public ResponseEntity<?> listAppointments() {
-    return ResponseEntity.ok(appointmentService.getAllAppointments());
-  }
+	/**
+	 * View a list of all appointments.
+	 * 
+	 * @return Returns a list of all appointments with "200 OK".
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@GetMapping(path = "/")
+	public ResponseEntity<?> listAppointments() {
+		return ResponseEntity.ok(appointmentService.getAllAppointments());
+	}
 
-  /**
-   * Returns a boolean list, where each index represents a day of the month.
-   * If index 5 is false then an appointment can not be scheduled on that day.
-   * @return  Returns a list of all appointments with "200 OK".
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/free-appointments/{date}")
-  public ResponseEntity<?> listFreeAppointmentDaysByMonth(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-    return ResponseEntity.ok(appointmentService.getFreeAppointmentDaysByMonth(date.getYear(), date.getMonthValue()));
-  }
+	/**
+	 * Returns a boolean list, where each index represents a day of the month. If
+	 * index 5 is false then an appointment can not be scheduled on that day.
+	 * 
+	 * @return Returns a list of all appointments with "200 OK".
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@GetMapping(path = "/free-appointments/{date}")
+	public ResponseEntity<?> listFreeAppointmentDaysByMonth(
+			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+		return ResponseEntity
+				.ok(appointmentService.getFreeAppointmentDaysByMonth(date.getYear(), date.getMonthValue()));
+	}
 
-  /**
-   * Returns a list of the appointments of a day.
-   * @return  Returns a list of all appointments with "200 OK".
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/appointments/{date}")
-  public ResponseEntity<?> listAppointmentsByDate(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-    return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
-  }
+	/**
+	 * Returns a list of the appointments of a day.
+	 * 
+	 * @return Returns a list of all appointments with "200 OK".
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@GetMapping(path = "/appointments/{date}")
+	public ResponseEntity<?> listAppointmentsByDate(
+			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+		return ResponseEntity.ok(
+				appointmentService.getAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
+	}
 
-  /**
-   * Returns a list of the available appointments of a day.
-   * @return  Returns a list of all appointments with "200 OK".
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/available-appointments/{date}")
-  public ResponseEntity<?> listAvailableAppointmentsByDate(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-    return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
-  }
+	/**
+	 * Returns a list of the available appointments of a day.
+	 * 
+	 * @return Returns a list of all appointments with "200 OK".
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@GetMapping(path = "/available-appointments/{date}")
+	public ResponseEntity<?> listAvailableAppointmentsByDate(
+			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+		return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(),
+				date.getDayOfMonth()));
+	}
 
-  /**
-   * Registers a new Appointment on the database.
-   * @param appointmentDTO appointment information
-   * @return status
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @PostMapping(path = "/")
-  public ResponseEntity<?> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
-    appointmentService.createAppointment(appointmentDTO);
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
+	/**
+	 * Registers a new Appointment on the database.
+	 * 
+	 * @param appointmentDTO appointment information
+	 * @return status
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PostMapping(path = "/")
+	public ResponseEntity<?> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
+		appointmentService.createAppointment(appointmentDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
 
-  @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @DeleteMapping(path = "/{id}")
-  public ResponseEntity<?> deleteAppointment(@PathVariable(name = "id") @NonNull Long appointmentID) {
-    appointmentService.deleteAppointment(appointmentID);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<?> deleteAppointment(@PathVariable(name = "id") @NonNull Long appointmentID) {
+		appointmentService.deleteAppointment(appointmentID);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
 }

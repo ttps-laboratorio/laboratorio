@@ -15,11 +15,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class StudyTypeDTO {
 
-    @NotNull(message = "Study type id is required")
-    private long id;
+	@NotNull(message = "Study type id is required")
+	private long id;
 
-    @NotNull(message = "Study type name is required")
-    private String name;
+	@NotNull(message = "Study type name is required")
+	private String name;
 
-    private String consent;
+	private String consent;
 }

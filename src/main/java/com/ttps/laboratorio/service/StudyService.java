@@ -15,22 +15,21 @@ import java.util.List;
 @Service
 public class StudyService {
 
-  @Autowired
-  private IPatientRepository patientRepository;
-  private final IStudyRepository studyRepository;
+	@Autowired
+	private IPatientRepository patientRepository;
+	private final IStudyRepository studyRepository;
 
-  public StudyService(IStudyRepository studyRepository) {
-    this.studyRepository = studyRepository;
-  }
+	public StudyService(IStudyRepository studyRepository) {
+		this.studyRepository = studyRepository;
+	}
 
-  /**
-   * Gets all studies registered.
-   *
-   * @return List of all the studies
-   */
-  public List<Study> getAllStudies() {
-    return new ArrayList<>(studyRepository.findAll());
-  }
-
+	/**
+	 * Gets all studies registered.
+	 *
+	 * @return List of all the studies
+	 */
+	public List<Study> getAllStudies() {
+		return new ArrayList<>(studyRepository.findAll());
+	}
 
 }

@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                          package com.ttps.laboratorio.entity;
+package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -11,8 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.sun.istack.NotNull;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

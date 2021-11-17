@@ -17,9 +17,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -83,7 +83,7 @@ public class Patient implements Serializable {
 	@JsonIgnore
 	private List<Study> studies;
 
-	public boolean addStudy(Study study){
+	public boolean addStudy(Study study) {
 		study.setPatient(this);
 		return studies.add(study);
 	}

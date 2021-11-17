@@ -16,14 +16,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ContactDTO {
 
-    @NotBlank(message = "Contact name is required")
-    private String name;
+	@NotBlank(message = "Contact name is required")
+	private String name;
 
-    @NotNull(message = "Contact phone number is required")
-    private String phoneNumber;
+	@NotNull(message = "Contact phone number is required")
+	private String phoneNumber;
 
-    @NotBlank(message = "Contact email is required")
-    private String email;
-
+	@NotBlank(message = "Contact email is required")
+	private String email;
 
 }

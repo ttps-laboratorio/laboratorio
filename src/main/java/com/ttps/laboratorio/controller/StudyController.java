@@ -12,20 +12,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "study")
 public class StudyController {
 
-    private final StudyService studyService;
+	private final StudyService studyService;
 
-    public StudyController(StudyService studyService) {
-        this.studyService = studyService;
-    }
+	public StudyController(StudyService studyService) {
+		this.studyService = studyService;
+	}
 
-    /**
-     * View a list of all studies.
-     * @return  Returns a list of all studies with "200 OK".
-     */
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping
-    public ResponseEntity<?> listStudies() {
-        return ResponseEntity.ok(studyService.getAllStudies());
-    }
+	/**
+	 * View a list of all studies.
+	 * 
+	 * @return Returns a list of all studies with "200 OK".
+	 */
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping
+	public ResponseEntity<?> listStudies() {
+		return ResponseEntity.ok(studyService.getAllStudies());
+	}
 
 }

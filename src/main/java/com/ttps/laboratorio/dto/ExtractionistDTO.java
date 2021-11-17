@@ -15,9 +15,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ExtractionistDTO {
 
-    protected Long id;
+	protected Long id;
 
-    @NotNull(message = "Extractionist full name is required")
-    protected String fullname;
+	@NotNull(message = "Extractionist full name is required")
+	protected String fullname;
 
 }

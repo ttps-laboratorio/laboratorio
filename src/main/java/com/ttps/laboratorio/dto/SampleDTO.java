@@ -18,17 +18,14 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class SampleDTO {
 
-    @NotNull(message = "Sample's mililiters are required")
-    private Double mililiters;
+	@NotNull(message = "Sample's mililiters are required")
+	private Double mililiters;
 
-    @NotNull(message = "Sample's mililiters are required")
-    private Integer freezer;
+	@NotNull(message = "Sample's mililiters are required")
+	private Integer freezer;
 
-    private long study;
+	private long study;
 
-    private long sampleBatch;
-
-
-
+	private long sampleBatch;
 
 }

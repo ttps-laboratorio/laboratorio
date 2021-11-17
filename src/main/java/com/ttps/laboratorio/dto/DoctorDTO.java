@@ -16,21 +16,21 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class DoctorDTO {
 
-  private long id;
+	private long id;
 
-  @NotBlank(message = "Doctor first name is required")
-  private String firstName;
+	@NotBlank(message = "Doctor first name is required")
+	private String firstName;
 
-  @NotBlank(message = "Doctor last name is required")
-  private String lastName;
+	@NotBlank(message = "Doctor last name is required")
+	private String lastName;
 
-  @NotBlank(message = "Doctor email is required")
-  @Email(message = "Invalid email")
-  private String email;
+	@NotBlank(message = "Doctor email is required")
+	@Email(message = "Invalid email")
+	private String email;
 
-  private String phoneNumber;
+	private String phoneNumber;
 
-  @NotNull(message = "Doctor last name is required")
-  private Integer licenseNumber;
+	@NotNull(message = "Doctor last name is required")
+	private Integer licenseNumber;
 
 }

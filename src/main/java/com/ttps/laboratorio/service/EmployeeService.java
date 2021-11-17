@@ -37,8 +37,8 @@ public class EmployeeService {
 	}
 
 	public List<EmployeeResponseDTO> getAll() {
-		return employeeRepository.findAll().stream()
-				.map(e -> new ModelMapper().map(e, EmployeeResponseDTO.class)).collect(Collectors.toList());
+		return employeeRepository.findAll().stream().map(e -> new ModelMapper().map(e, EmployeeResponseDTO.class))
+				.collect(Collectors.toList());
 	}
 
 	public EmployeeResponseDTO create(EmployeeRequestDTO request) {
