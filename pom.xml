@@ -19,8 +19,11 @@
 		<postgres.version>42.2.24</postgres.version>
 		<jjwt.version>0.9.1</jjwt.version>
 		<validation-api.version>2.0.1.Final</validation-api.version>
+		<modelmapper.version>2.4.2</modelmapper.version>
 	</properties>
 	<dependencies>
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -49,11 +52,18 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!--<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>2.7.4</version>
+		</dependency>-->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-<!-- 			<version>${postgresql.version}</version> -->
+			<!-- <version>${postgresql.version}</version> -->
 		</dependency>
+
+
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -76,9 +86,13 @@
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-<!-- 			<version>${validation-api.version}</version> -->
+			<!-- <version>${validation-api.version}</version> -->
 		</dependency>
-
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>${modelmapper.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
