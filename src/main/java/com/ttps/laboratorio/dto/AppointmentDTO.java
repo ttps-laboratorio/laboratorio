@@ -6,26 +6,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Validated
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContactDTO {
+public class AppointmentDTO {
 
-    @NotBlank(message = "Contact name is required")
-    private String name;
+    @NotNull(message = "The appointment's date is required")
+    private LocalDate date;
 
-    @NotNull(message = "Contact phone number is required")
-    private Integer phoneNumber;
-
-    @NotBlank(message = "Contact email is required")
-    private String email;
-
-
-
+    @NotNull(message = "The appointment's schedule is required")
+    private LocalTime time;
 
 }

@@ -29,12 +29,13 @@ public class HealthInsuranceService {
    * Creates new health insurance.
    * @param request health insurance information
    */
-  public void createHealthInsurance(HealthInsuranceDTO request) {
+  public HealthInsurance createHealthInsurance(HealthInsuranceDTO request) {
     HealthInsurance healthInsurance = new HealthInsurance();
     healthInsurance.setName(request.getName());
     healthInsurance.setPhoneNumber(request.getPhoneNumber());
     healthInsurance.setEmail(request.getEmail());
     healthInsuranceRepository.save(healthInsurance);
+    return healthInsurance;
   }
 
   /**

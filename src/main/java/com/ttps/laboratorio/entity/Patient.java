@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -64,7 +65,7 @@ public class Patient implements Serializable {
 	@Column(name = "clinic_history")
 	private String clinicHistory;
 
-	@Column(name = "afiliate_number")
+	@Column(name = "affiliate_number")
 	private String affiliateNumber;
 
 	@OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, optional = true, cascade = CascadeType.ALL)
@@ -75,5 +76,11 @@ public class Patient implements Serializable {
 	private HealthInsurance healthInsurance;
 
 	@OneToMany(mappedBy = "patient", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Study> studies;
+
+	public boolean addStudy(Study study){
+		study.setPatient(this);
+		return studies.add(study);
+	}
 }

@@ -1,8 +1,11 @@
 package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.dto.PatientDTO;
+import com.ttps.laboratorio.dto.StudyDTO;
 import com.ttps.laboratorio.entity.Patient;
-import com.ttps.laboratorio.repository.IPatientRepository;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.exception.NotFoundException;
+import com.ttps.laboratorio.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +16,23 @@ import java.util.List;
 public class PatientService {
 
   @Autowired
+  IPresumptiveDiagnosisRepository presumptiveDiagnosisRepository;
+  @Autowired
+  IExtractionistRepository extractionistRepository;
+  @Autowired
+  IDoctorRepository doctorRepository;
+  @Autowired
   ContactService contactService;
+  @Autowired
+  IStudyTypeRepository studyTypeRepository;
+  @Autowired
+  HealthInsuranceService healthInsuranceService;
 
+  @Autowired
+  private IStudyRepository studyRepository;
+
+  @Autowired
+  private IHealthInsuranceRepository healthInsuranceRepository;
   private final IPatientRepository patientRepository;
 
   public PatientService (IPatientRepository patientRepository) {
@@ -41,7 +59,56 @@ public class PatientService {
     patient.setClinicHistory(request.getClinicHistory());
     patient.setAffiliateNumber(request.getAffiliateNumber());
     patient.setContact(contactService.createContact(request.getContact()));
-    //patient.setHealthInsurance(request.getHealthInsurance());
+    patient.setHealthInsurance(healthInsuranceService.createHealthInsurance(request.getHealthInsurance()));
     patientRepository.save(patient);
+  }
+
+  /**
+   * Updates an existing patient.
+   * @param patientID id from the patient to search
+   * @param request new data to change
+   */
+  public void updatePatient(Long patientID, PatientDTO request) {
+    Patient patient = patientRepository.findById(patientID)
+            .orElseThrow(() -> new NotFoundException("A patient with the id " + patientID + " does not exist."));
+    patient.setFirstName(request.getFirstName());
+    patient.setLastName(request.getLastName());
+    patient.setBirthDate(request.getBirthDate());
+    patient.setClinicHistory(request.getClinicHistory());
+    patient.setAffiliateNumber(request.getAffiliateNumber());
+    patient.setContact(contactService.createContact(request.getContact()));
+    patient.setHealthInsurance(healthInsuranceRepository.findById(patient.getHealthInsurance().getId()).orElseThrow(() -> new NotFoundException("A Health Insurance with the id " + patient.getHealthInsurance().getId() + " does not exist.")));
+    patientRepository.save(patient);
+  }
+
+  /**
+   * Creates a study
+   * @param patientID id from the patient to search
+   * @param request study data
+   */
+  public void createStudy(Long patientID, StudyDTO request){
+    Patient patient = patientRepository.findById(patientID)
+            .orElseThrow(() -> new NotFoundException("A patient with the id " + patientID + " does not exist."));
+    Study study = new Study();
+    study.setCreated_at(request.getCreated_at());
+    study.setBudget(request.getBudget());
+    study.setExtractionAmount(request.getExtractionAmount());
+    study.setPaidExtractionAmount(request.getPaidExtractionAmount());
+    study.setPositiveResult(request.getPositiveResult());
+    study.setDelay(request.getDelay());
+    study.setPatient(patient);
+    study.setType(studyTypeRepository.findById(request.getType().getId())
+            .orElseThrow(() -> new NotFoundException("A study type with the id " + request.getType().getId() + " does not exist.")));
+    study.setReferringDoctor(doctorRepository.findById(request.getReferringDoctor().getId())
+            .orElseThrow(() -> new NotFoundException("A doctor with the id " + request.getReferringDoctor().getId() + " does not exist.")));
+    study.setExtractionist(extractionistRepository.findById(request.getExtractionist().getId())
+            .orElseThrow(() -> new NotFoundException("An extractionist with the id " + request.getExtractionist().getId() + " does not exist.")));
+    study.setPresumptiveDiagnosis(presumptiveDiagnosisRepository.findById(request.getPresumptiveDiagnosis().getId())
+            .orElseThrow(() -> new NotFoundException("A presumptive diagnosis with the id " + request.getPresumptiveDiagnosis().getId() + " does not exist.")));
+    // Tema de samples y sample batch ?????????
+    studyRepository.save(study);
+    patient.addStudy(study); //Necesario?
+
+
   }
 }

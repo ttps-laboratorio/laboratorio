@@ -35,7 +35,7 @@ public class PatientDTO {
 
     private HealthInsuranceDTO healthInsurance;
 
-    //private StudyDTO studies;
+    private StudyDTO studies;
 
 
 

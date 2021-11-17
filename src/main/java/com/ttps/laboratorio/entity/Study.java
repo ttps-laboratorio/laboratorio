@@ -7,18 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -66,17 +57,17 @@ public class Study implements Serializable {
 	/**
 	 * Maybe this has to be deleted and calculated.
 	 */
-	@Column(name = "delayed")
-	private Boolean delayed;
+	@Column(name = "delay")
+	private Boolean delay;
 
 	/**
-	 * An study has one patient and a patient may has many studies
+	 * A study has one patient and a patient may have many studies
 	 */
 	@ManyToOne(optional = false)
 	private Patient patient;
 
 	/**
-	 * An study may has one appointment
+	 * A study has one appointment
 	 */
 	@OneToOne(optional = true)
 	private Appointment appointment;
@@ -85,7 +76,7 @@ public class Study implements Serializable {
 	 * Doctor who refers the patient
 	 */
 	@ManyToOne
-	private Doctor referingDoctor;
+	private Doctor referringDoctor;
 
 	/**
 	 * Type of the study
@@ -100,7 +91,7 @@ public class Study implements Serializable {
 	private Extractionist extractionist;
 
 	/**
-	 * Presumptive diagnosis elaborated by refering doctor
+	 * Presumptive diagnosis elaborated by referring doctor
 	 */
 	@NotNull
 	@ManyToOne(optional = false)
