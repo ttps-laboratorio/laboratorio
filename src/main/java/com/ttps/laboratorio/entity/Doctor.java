@@ -52,7 +52,7 @@ public class Doctor implements Serializable {
 	private String email;
 
 	@Column(name = "phone_number", nullable = true)
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@NotNull
 	@Column(name = "license_number", nullable = false)

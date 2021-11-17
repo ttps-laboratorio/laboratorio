@@ -22,8 +22,8 @@ public class HealthInsuranceDTO {
   @NotBlank(message = "Health insurance name is required")
   private String name;
 
-  @NotNull(message = "Health insurance phone number is required")
-  private Integer phoneNumber;
+  @NotBlank(message = "Health insurance phone number is required")
+  private String phoneNumber;
 
   @NotBlank(message = "Health insurance email is required")
   private String email;

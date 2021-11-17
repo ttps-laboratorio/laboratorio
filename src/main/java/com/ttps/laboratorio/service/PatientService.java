@@ -2,6 +2,7 @@ package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.dto.PatientDTO;
 import com.ttps.laboratorio.dto.StudyDTO;
+import com.ttps.laboratorio.entity.Contact;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.exception.NotFoundException;
@@ -56,15 +57,7 @@ public class PatientService {
    */
   public void createPatient(PatientDTO request) {
     Patient patient = new Patient();
-    patient.setFirstName(request.getFirstName());
-    patient.setLastName(request.getLastName());
-    patient.setBirthDate(request.getBirthDate());
-    patient.setClinicHistory(request.getClinicHistory());
-    patient.setAffiliateNumber(request.getAffiliateNumber());
-    patient.setContact(contactService.createContact(request.getContact()));
-    patient.setHealthInsurance(healthInsuranceRepository.findById(request.getHealthInsurance().getId())
-            .orElseThrow(() -> new NotFoundException("A health insurance with the id " + request.getHealthInsurance().getId() + " does not exist.")));
-    patientRepository.save(patient);
+    setPatient(patient, request);
   }
 
   /**
@@ -74,7 +67,16 @@ public class PatientService {
    */
   public void updatePatient(Long patientID, PatientDTO request) {
     Patient patient = patientRepository.findById(patientID)
-            .orElseThrow(() -> new NotFoundException("A patient with the id " + patientID + " does not exist."));
+        .orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + patientID + "."));
+    setPatient(patient, request);
+  }
+
+  private void setPatient(Patient patient, PatientDTO request) {
+    Contact contact = new Contact();
+    contact.setName(request.getContact().getName());
+    contact.setEmail(request.getContact().getEmail());
+    contact.setPhoneNumber(request.getContact().getPhoneNumber());
+    patient.setDni(request.getDni());
     patient.setFirstName(request.getFirstName());
     patient.setLastName(request.getLastName());
     patient.setBirthDate(request.getBirthDate());

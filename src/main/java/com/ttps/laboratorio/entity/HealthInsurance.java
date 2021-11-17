@@ -42,7 +42,7 @@ public class HealthInsurance implements Serializable {
 
 	@NotNull
 	@Column(name = "phone_number", nullable = false)
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@NotNull
 	@Column(name = "email", length = 255, nullable = false, unique = true)

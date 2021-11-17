@@ -11,6 +11,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,8 +54,8 @@ public class AppointmentController {
    * @return  Returns a list of all appointments with "200 OK".
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/appointments")
-  public ResponseEntity<?> listAppointmentsByDate(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+  @GetMapping(path = "/appointments/{date}")
+  public ResponseEntity<?> listAppointmentsByDate(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
   }
 
@@ -63,8 +64,8 @@ public class AppointmentController {
    * @return  Returns a list of all appointments with "200 OK".
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/available-appointments")
-  public ResponseEntity<?> listAvailableAppointmentsByDate(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+  @GetMapping(path = "/available-appointments/{date}")
+  public ResponseEntity<?> listAvailableAppointmentsByDate(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
   }
 
@@ -81,8 +82,8 @@ public class AppointmentController {
   }
 
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @DeleteMapping(path = "/")
-  public ResponseEntity<?> deleteAppointment(@RequestParam(name = "appointmentId") @NonNull Long appointmentID) {
+  @DeleteMapping(path = "/{id}")
+  public ResponseEntity<?> deleteAppointment(@PathVariable(name = "id") @NonNull Long appointmentID) {
     appointmentService.deleteAppointment(appointmentID);
     return new ResponseEntity<>(HttpStatus.OK);
   }

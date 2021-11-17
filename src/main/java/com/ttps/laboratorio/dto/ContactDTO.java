@@ -1,12 +1,12 @@
 package com.ttps.laboratorio.dto;
 
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Validated
@@ -24,8 +24,6 @@ public class ContactDTO {
 
     @NotBlank(message = "Contact email is required")
     private String email;
-
-
 
 
 }
