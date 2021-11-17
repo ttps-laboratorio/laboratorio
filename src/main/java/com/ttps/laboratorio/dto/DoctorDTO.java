@@ -16,6 +16,8 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class DoctorDTO {
 
+  private long id;
+
   @NotBlank(message = "Doctor first name is required")
   private String firstName;
 

@@ -1,5 +1,8 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.dto.DoctorDTO;
+import com.ttps.laboratorio.dto.PresumptiveDiagnosisDTO;
+import com.ttps.laboratorio.entity.Doctor;
 import com.ttps.laboratorio.entity.PresumptiveDiagnosis;
 import com.ttps.laboratorio.repository.IPresumptiveDiagnosisRepository;
 import java.util.ArrayList;
@@ -21,5 +24,15 @@ public class PresumptiveDiagnosisService {
    */
   public List<PresumptiveDiagnosis> getAllPresumptiveDiagnosis() {
     return new ArrayList<>(presumptiveDiagnosisRepository.findAll());
+  }
+
+  /**
+   * Creates new presumptive diagnosis.
+   * @param request presumptive diagnosis information
+   */
+  public PresumptiveDiagnosis createPresumptiveDiagnosis(PresumptiveDiagnosisDTO request) {
+    PresumptiveDiagnosis presumptiveDiagnosis = new PresumptiveDiagnosis();
+    presumptiveDiagnosis.setDescription(request.getDescription());
+    return presumptiveDiagnosis;
   }
 }

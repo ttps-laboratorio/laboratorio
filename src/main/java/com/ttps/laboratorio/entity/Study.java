@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.sun.istack.NotNull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,7 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,8 +65,8 @@ public class Study implements Serializable {
 	/**
 	 * Maybe this has to be deleted and calculated.
 	 */
-	@Column(name = "delayed")
-	private Boolean delayed;
+	@Column(name = "delay")
+	private Boolean delay;
 
 	/**
 	 * A study has one patient and a patient may have many studies

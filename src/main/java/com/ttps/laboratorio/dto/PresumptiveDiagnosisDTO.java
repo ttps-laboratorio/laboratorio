@@ -1,6 +1,5 @@
 package com.ttps.laboratorio.dto;
 
-import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,22 +7,18 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Validated
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContactDTO {
+public class PresumptiveDiagnosisDTO {
 
-    @NotBlank(message = "Contact name is required")
-    private String name;
+    private long id;
 
-    @NotNull(message = "Contact phone number is required")
-    private String phoneNumber;
-
-    @NotBlank(message = "Contact email is required")
-    private String email;
-
+    @NotNull(message = "Diagnosis description is required")
+    private String description;
 
 }

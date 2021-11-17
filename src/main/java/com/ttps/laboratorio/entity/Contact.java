@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Represents a contact data of a patient
+ * Represents a contact information of a patient
  *
  */
 @Data

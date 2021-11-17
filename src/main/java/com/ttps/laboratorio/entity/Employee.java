@@ -21,7 +21,7 @@ import lombok.ToString;
 
 /**
  * 
- * Represents an employee of laboratory
+ * Represents a lab employee
  *
  */
 @Data

@@ -34,7 +34,7 @@ public class HealthInsuranceController {
    * View a list of all health insurances.
    * @return  Returns a list of all health insurances with "200 OK".
    */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping
   public ResponseEntity<?> listHealthInsurance() {
     return ResponseEntity.ok(healthInsuranceService.getAllHealthInsurances());
