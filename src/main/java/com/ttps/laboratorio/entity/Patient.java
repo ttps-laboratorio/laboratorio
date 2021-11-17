@@ -48,7 +48,7 @@ public class Patient implements Serializable {
 	private Long id;
 
 	@NotNull
-	@Column(name = "dni", length = 10, nullable = false)
+	@Column(name = "dni", length = 10, unique = true, nullable = false)
 	private String dni;
 
 	@NotNull
