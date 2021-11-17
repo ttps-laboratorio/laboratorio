@@ -41,7 +41,7 @@ public class HealthInsuranceServiceTest {
         setId(1L);
         setName("one");
         setEmail("one@email.com");
-        setPhoneNumber(123);
+        setPhoneNumber("123");
       }
     });
     healthInsurances.add(new HealthInsurance() {
@@ -49,7 +49,7 @@ public class HealthInsuranceServiceTest {
         setId(2L);
         setName("two");
         setEmail("two@email.com");
-        setPhoneNumber(123);
+        setPhoneNumber("123");
       }
     });
     healthInsurances.add(new HealthInsurance() {
@@ -57,7 +57,7 @@ public class HealthInsuranceServiceTest {
         setId(3L);
         setName("three");
         setEmail("three@email.com");
-        setPhoneNumber(123);
+        setPhoneNumber("123");
       }
     });
     return healthInsurances;
