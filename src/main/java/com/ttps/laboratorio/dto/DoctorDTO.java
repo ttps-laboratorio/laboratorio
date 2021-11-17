@@ -26,7 +26,7 @@ public class DoctorDTO {
   @Email(message = "Invalid email")
   private String email;
 
-  private Integer phoneNumber;
+  private String phoneNumber;
 
   @NotNull(message = "Doctor last name is required")
   private Integer licenseNumber;
