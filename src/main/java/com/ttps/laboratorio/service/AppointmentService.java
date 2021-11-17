@@ -61,6 +61,10 @@ public class AppointmentService {
   public List<LocalTime> getAvailableAppointmentsByDate(Integer year, Integer month, Integer day) {
     List<Appointment> appointmentsFromDate = getAppointmentsByDate(year, month, day);
     List<LocalTime> appointmentList = getRawAppointmentList();
+    List<Boolean> availableDays = getBooleanFreeAppointmentDaysByMonthWithoutFullAppointmentDays(year, month);
+    if (!availableDays.get(day - 1)) {
+      return new ArrayList<>();
+    }
     if (appointmentsFromDate != null && !appointmentsFromDate.isEmpty()) {
       appointmentsFromDate.forEach(appointment -> appointmentList.removeIf(a -> a.equals(appointment.getTime())));
     }
@@ -103,6 +107,15 @@ public class AppointmentService {
 
   private List<Boolean> getBooleanFreeAppointmentDaysByMonth(Integer year, Integer month) {
     int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
+    Calendar calendar = Calendar.getInstance();
+    List<Boolean> freeDaysInMonth = getBooleanFreeAppointmentDaysByMonthWithoutFullAppointmentDays(year, month);
+    // filters appointment full days
+    blockAppointmentFullDays(calendar, year, month, daysInMonth, freeDaysInMonth);
+    return freeDaysInMonth;
+  }
+
+  private List<Boolean> getBooleanFreeAppointmentDaysByMonthWithoutFullAppointmentDays(Integer year, Integer month) {
+    int daysInMonth = YearMonth.of(year, month).lengthOfMonth();
     List<Boolean> freeDaysInMonth = new ArrayList<>(Arrays.asList(new Boolean[daysInMonth]));
     Collections.fill(freeDaysInMonth, Boolean.TRUE);
     Calendar calendar = Calendar.getInstance();
@@ -111,8 +124,6 @@ public class AppointmentService {
     List<BlockedDay> blockedDaysFromMonth = blockedDayService.getBlockedDaysByMonth(month);
     // filters blocked days
     blockedDaysFromMonth.forEach(blockedDay -> blockBlockedDays(blockedDay, freeDaysInMonth));
-    // filters appointment full days
-    blockAppointmentFullDays(calendar, year, month, daysInMonth, freeDaysInMonth);
     return freeDaysInMonth;
   }
 
@@ -137,7 +148,7 @@ public class AppointmentService {
       calendar.set(year, month - 1, day);
       List<LocalTime> availableAppointmentsFromDate = getAvailableAppointmentsByDate(year, month, day);
       if (availableAppointmentsFromDate != null && availableAppointmentsFromDate.isEmpty()) {
-        freeDaysInMonth.set(day, Boolean.FALSE);
+        freeDaysInMonth.set(day - 1, Boolean.FALSE);
       }
     }
   }

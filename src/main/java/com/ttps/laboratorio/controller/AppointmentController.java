@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,8 +43,8 @@ public class AppointmentController {
    * @return  Returns a list of all appointments with "200 OK".
    */
   @PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-  @GetMapping(path = "/free-appointments")
-  public ResponseEntity<?> listFreeAppointmentDaysByMonth(@RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+  @GetMapping(path = "/free-appointments/{date}")
+  public ResponseEntity<?> listFreeAppointmentDaysByMonth(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
     return ResponseEntity.ok(appointmentService.getFreeAppointmentDaysByMonth(date.getYear(), date.getMonthValue()));
   }
 
