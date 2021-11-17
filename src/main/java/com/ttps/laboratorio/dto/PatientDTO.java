@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ttps.laboratorio.entity.HealthInsurance;
 import java.time.LocalDate;
 import javax.validation.constraints.Email;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -35,15 +36,8 @@ public class PatientDTO {
   @NotBlank(message = "Patient clinic history is required")
   private String clinicHistory;
 
-  @NotBlank(message = "Patient contact name is required")
-  private String contactName;
-
-  @NotBlank(message = "Patient contact phone number is required")
-  private String contactPhoneNumber;
-
-  @NotBlank(message = "Patient contact email is required")
-  @Email(message = "Invalid email")
-  private String contactEmail;
+  @Valid
+  private ContactDTO contact;
 
   private String affiliateNumber;
 
