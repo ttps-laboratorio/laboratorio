@@ -20,8 +20,8 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class PatientDTO {
 
-  @NotBlank(message = "Patient dni is required")
-  private String dni;
+  @NotNull(message = "Patient dni is required")
+  private Long dni;
 
   @NotBlank(message = "Patient first name is required")
   private String firstName;
