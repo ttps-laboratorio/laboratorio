@@ -1,7 +1,9 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.request.HealthInsuranceDTO;
+import com.ttps.laboratorio.entity.HealthInsurance;
+import com.ttps.laboratorio.service.HealthInsuranceService;
 import javax.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -16,29 +18,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ttps.laboratorio.dto.HealthInsuranceDTO;
-import com.ttps.laboratorio.entity.HealthInsurance;
-import com.ttps.laboratorio.service.HealthInsuranceService;
-
 @RestController
 @RequestMapping(path = "/health-insurance")
 public class HealthInsuranceController {
 
-  private final HealthInsuranceService healthInsuranceService;
+	private final HealthInsuranceService healthInsuranceService;
 
-  public HealthInsuranceController(HealthInsuranceService healthInsuranceService) {
-    this.healthInsuranceService = healthInsuranceService;
-  }
+	public HealthInsuranceController(HealthInsuranceService healthInsuranceService) {
+		this.healthInsuranceService = healthInsuranceService;
+	}
 
-  /**
-   * View a list of all health insurances.
-   * @return  Returns a list of all health insurances with "200 OK".
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+	/**
+	 * View a list of all health insurances.
+	 *
+	 * @return Returns a list of all health insurances with "200 OK".
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping
-  public ResponseEntity<?> listHealthInsurance() {
-    return ResponseEntity.ok(healthInsuranceService.getAllHealthInsurances());
-  }
+	public ResponseEntity<?> listHealthInsurance() {
+		return ResponseEntity.ok(healthInsuranceService.getAllHealthInsurances());
+	}
 
 	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@GetMapping("/{id}")
@@ -48,36 +47,39 @@ public class HealthInsuranceController {
 		return ResponseEntity.ok(healthInsurance);
 	}
 
-  /**
-   * Registers a new Health Insurance on the database.
-   * @param healthInsuranceDTO health insurance information
-   * @return status
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+	/**
+	 * Registers a new Health Insurance on the database.
+	 *
+	 * @param healthInsuranceDTO health insurance information
+	 * @return status
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@PostMapping
-  public ResponseEntity<?> createHealthInsurance(@Valid @RequestBody HealthInsuranceDTO healthInsuranceDTO) {
-    healthInsuranceService.createHealthInsurance(healthInsuranceDTO);
-    return new ResponseEntity<>(HttpStatus.CREATED);
-  }
+	public ResponseEntity<?> createHealthInsurance(@Valid @RequestBody HealthInsuranceDTO healthInsuranceDTO) {
+		healthInsuranceService.createHealthInsurance(healthInsuranceDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
 
-  /**
-   * Modifies a new Health Insurance on the database.
-   * @param healthInsuranceDTO health insurance information
-   * @return status
-   */
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+	/**
+	 * Modifies a new Health Insurance on the database.
+	 *
+	 * @param healthInsuranceDTO health insurance information
+	 * @return status
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateHealthInsurance(@PathVariable(name = "id") @NonNull Long healthInsuranceID,
-			@Valid @RequestBody @NonNull HealthInsuranceDTO healthInsuranceDTO) {
-    healthInsuranceService.updateHealthInsurance(healthInsuranceID, healthInsuranceDTO);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+																								 @Valid @RequestBody @NonNull HealthInsuranceDTO healthInsuranceDTO) {
+		healthInsuranceService.updateHealthInsurance(healthInsuranceID, healthInsuranceDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
-  @PreAuthorize("hasRole('CONFIGURATOR')")
+	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@DeleteMapping
-  public ResponseEntity<?> deleteHealthInsurance(@RequestParam(name = "healthInsuranceId") @NonNull Long healthInsuranceID) {
-    healthInsuranceService.deleteHealthInsurance(healthInsuranceID);
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
+	public ResponseEntity<?> deleteHealthInsurance(
+			@RequestParam(name = "healthInsuranceId") @NonNull Long healthInsuranceID) {
+		healthInsuranceService.deleteHealthInsurance(healthInsuranceID);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
 }

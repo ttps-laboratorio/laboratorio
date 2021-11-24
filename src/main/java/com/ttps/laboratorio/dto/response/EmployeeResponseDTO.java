@@ -1,18 +1,20 @@
-package com.ttps.laboratorio.dto;
-
-import org.springframework.validation.annotation.Validated;
+package com.ttps.laboratorio.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeRequestDTO {
+public class EmployeeResponseDTO {
+
+	private Long id;
 
 	private String firstName;
+
 	private String lastName;
-	private UserRequestDTO user;
+
+	private UserResponseDTO user;
+
 }

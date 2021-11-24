@@ -1,9 +1,9 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,9 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import com.sun.istack.NotNull;
-
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,9 +26,8 @@ import lombok.ToString;
 
 /**
  * Represents a patient.
- * 
+ * <p>
  * Patient is a person that has genetic medical studies in the laboratory
- *
  */
 @Data
 @NoArgsConstructor
@@ -48,8 +45,8 @@ public class Patient implements Serializable {
 	private Long id;
 
 	@NotNull
-	@Column(name = "dni", length = 10, nullable = false)
-	private String dni;
+	@Column(name = "dni", length = 10, unique = true, nullable = false)
+	private Long dni;
 
 	@NotNull
 	@Column(name = "first_name", length = 50, nullable = false)
@@ -79,6 +76,7 @@ public class Patient implements Serializable {
 	private HealthInsurance healthInsurance;
 
 	@OneToMany(mappedBy = "patient", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Study> studies;
 
 	public boolean addStudy(Study study) {

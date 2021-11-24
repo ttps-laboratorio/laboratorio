@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class StudyStatusService {
 
-  private final IStudyStatusRepository studyStatusRepository;
+	private final IStudyStatusRepository studyStatusRepository;
 
-  public StudyStatusService (IStudyStatusRepository studyStatusRepository) {
-    this.studyStatusRepository = studyStatusRepository;
-  }
+	public StudyStatusService(IStudyStatusRepository studyStatusRepository) {
+		this.studyStatusRepository = studyStatusRepository;
+	}
 
-  public StudyStatus getStudyStatus(Long id) {
-    return this.studyStatusRepository.findById(id).orElseThrow(() -> new NotFoundException("No existe un estado con el id " + id + "."));
-  }
+	public StudyStatus getStudyStatus(Long id) {
+		return this.studyStatusRepository.findById(id).orElseThrow(() -> new NotFoundException("No existe un estado con el id " + id + "."));
+	}
 
 }

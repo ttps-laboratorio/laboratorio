@@ -23,11 +23,11 @@ import lombok.ToString;
 @Table(name = "blocked_days")
 public class BlockedDay implements Serializable {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-  @Column(name = "date")
-  private Date date;
+	@Column(name = "date")
+	private Date date;
 
 }

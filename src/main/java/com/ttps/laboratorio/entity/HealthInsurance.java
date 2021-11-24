@@ -1,16 +1,13 @@
 package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.sun.istack.NotNull;
-
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +16,6 @@ import lombok.ToString;
 
 /**
  * Represents a HealthInsurance
- *
  */
 @Data
 @NoArgsConstructor
@@ -42,7 +38,7 @@ public class HealthInsurance implements Serializable {
 
 	@NotNull
 	@Column(name = "phone_number", nullable = false)
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@NotNull
 	@Column(name = "email", length = 255, nullable = false, unique = true)

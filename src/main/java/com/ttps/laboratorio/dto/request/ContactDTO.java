@@ -1,4 +1,4 @@
-package com.ttps.laboratorio.dto;
+package com.ttps.laboratorio.dto.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -15,14 +15,14 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class ContactDTO {
 
-  @NotBlank(message = "Patient contact name is required")
-  private String name;
+	@NotBlank(message = "Contact name is required")
+	private String name;
 
-  @NotBlank(message = "Patient contact phone number is required")
-  private String phoneNumber;
+	@NotBlank(message = "Contact phone number is required")
+	private String phoneNumber;
 
-  @NotBlank(message = "Patient contact email is required")
-  @Email(message = "Invalid email")
-  private String email;
+	@NotBlank(message = "Contact email is required")
+	@Email(message = "Invalid email")
+	private String email;
 
 }

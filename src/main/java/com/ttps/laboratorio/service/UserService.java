@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-  private final IUserRepository userRepository;
+	private final IUserRepository userRepository;
 
-  public UserService (IUserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+	public UserService(IUserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
-  public User getUser(Long id) {
-    return this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("No existe un usuario con el id " + id + "."));
-  }
+	public User getUser(Long id) {
+		return this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("No existe un usuario con el id " + id + "."));
+	}
 
 }

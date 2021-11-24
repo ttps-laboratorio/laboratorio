@@ -1,8 +1,8 @@
 package com.ttps.laboratorio.service;
 
-import com.ttps.laboratorio.dto.PatientDTO;
-import com.ttps.laboratorio.entity.Contact;
+import com.ttps.laboratorio.dto.request.PatientDTO;
 import com.ttps.laboratorio.entity.Patient;
+import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IPatientRepository;
 import java.util.ArrayList;
@@ -12,58 +12,71 @@ import org.springframework.stereotype.Service;
 @Service
 public class PatientService {
 
-  private final IPatientRepository patientRepository;
+	private final ContactService contactService;
 
-  public PatientService (IPatientRepository patientRepository) {
-    this.patientRepository = patientRepository;
-  }
+	private final HealthInsuranceService healthInsuranceService;
 
-  public Patient getPatient(Long id) {
-    return this.patientRepository.findById(id).orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + id + "."));
-  }
+	private final IPatientRepository patientRepository;
 
-  /**
-   * Gets all patients registered.
-   * @return List of all the patients
-   */
-  public List<Patient> getAllPatients() {
-    return new ArrayList<>(patientRepository.findAll());
-  }
+	public PatientService(IPatientRepository patientRepository,
+												HealthInsuranceService healthInsuranceService,
+												ContactService contactService) {
+		this.patientRepository = patientRepository;
+		this.healthInsuranceService = healthInsuranceService;
+		this.contactService = contactService;
+	}
 
-  /**
-   * Creates new patient.
-   * @param request patient information
-   */
-  public void createPatient(PatientDTO request) {
-    Patient patient = new Patient();
-    setPatient(patient, request);
-  }
+	public Patient getPatient(Long id) {
+		return this.patientRepository.findById(id).orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + id + "."));
+	}
 
-  /**
-   * Updates an existing patient.
-   * @param patientID id from the patient to search
-   * @param request new data to change
-   */
-  public void updatePatient(Long patientID, PatientDTO request) {
-    Patient patient = patientRepository.findById(patientID)
-        .orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + patientID + "."));
-    setPatient(patient, request);
-  }
+	/**
+	 * Gets all patients registered.
+	 *
+	 * @return List of all the patients
+	 */
+	public List<Patient> getAllPatients() {
+		return new ArrayList<>(patientRepository.findAll());
+	}
 
-  private void setPatient(Patient patient, PatientDTO request) {
-    Contact contact = new Contact();
-    contact.setName(request.getContact().getName());
-    contact.setEmail(request.getContact().getEmail());
-    contact.setPhoneNumber(request.getContact().getPhoneNumber());
-    patient.setDni(request.getDni());
-    patient.setFirstName(request.getFirstName());
-    patient.setLastName(request.getLastName());
-    patient.setBirthDate(request.getBirthDate());
-    patient.setClinicHistory(request.getClinicHistory());
-    patient.setContact(contact);
-    patient.setAffiliateNumber(request.getAffiliateNumber());
-    patient.setHealthInsurance(request.getHealthInsurance());
-    patientRepository.save(patient);
-  }
+	/**
+	 * Creates new patient.
+	 *
+	 * @param request patient information
+	 */
+	public void createPatient(PatientDTO request) {
+		if (patientRepository.existsByDni(request.getDni())) {
+			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
+		}
+		Patient patient = new Patient();
+		setPatient(patient, request);
+	}
+
+	/**
+	 * Updates an existing patient.
+	 *
+	 * @param patientID id from the patient to search
+	 * @param request   new data to change
+	 */
+	public void updatePatient(Long patientID, PatientDTO request) {
+		Patient patient = patientRepository.findById(patientID)
+				.orElseThrow(() -> new NotFoundException("No existe un paciente con el id " + patientID + "."));
+		if (patientRepository.existsByDniAndIdNot(request.getDni(), patientID)) {
+			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
+		}
+		setPatient(patient, request);
+	}
+
+	private void setPatient(Patient patient, PatientDTO request) {
+		patient.setDni(request.getDni());
+		patient.setFirstName(request.getFirstName());
+		patient.setLastName(request.getLastName());
+		patient.setBirthDate(request.getBirthDate());
+		patient.setClinicHistory(request.getClinicHistory());
+		patient.setAffiliateNumber(request.getAffiliateNumber());
+		patient.setContact(contactService.createContact(request.getContact()));
+		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(request.getHealthInsurance().getId()));
+		patientRepository.save(patient);
+	}
 
 }

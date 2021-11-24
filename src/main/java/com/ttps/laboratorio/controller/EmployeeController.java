@@ -1,9 +1,10 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.request.EmployeeRequestDTO;
+import com.ttps.laboratorio.dto.response.EmployeeResponseDTO;
+import com.ttps.laboratorio.service.EmployeeService;
 import java.util.List;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -15,10 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ttps.laboratorio.dto.EmployeeRequestDTO;
-import com.ttps.laboratorio.dto.EmployeeResponseDTO;
-import com.ttps.laboratorio.service.EmployeeService;
 
 @RestController
 @RequestMapping(path = "employee")
@@ -53,7 +50,7 @@ public class EmployeeController {
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
 	@PutMapping("/{id}")
 	public ResponseEntity<EmployeeResponseDTO> updateDoctor(@PathVariable(name = "id") @NonNull Long empployeeId,
-			@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO) {
+																													@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO) {
 		EmployeeResponseDTO dto = employeeService.update(empployeeId, employeeRequestDTO);
 		return ResponseEntity.ok(dto);
 	}

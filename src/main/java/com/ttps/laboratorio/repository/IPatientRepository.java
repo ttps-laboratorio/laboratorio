@@ -7,4 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IPatientRepository extends JpaRepository<Patient, Long> {
 
+	boolean existsByDniAndIdNot(Long dni, Long patientID);
+
+	boolean existsByDni(Long dni);
+
 }

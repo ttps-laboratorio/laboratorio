@@ -2,16 +2,13 @@ package com.ttps.laboratorio.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.sun.istack.NotNull;
-
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * 
  * Represents a Doctor
- *
  */
 @Data
 @NoArgsConstructor
@@ -52,7 +47,7 @@ public class Doctor implements Serializable {
 	private String email;
 
 	@Column(name = "phone_number", nullable = true)
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@NotNull
 	@Column(name = "license_number", nullable = false)

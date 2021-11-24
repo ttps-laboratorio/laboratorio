@@ -1,7 +1,6 @@
 package com.ttps.laboratorio.auth;
 
 import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +21,6 @@ public class AuthController {
 	@Autowired
 	private TokenProvider tokenProvider;
 
-
 	@PostMapping(value = "/login")
 	public ResponseEntity<LoginResponseDTO> generateAuthenticationToken(@RequestBody Credentials authenticationRequest)
 			throws Exception {
@@ -38,7 +36,6 @@ public class AuthController {
 	private Authentication authenticate(String username, String password) throws Exception {
 		Objects.requireNonNull(username);
 		Objects.requireNonNull(password);
-		return authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 	}
 }
