@@ -14,26 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "study-type")
 public class StudyTypeController {
 
-  private final StudyTypeService studyTypeService;
+	private final StudyTypeService studyTypeService;
 
-  public StudyTypeController(StudyTypeService studyTypeService) {
-    this.studyTypeService = studyTypeService;
-  }
+	public StudyTypeController(StudyTypeService studyTypeService) {
+		this.studyTypeService = studyTypeService;
+	}
 
-  @PreAuthorize("hasRole('EMPLOYEE')")
-  @GetMapping("/{id}")
-  public ResponseEntity<StudyType> getStudyType(@PathVariable(name = "id") @NonNull Long studyTypeId) {
-    return ResponseEntity.ok(studyTypeService.getStudyType(studyTypeId));
-  }
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/{id}")
+	public ResponseEntity<StudyType> getStudyType(@PathVariable(name = "id") @NonNull Long studyTypeId) {
+		return ResponseEntity.ok(studyTypeService.getStudyType(studyTypeId));
+	}
 
-  /**
-   * View a list of all studyTypes.
-   *
-   * @return Returns a list of all studyTypes with "200 OK".
-   */
-  @PreAuthorize("hasRole('EMPLOYEE')")
-  @GetMapping()
-  public ResponseEntity<?> listStudyTypes() {
-    return ResponseEntity.ok(studyTypeService.getAllStudyTypes());
-  }
+	/**
+	 * View a list of all studyTypes.
+	 *
+	 * @return Returns a list of all studyTypes with "200 OK".
+	 */
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping()
+	public ResponseEntity<?> listStudyTypes() {
+		return ResponseEntity.ok(studyTypeService.getAllStudyTypes());
+	}
 }

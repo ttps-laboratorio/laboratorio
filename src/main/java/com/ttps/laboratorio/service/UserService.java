@@ -19,7 +19,8 @@ public class UserService {
 	}
 
 	public User getUserByUsername(String username) {
-		return this.userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("No existe un usuario con el nombre de usuario " + username + "."));
+		return this.userRepository.findByUsername(username)
+				.orElseThrow(() -> new NotFoundException("No existe un usuario con el nombre de usuario " + username + "."));
 	}
 
 }
