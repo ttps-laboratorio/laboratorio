@@ -13,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -21,16 +22,18 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
  * Represents a study of a patient in the laboratory
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 @Entity
 @Table(name = "studies")
@@ -43,7 +46,7 @@ public class Study implements Serializable {
 	private Long id;
 
 	@Column(name = "created_at")
-	private LocalDateTime created_at = LocalDateTime.now();
+	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@NotNull
 	@Column(name = "budget", nullable = false)
@@ -62,7 +65,7 @@ public class Study implements Serializable {
 	/**
 	 * Maybe this has to be deleted and calculated.
 	 */
-	@Column(name = "delay = false")
+	@Column(name = "delay")
 	private Boolean delay = false;
 
 	/**

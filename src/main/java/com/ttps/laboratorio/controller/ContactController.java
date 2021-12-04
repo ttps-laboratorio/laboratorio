@@ -30,7 +30,7 @@ public class ContactController {
 	 *
 	 * @return Returns a list of all contacts with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR')")
+	@PreAuthorize("hasRole('EMPLOYEE')")
 	@GetMapping
 	public ResponseEntity<?> listContacts() {
 		return ResponseEntity.ok(contactService.getAllContacts());
@@ -42,14 +42,14 @@ public class ContactController {
 	 * @param contactDTO contact information
 	 * @return status
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR')")
+	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping
 	public ResponseEntity<?> createContact(@Valid @RequestBody ContactDTO contactDTO) {
 		contactService.createContact(contactDTO);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	@PreAuthorize("hasRole('CONFIGURATOR')")
+	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PutMapping
 	public ResponseEntity<?> updateContact(@RequestParam(name = "contactId") @NonNull Long contactID,
 																				 @Valid @RequestBody @NonNull ContactDTO contactDTO) {

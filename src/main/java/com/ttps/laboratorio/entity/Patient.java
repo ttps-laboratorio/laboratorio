@@ -21,7 +21,9 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -29,10 +31,10 @@ import lombok.ToString;
  * <p>
  * Patient is a person that has genetic medical studies in the laboratory
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "clinicHistory")
 @Builder
 @Entity
 @Table(name = "patients")

@@ -34,6 +34,13 @@ UPDATE study_statuses SET next_id=10,previous_id=8 WHERE id=9;
 UPDATE study_statuses SET next_id=11,previous_id=9 WHERE id=10;
 UPDATE study_statuses SET previous_id=10 WHERE id=11;
 
+INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_uno@email.com','doctor','uno',111,'111');
+INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_dos@email.com','doctor','dos',222,'222');
+
+INSERT INTO employees (first_name,last_name,user_id) VALUES ('Ignacio','Vacca',1);
+INSERT INTO employees (first_name,last_name,user_id) VALUES ('Sofia','Scotto',2);
+INSERT INTO employees (first_name,last_name,user_id) VALUES ('Agustina','Garcia',5);
+
 INSERT INTO presumptive_diagnoses (description) VALUES ('Acidez de estómago');
 INSERT INTO presumptive_diagnoses (description) VALUES ('Acné');
 INSERT INTO presumptive_diagnoses (description) VALUES ('Acúfenos');

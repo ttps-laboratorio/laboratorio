@@ -13,6 +13,7 @@ import com.ttps.laboratorio.repository.IStudyRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -72,11 +73,18 @@ public class StudyService {
 		patient.addStudy(study);
 		study.setBudget(request.getBudget());
 		study.setExtractionAmount(request.getExtractionAmount());
-		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctor().getId()));
-		study.setType(studyTypeService.getStudyType(request.getStudyType().getId()));
-		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosis().getId()));
-		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User queriedUser = userService.getUser(currentUser.getId());
+		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctorId().longValue()));
+		study.setType(studyTypeService.getStudyType(request.getStudyTypeId().longValue()));
+		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosisId().longValue()));
+//		User currentUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username;
+		if (principal instanceof UserDetails) {
+			username = ((UserDetails)principal).getUsername();
+		} else {
+			username = principal.toString();
+		}
+		User queriedUser = userService.getUserByUsername(username);
 		Employee employee = employeeService.getByUser(queriedUser);
 		Checkpoint checkpoint = new Checkpoint();
 		checkpoint.setStudy(study);
@@ -101,12 +109,12 @@ public class StudyService {
 			throw new BadRequestException("El laboratorio ya abono el monto extraccionista.");
 		}
 		if (actualStatus.getOrder() <= 2) {
-			study.setType(studyTypeService.getStudyType(request.getStudyType().getId()));
+			study.setType(studyTypeService.getStudyType(request.getStudyTypeId().longValue()));
 		} else {
 			throw new BadRequestException("Ya se envio el consentimiento informado al paciente.");
 		}
-		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctor().getId()));
-		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosis().getId()));
+		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctorId().longValue()));
+		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosisId().longValue()));
 	}
 
 }

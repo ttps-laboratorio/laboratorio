@@ -37,7 +37,6 @@ public class StudyType implements Serializable {
 	@Column(name = "name", unique = true, nullable = false)
 	private String name;
 
-	@Lob
 	@Column(name = "consent")
 	private String consent;
 }

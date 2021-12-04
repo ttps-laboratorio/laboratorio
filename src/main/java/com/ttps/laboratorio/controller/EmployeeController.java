@@ -28,13 +28,13 @@ public class EmployeeController {
 		this.employeeService = employeeService;
 	}
 
-	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	@PreAuthorize("hasRole('ADMINISTRATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping("/{id}")
 	public ResponseEntity<EmployeeResponseDTO> get(@PathVariable(name = "id") @NonNull Long employeeId) {
 		return ResponseEntity.ok(employeeService.get(employeeId));
 	}
 
-	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	@PreAuthorize("hasRole('ADMINISTRATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping()
 	public ResponseEntity<List<EmployeeResponseDTO>> list() {
 		return ResponseEntity.ok(employeeService.getAll());

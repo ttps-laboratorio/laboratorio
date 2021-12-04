@@ -39,7 +39,7 @@ public class HealthInsuranceController {
 		return ResponseEntity.ok(healthInsuranceService.getAllHealthInsurances());
 	}
 
-	@PreAuthorize("hasRole('CONFIGURATOR')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping("/{id}")
 	public ResponseEntity<HealthInsurance> getHealthInsurance(
 			@PathVariable(name = "id") @NonNull Long healthInsuranceID) {
