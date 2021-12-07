@@ -1,25 +1,20 @@
-package com.ttps.laboratorio.dto;
+package com.ttps.laboratorio.dto.request;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
-
 @Validated
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudyTypeDTO {
+public class PresumptiveDiagnosisDTO {
 
-	@NotNull(message = "Study type id is required")
+	@NotNull(message = "Presumptive diagnosis id is required")
 	private long id;
 
-	@NotNull(message = "Study type name is required")
-	private String name;
-
-	private String consent;
 }

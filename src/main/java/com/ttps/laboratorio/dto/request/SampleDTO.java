@@ -1,15 +1,11 @@
-package com.ttps.laboratorio.dto;
+package com.ttps.laboratorio.dto.request;
 
-import com.ttps.laboratorio.entity.SampleBatch;
-import com.ttps.laboratorio.entity.Study;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 @Validated
 @Getter
@@ -18,10 +14,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class SampleDTO {
 
-	@NotNull(message = "Sample's mililiters are required")
-	private Double mililiters;
+	@NotNull(message = "Sample's milliliters are required")
+	private Double milliliters;
 
-	@NotNull(message = "Sample's mililiters are required")
+	@NotNull(message = "Sample's freezer is required")
 	private Integer freezer;
 
 	private long study;

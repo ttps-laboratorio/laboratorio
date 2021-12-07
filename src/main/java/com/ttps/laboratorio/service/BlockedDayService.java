@@ -20,7 +20,7 @@ public class BlockedDayService {
 
 	/**
 	 * Gets all blocked days registered.
-	 * 
+	 *
 	 * @return List of all blocked days
 	 */
 	public List<BlockedDay> getAllBlockedDays() {

@@ -1,21 +1,19 @@
 package com.ttps.laboratorio.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.ttps.laboratorio.dto.EmployeeRequestDTO;
-import com.ttps.laboratorio.dto.EmployeeResponseDTO;
-import com.ttps.laboratorio.dto.UserRequestDTO;
+import com.ttps.laboratorio.dto.request.EmployeeRequestDTO;
+import com.ttps.laboratorio.dto.request.UserRequestDTO;
+import com.ttps.laboratorio.dto.response.EmployeeResponseDTO;
 import com.ttps.laboratorio.entity.Employee;
 import com.ttps.laboratorio.entity.RoleEnum;
 import com.ttps.laboratorio.entity.User;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IEmployeeRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class EmployeeService {
@@ -62,6 +60,10 @@ public class EmployeeService {
 		user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 		employee = employeeRepository.save(employee);
 		return new ModelMapper().map(employee, EmployeeResponseDTO.class);
+	}
+
+	public Employee getByUser(User user) {
+		return this.employeeRepository.findByUser(user);
 	}
 
 }

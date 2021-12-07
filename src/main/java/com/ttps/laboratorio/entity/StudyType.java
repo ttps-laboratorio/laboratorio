@@ -1,16 +1,13 @@
 package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +16,6 @@ import lombok.ToString;
 
 /**
  * Represents a clasification of a study
- *
  */
 @Data
 @NoArgsConstructor
@@ -40,7 +36,6 @@ public class StudyType implements Serializable {
 	@Column(name = "name", unique = true, nullable = false)
 	private String name;
 
-	@Lob
 	@Column(name = "consent")
 	private String consent;
 }

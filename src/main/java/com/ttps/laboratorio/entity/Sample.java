@@ -1,7 +1,6 @@
 package com.ttps.laboratorio.entity;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +18,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * Represents the blood extraction of a patient for a study
- *
  */
 @Data
 @NoArgsConstructor
@@ -37,8 +34,8 @@ public class Sample implements Serializable {
 	private Long id;
 
 	@NotNull
-	@Column(name = "mililiters", nullable = false)
-	private Double mililiters;
+	@Column(name = "milliliters", nullable = false)
+	private Double milliliters;
 
 	@NotNull
 	@Column(name = "freezer", nullable = false)

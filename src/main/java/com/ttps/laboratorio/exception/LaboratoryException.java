@@ -1,7 +1,6 @@
 package com.ttps.laboratorio.exception;
 
 /**
- * 
  *
  */
 public class LaboratoryException extends RuntimeException {

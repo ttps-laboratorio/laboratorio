@@ -1,8 +1,12 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.request.PatientDTO;
+import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.entity.Patient;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.service.PatientService;
+import com.ttps.laboratorio.service.StudyService;
 import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -15,22 +19,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ttps.laboratorio.dto.PatientDTO;
-import com.ttps.laboratorio.dto.StudyDTO;
-import com.ttps.laboratorio.entity.Patient;
-import com.ttps.laboratorio.repository.IPatientRepository;
-import com.ttps.laboratorio.service.PatientService;
-
 @RestController
 @RequestMapping(path = "patient")
 public class PatientController {
 
 	private final PatientService patientService;
-	@Autowired
-	private IPatientRepository patientRepository;
 
-	public PatientController(PatientService patientService) {
+	private final StudyService studyService;
+
+	public PatientController(PatientService patientService, StudyService studyService) {
 		this.patientService = patientService;
+		this.studyService = studyService;
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
@@ -59,36 +58,36 @@ public class PatientController {
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping
-	public ResponseEntity<?> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
+	public ResponseEntity<Patient> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
 		patientService.createPatient(patientDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		return new ResponseEntity<>(patientService.createPatient(patientDTO), HttpStatus.CREATED);
 	}
 
 	/**
 	 * Modifies a new Patient on the database.
-	 * 
+	 *
 	 * @param patientDTO patient information
 	 * @return status
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updatePatient(@PathVariable(name = "id") @NonNull Long patientID,
-			@Valid @RequestBody @NonNull PatientDTO patientDTO) {
+																				 @Valid @RequestBody @NonNull PatientDTO patientDTO) {
 		patientService.updatePatient(patientID, patientDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	/**
-	 * Registers a new Study for a specific Patient on the database.
+	 * Registers a new Study on the database.
 	 *
-	 * @param request Study information
+	 * @param studyDTO study information
 	 * @return status
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	@PostMapping(path = "/{patientID}/study")
-	public ResponseEntity<?> createStudy(@PathVariable long patientID, @Valid @RequestBody StudyDTO request) {
-		patientService.createStudy(patientID, request);
-		return new ResponseEntity<>(HttpStatus.OK);
+	@PostMapping("/{id}/study")
+	public ResponseEntity<Study> createStudy(@PathVariable(name = "id") @NonNull Long patientID,
+																					 @Valid @RequestBody StudyDTO studyDTO) {
+		return new ResponseEntity<>(studyService.createStudy(patientID, studyDTO), HttpStatus.CREATED);
 	}
 
 }

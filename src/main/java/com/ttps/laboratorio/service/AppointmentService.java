@@ -1,6 +1,6 @@
 package com.ttps.laboratorio.service;
 
-import com.ttps.laboratorio.dto.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.BlockedDay;
 import com.ttps.laboratorio.entity.ScheduleConfigurator;
@@ -73,10 +73,10 @@ public class AppointmentService {
 
 	/**
 	 * Creates new appointment.
-	 * 
+	 *
 	 * @param request appointment information
 	 */
-	public void createAppointment(AppointmentDTO request) {
+	public Appointment createAppointment(AppointmentDTO request) {
 		ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
 		List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(request.getDate().getYear(),
 				request.getDate().getMonthValue());
@@ -98,11 +98,12 @@ public class AppointmentService {
 		appointment.setDate(request.getDate());
 		appointment.setTime(request.getTime());
 		appointmentRepository.save(appointment);
+		return appointment;
 	}
 
 	/**
 	 * Deletes a appointment.
-	 * 
+	 *
 	 * @param appointmentID id from the appointment to delete
 	 */
 	public void deleteAppointment(Long appointmentID) {
@@ -133,7 +134,7 @@ public class AppointmentService {
 	}
 
 	private void blockSaturdaysAndSundays(Calendar calendar, Integer year, Integer month, int daysInMonth,
-			List<Boolean> freeDaysInMonth) {
+																				List<Boolean> freeDaysInMonth) {
 		for (int day = 1; day <= daysInMonth; day++) {
 			calendar.set(year, month - 1, day);
 			int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
@@ -150,7 +151,7 @@ public class AppointmentService {
 	}
 
 	private void blockAppointmentFullDays(Calendar calendar, Integer year, Integer month, int daysInMonth,
-			List<Boolean> freeDaysInMonth) {
+																				List<Boolean> freeDaysInMonth) {
 		for (int day = 1; day <= daysInMonth; day++) {
 			calendar.set(year, month - 1, day);
 			List<LocalTime> availableAppointmentsFromDate = getAvailableAppointmentsByDate(year, month, day);

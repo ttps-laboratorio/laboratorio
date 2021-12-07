@@ -1,19 +1,15 @@
-package com.ttps.laboratorio.dto;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.validation.annotation.Validated;
+package com.ttps.laboratorio.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import java.time.LocalDate;
+import java.time.LocalTime;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 @Validated
 @Getter

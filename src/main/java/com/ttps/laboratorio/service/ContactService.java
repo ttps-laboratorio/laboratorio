@@ -1,13 +1,12 @@
 package com.ttps.laboratorio.service;
 
-import com.ttps.laboratorio.dto.ContactDTO;
+import com.ttps.laboratorio.dto.request.ContactDTO;
 import com.ttps.laboratorio.entity.Contact;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IContactRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ContactService {
@@ -20,7 +19,7 @@ public class ContactService {
 
 	/**
 	 * Gets all contacts registered.
-	 * 
+	 *
 	 * @return List of all the contacts
 	 */
 	public List<Contact> getAllContacts() {
@@ -29,7 +28,7 @@ public class ContactService {
 
 	/**
 	 * Creates new contact.
-	 * 
+	 *
 	 * @param request contact information
 	 */
 	public Contact createContact(ContactDTO request) {
@@ -43,7 +42,7 @@ public class ContactService {
 
 	/**
 	 * Updates an existing contact
-	 * 
+	 *
 	 * @param contactID  id from the health insurance to search
 	 * @param contactDTO new data to change
 	 */

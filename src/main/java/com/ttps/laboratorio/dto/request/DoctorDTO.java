@@ -1,4 +1,4 @@
-package com.ttps.laboratorio.dto;
+package com.ttps.laboratorio.dto.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

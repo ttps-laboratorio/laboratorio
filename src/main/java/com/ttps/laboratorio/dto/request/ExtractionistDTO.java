@@ -1,12 +1,11 @@
-package com.ttps.laboratorio.dto;
+package com.ttps.laboratorio.dto.request;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 
 @Validated
 @Getter
@@ -15,9 +14,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ExtractionistDTO {
 
+	@NotNull(message = "Extractionist id is required")
 	protected Long id;
-
-	@NotNull(message = "Extractionist full name is required")
-	protected String fullname;
 
 }

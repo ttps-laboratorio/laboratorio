@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,21 +18,19 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
 /**
  * Represents a study of a patient in the laboratory
- *
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 @Entity
 @Table(name = "studies")
@@ -46,7 +43,7 @@ public class Study implements Serializable {
 	private Long id;
 
 	@Column(name = "created_at")
-	private LocalDateTime created_at = LocalDateTime.now();
+	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@NotNull
 	@Column(name = "budget", nullable = false)
@@ -57,7 +54,7 @@ public class Study implements Serializable {
 	private BigDecimal extractionAmount;
 
 	@Column(name = "paid_extraction_amount")
-	private Boolean paidExtractionAmount;
+	private Boolean paidExtractionAmount = false;
 
 	@OneToOne(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private FinalReport finalReport;
@@ -66,7 +63,7 @@ public class Study implements Serializable {
 	 * Maybe this has to be deleted and calculated.
 	 */
 	@Column(name = "delay")
-	private Boolean delay;
+	private Boolean delay = false;
 
 	/**
 	 * A study has one patient and a patient may have many studies
@@ -117,7 +114,7 @@ public class Study implements Serializable {
 
 	/**
 	 * Get actual checkpoint or null
-	 * 
+	 *
 	 * @return
 	 */
 	public Checkpoint getRecentCheckpoint() {
@@ -126,7 +123,7 @@ public class Study implements Serializable {
 
 	/**
 	 * Get actual status or null
-	 * 
+	 *
 	 * @return
 	 */
 	public StudyStatus getActualStatus() {

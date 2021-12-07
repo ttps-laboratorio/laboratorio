@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.service.AppointmentService;
 import java.time.LocalDate;
 import javax.validation.Valid;
@@ -29,7 +30,7 @@ public class AppointmentController {
 
 	/**
 	 * View a list of all appointments.
-	 * 
+	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
@@ -41,7 +42,7 @@ public class AppointmentController {
 	/**
 	 * Returns a boolean list, where each index represents a day of the month. If
 	 * index 5 is false then an appointment can not be scheduled on that day.
-	 * 
+	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
@@ -54,41 +55,38 @@ public class AppointmentController {
 
 	/**
 	 * Returns a list of the appointments of a day.
-	 * 
+	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping(path = "/appointments/{date}")
 	public ResponseEntity<?> listAppointmentsByDate(
 			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-		return ResponseEntity.ok(
-				appointmentService.getAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
+		return ResponseEntity.ok(appointmentService.getAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
 	}
 
 	/**
 	 * Returns a list of the available appointments of a day.
-	 * 
+	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping(path = "/available-appointments/{date}")
 	public ResponseEntity<?> listAvailableAppointmentsByDate(
 			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-		return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(),
-				date.getDayOfMonth()));
+		return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
 	}
 
 	/**
 	 * Registers a new Appointment on the database.
-	 * 
+	 *
 	 * @param appointmentDTO appointment information
 	 * @return status
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@PostMapping(path = "/")
-	public ResponseEntity<?> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
-		appointmentService.createAppointment(appointmentDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	public ResponseEntity<Appointment> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
+		return new ResponseEntity<>(appointmentService.createAppointment(appointmentDTO), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")

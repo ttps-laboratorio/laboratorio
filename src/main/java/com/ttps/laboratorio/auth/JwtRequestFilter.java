@@ -1,12 +1,12 @@
 package com.ttps.laboratorio.auth;
 
+import com.ttps.laboratorio.auth.config.WebSecurityConfig;
+import io.jsonwebtoken.ExpiredJwtException;
 import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ttps.laboratorio.auth.config.WebSecurityConfig;
-
-import io.jsonwebtoken.ExpiredJwtException;
-
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-	private static Logger LOGGER = LoggerFactory.getLogger(JwtRequestFilter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JwtRequestFilter.class);
 
 	@Autowired
 	private TokenProvider tokenProvider;
@@ -55,7 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		String bearerToken = request.getHeader(WebSecurityConfig.AUTHORIZATION_HEADER);
 		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-			return bearerToken.substring(7, bearerToken.length());
+			return bearerToken.substring(7);
 		}
 		return null;
 	}

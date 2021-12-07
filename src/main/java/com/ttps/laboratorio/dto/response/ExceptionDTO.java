@@ -1,8 +1,9 @@
-package com.ttps.laboratorio.dto;
+package com.ttps.laboratorio.dto.response;
 
 public class ExceptionDTO {
 
 	private String name;
+
 	private String message;
 
 	public String getName() {
