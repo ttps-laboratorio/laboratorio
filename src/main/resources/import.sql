@@ -34,6 +34,10 @@ UPDATE study_statuses SET next_id=10,previous_id=8 WHERE id=9;
 UPDATE study_statuses SET next_id=11,previous_id=9 WHERE id=10;
 UPDATE study_statuses SET previous_id=10 WHERE id=11;
 
+INSERT INTO health_insurances (email,name,phone_number) VALUES ('osde@email.com', 'osde', '111');
+INSERT INTO health_insurances (email,name,phone_number) VALUES ('ioma@email.com', 'ioma', '222');
+INSERT INTO health_insurances (email,name,phone_number) VALUES ('galeno@email.com', 'galeno', '333');
+
 INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_uno@email.com','doctor','uno',111,'111');
 INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_dos@email.com','doctor','dos',222,'222');
 

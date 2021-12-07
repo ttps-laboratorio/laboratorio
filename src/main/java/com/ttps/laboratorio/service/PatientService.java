@@ -44,12 +44,13 @@ public class PatientService {
 	 *
 	 * @param request patient information
 	 */
-	public void createPatient(PatientDTO request) {
+	public Patient createPatient(PatientDTO request) {
 		if (patientRepository.existsByDni(request.getDni())) {
 			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
 		}
 		Patient patient = new Patient();
 		setPatient(patient, request);
+		return patient;
 	}
 
 	/**
@@ -75,7 +76,7 @@ public class PatientService {
 		patient.setClinicHistory(request.getClinicHistory());
 		patient.setAffiliateNumber(request.getAffiliateNumber());
 		patient.setContact(contactService.createContact(request.getContact()));
-		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(request.getHealthInsurance().getId()));
+		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(request.getHealthInsuranceId().longValue()));
 		patientRepository.save(patient);
 	}
 

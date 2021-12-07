@@ -39,6 +39,6 @@ public class PatientDTO {
 
 	private String affiliateNumber;
 
-	private HealthInsuranceDTO healthInsurance;
+	private Integer healthInsuranceId;
 
 }

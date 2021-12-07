@@ -76,7 +76,7 @@ public class AppointmentService {
 	 *
 	 * @param request appointment information
 	 */
-	public void createAppointment(AppointmentDTO request) {
+	public Appointment createAppointment(AppointmentDTO request) {
 		ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
 		List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(request.getDate().getYear(),
 				request.getDate().getMonthValue());
@@ -98,6 +98,7 @@ public class AppointmentService {
 		appointment.setDate(request.getDate());
 		appointment.setTime(request.getTime());
 		appointmentRepository.save(appointment);
+		return appointment;
 	}
 
 	/**

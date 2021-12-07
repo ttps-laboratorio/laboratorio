@@ -35,14 +35,14 @@ public class DoctorService {
 	 *
 	 * @param request doctor information
 	 */
-	public void createDoctor(DoctorDTO request) {
+	public Doctor createDoctor(DoctorDTO request) {
 		Doctor doctor = new Doctor();
 		doctor.setFirstName(request.getFirstName());
 		doctor.setLastName(request.getLastName());
 		doctor.setEmail(request.getEmail());
 		doctor.setPhoneNumber(request.getPhoneNumber());
 		doctor.setLicenseNumber(request.getLicenseNumber());
-		doctorRepository.save(doctor);
+		return doctorRepository.save(doctor);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class DoctorService {
 	 * @param doctorID id from the doctor to search
 	 * @param request  new data to change
 	 */
-	public void updateDoctor(Long doctorID, DoctorDTO request) {
+	public Doctor updateDoctor(Long doctorID, DoctorDTO request) {
 		Doctor doctor = doctorRepository.findById(doctorID)
 				.orElseThrow(() -> new NotFoundException("No existe un doctor con el id " + doctorID + "."));
 		doctor.setFirstName(request.getFirstName());
@@ -59,7 +59,7 @@ public class DoctorService {
 		doctor.setEmail(request.getEmail());
 		doctor.setPhoneNumber(request.getPhoneNumber());
 		doctor.setLicenseNumber(request.getLicenseNumber());
-		doctorRepository.save(doctor);
+		return doctorRepository.save(doctor);
 	}
 
 }

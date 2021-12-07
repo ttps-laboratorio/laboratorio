@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.service.AppointmentService;
 import java.time.LocalDate;
 import javax.validation.Valid;
@@ -84,9 +85,8 @@ public class AppointmentController {
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@PostMapping(path = "/")
-	public ResponseEntity<?> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
-		appointmentService.createAppointment(appointmentDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	public ResponseEntity<Appointment> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
+		return new ResponseEntity<>(appointmentService.createAppointment(appointmentDTO), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")

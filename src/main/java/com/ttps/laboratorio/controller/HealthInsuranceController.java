@@ -55,9 +55,8 @@ public class HealthInsuranceController {
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@PostMapping
-	public ResponseEntity<?> createHealthInsurance(@Valid @RequestBody HealthInsuranceDTO healthInsuranceDTO) {
-		healthInsuranceService.createHealthInsurance(healthInsuranceDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	public ResponseEntity<HealthInsurance> createHealthInsurance(@Valid @RequestBody HealthInsuranceDTO healthInsuranceDTO) {
+		return new ResponseEntity<>(healthInsuranceService.createHealthInsurance(healthInsuranceDTO), HttpStatus.CREATED);
 	}
 
 	/**
@@ -68,10 +67,9 @@ public class HealthInsuranceController {
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateHealthInsurance(@PathVariable(name = "id") @NonNull Long healthInsuranceID,
+	public ResponseEntity<HealthInsurance> updateHealthInsurance(@PathVariable(name = "id") @NonNull Long healthInsuranceID,
 																								 @Valid @RequestBody @NonNull HealthInsuranceDTO healthInsuranceDTO) {
-		healthInsuranceService.updateHealthInsurance(healthInsuranceID, healthInsuranceDTO);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(healthInsuranceService.updateHealthInsurance(healthInsuranceID, healthInsuranceDTO), HttpStatus.OK);
 	}
 
 	@PreAuthorize("hasRole('CONFIGURATOR')")

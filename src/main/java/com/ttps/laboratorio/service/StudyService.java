@@ -76,7 +76,6 @@ public class StudyService {
 		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctorId().longValue()));
 		study.setType(studyTypeService.getStudyType(request.getStudyTypeId().longValue()));
 		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosisId().longValue()));
-//		User currentUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String username;
 		if (principal instanceof UserDetails) {

@@ -3,6 +3,7 @@ package com.ttps.laboratorio.controller;
 import com.ttps.laboratorio.dto.request.PatientDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.entity.Patient;
+import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.service.PatientService;
 import com.ttps.laboratorio.service.StudyService;
 import javax.validation.Valid;
@@ -57,9 +58,9 @@ public class PatientController {
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping
-	public ResponseEntity<?> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
+	public ResponseEntity<Patient> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
 		patientService.createPatient(patientDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		return new ResponseEntity<>(patientService.createPatient(patientDTO), HttpStatus.CREATED);
 	}
 
 	/**
@@ -84,10 +85,9 @@ public class PatientController {
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping("/{id}/study")
-	public ResponseEntity<?> createStudy(@PathVariable(name = "id") @NonNull Long patientID,
-																			 @Valid @RequestBody StudyDTO studyDTO) {
-		studyService.createStudy(patientID, studyDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	public ResponseEntity<Study> createStudy(@PathVariable(name = "id") @NonNull Long patientID,
+																					 @Valid @RequestBody StudyDTO studyDTO) {
+		return new ResponseEntity<>(studyService.createStudy(patientID, studyDTO), HttpStatus.CREATED);
 	}
 
 }

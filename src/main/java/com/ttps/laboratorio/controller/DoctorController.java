@@ -29,8 +29,7 @@ public class DoctorController {
 	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@GetMapping("/{id}")
 	public ResponseEntity<Doctor> getDoctor(@PathVariable(name = "id") @NonNull Long doctorId) {
-		Doctor doctor = doctorService.getDoctor(doctorId);
-		return ResponseEntity.ok(doctor);
+		return ResponseEntity.ok(doctorService.getDoctor(doctorId));
 	}
 
 	/**
@@ -52,9 +51,8 @@ public class DoctorController {
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@PostMapping()
-	public ResponseEntity<?> createDoctor(@Valid @RequestBody DoctorDTO doctorDTO) {
-		doctorService.createDoctor(doctorDTO);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	public ResponseEntity<Doctor> createDoctor(@Valid @RequestBody DoctorDTO doctorDTO) {
+		return new ResponseEntity<>(doctorService.createDoctor(doctorDTO), HttpStatus.CREATED);
 	}
 
 	/**
@@ -65,10 +63,9 @@ public class DoctorController {
 	 */
 	@PreAuthorize("hasRole('CONFIGURATOR')")
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateDoctor(@PathVariable(name = "id") @NonNull Long doctorID,
+	public ResponseEntity<Doctor> updateDoctor(@PathVariable(name = "id") @NonNull Long doctorID,
 																				@Valid @RequestBody @NonNull DoctorDTO doctorDTO) {
-		doctorService.updateDoctor(doctorID, doctorDTO);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(doctorService.updateDoctor(doctorID, doctorDTO), HttpStatus.OK);
 	}
 
 }

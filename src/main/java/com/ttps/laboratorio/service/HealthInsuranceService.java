@@ -51,13 +51,14 @@ public class HealthInsuranceService {
 	 * @param healthInsuranceID id from the health insurance to search
 	 * @param request           new data to change
 	 */
-	public void updateHealthInsurance(Long healthInsuranceID, HealthInsuranceDTO request) {
+	public HealthInsurance updateHealthInsurance(Long healthInsuranceID, HealthInsuranceDTO request) {
 		HealthInsurance healthInsurance = healthInsuranceRepository.findById(healthInsuranceID).orElseThrow(
 				() -> new NotFoundException("No existe una obra social con el id " + healthInsuranceID + "."));
 		healthInsurance.setName(request.getName());
 		healthInsurance.setPhoneNumber(request.getPhoneNumber());
 		healthInsurance.setEmail(request.getEmail());
 		healthInsuranceRepository.save(healthInsurance);
+		return healthInsurance;
 	}
 
 	/**
