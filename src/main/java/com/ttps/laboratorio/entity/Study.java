@@ -1,5 +1,7 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +29,7 @@ import lombok.Setter;
 /**
  * Represents a study of a patient in the laboratory
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -117,6 +120,7 @@ public class Study implements Serializable {
 	 *
 	 * @return
 	 */
+	@JsonIgnore
 	public Checkpoint getRecentCheckpoint() {
 		return checkpoints.stream().sorted(Checkpoint.CREATED_AT_COMPARATOR_DESC).findFirst().orElse(null);
 	}

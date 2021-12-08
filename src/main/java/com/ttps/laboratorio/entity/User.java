@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ public class User implements Serializable {
 
 	@NotNull
 	@Column(name = "password", length = 255, nullable = false)
+	@JsonIgnore
 	private String password;
 
 	@NotNull

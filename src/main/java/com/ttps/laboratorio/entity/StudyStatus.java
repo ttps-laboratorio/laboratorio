@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,10 +45,12 @@ public class StudyStatus implements Serializable {
 	// TODO: maybe this is not necessary
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "next_id", referencedColumnName = "id")
+	@JsonIgnore
 	private StudyStatus next;
 
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "previous_id", referencedColumnName = "id")
+	@JsonIgnore
 	private StudyStatus previous;
 
 }

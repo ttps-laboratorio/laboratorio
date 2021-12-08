@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -48,6 +49,7 @@ public class Checkpoint implements Serializable {
 	private Employee createdBy;
 
 	@ManyToOne
+	@JsonIgnore
 	private Study study;
 
 	public static class CheckpointComparatorAsc implements Comparator<Checkpoint> {

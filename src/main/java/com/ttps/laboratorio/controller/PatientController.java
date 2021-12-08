@@ -59,7 +59,6 @@ public class PatientController {
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping
 	public ResponseEntity<Patient> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
-		patientService.createPatient(patientDTO);
 		return new ResponseEntity<>(patientService.createPatient(patientDTO), HttpStatus.CREATED);
 	}
 
