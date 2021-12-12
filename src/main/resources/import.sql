@@ -21,6 +21,7 @@ INSERT INTO study_statuses (name,num_order) VALUES ('Esperando resultado biotecn
 INSERT INTO study_statuses (name,num_order) VALUES ('Esperando interpretación de resultados e informes',9);
 INSERT INTO study_statuses (name,num_order) VALUES ('Esperando ser entregado a médico derivante',10);
 INSERT INTO study_statuses (name,num_order) VALUES ('Resultado entregado',11);
+INSERT INTO study_statuses (name,num_order) VALUES ('Anulado por falta de pago', 12);
 
 UPDATE study_statuses SET next_id=2 WHERE id=1;
 UPDATE study_statuses SET next_id=3,previous_id=1 WHERE id=2;
@@ -34,12 +35,12 @@ UPDATE study_statuses SET next_id=10,previous_id=8 WHERE id=9;
 UPDATE study_statuses SET next_id=11,previous_id=9 WHERE id=10;
 UPDATE study_statuses SET previous_id=10 WHERE id=11;
 
-INSERT INTO health_insurances (email,name,phone_number) VALUES ('osde@email.com', 'osde', '111');
-INSERT INTO health_insurances (email,name,phone_number) VALUES ('ioma@email.com', 'ioma', '222');
-INSERT INTO health_insurances (email,name,phone_number) VALUES ('galeno@email.com', 'galeno', '333');
+INSERT INTO health_insurances (email,name,phone_number) VALUES ('osde@email.com', 'OSDE', '111');
+INSERT INTO health_insurances (email,name,phone_number) VALUES ('ioma@email.com', 'IOMA', '222');
+INSERT INTO health_insurances (email,name,phone_number) VALUES ('galeno@email.com', 'Galeno', '333');
 
-INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_uno@email.com','doctor','uno',111,'111');
-INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_dos@email.com','doctor','dos',222,'222');
+INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_uno@email.com','Doctor','Uno',111,'111');
+INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_dos@email.com','Doctor','Dos',222,'222');
 
 INSERT INTO employees (first_name,last_name,user_id) VALUES ('Ignacio','Vacca',1);
 INSERT INTO employees (first_name,last_name,user_id) VALUES ('Sofia','Scotto',2);
