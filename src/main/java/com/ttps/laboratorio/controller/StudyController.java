@@ -3,6 +3,8 @@ package com.ttps.laboratorio.controller;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.service.StudyService;
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +57,12 @@ public class StudyController {
 																			 @Valid @RequestBody @NonNull StudyDTO studyDTO) {
 		studyService.updateStudy(studyID, studyDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/pdf/budget/{id}")
+	public void generateBudgetPDF(@PathVariable(name = "id") @NonNull Long studyID, HttpServletResponse response) throws IOException {
+		studyService.downloadBudgetFile(studyID, response);
 	}
 
 }
