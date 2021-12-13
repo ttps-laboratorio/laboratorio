@@ -13,6 +13,8 @@ import com.ttps.laboratorio.repository.IStudyRepository;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -149,16 +151,20 @@ public class StudyService {
 
 		fileDownloadService.exportBudget(response, study);
 
+		LocalDateTime thirtyDaysLater = LocalDateTime.now().plusDays(30);
+		Date thirtyDaysLaterAsDate = Date.from(thirtyDaysLater.atZone(ZoneId.systemDefault()).toInstant());
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				Checkpoint checkpoint = new Checkpoint();
-				checkpoint.setStudy(study);
-				checkpoint.setCreatedBy(null);
-				checkpoint.setStatus(studyStatusService.getStudyStatus(12L));
-				study.getCheckpoints().add(checkpoint);
+				if (study.getActualStatus().getId() == 1L) {
+					Checkpoint checkpoint = new Checkpoint();
+					checkpoint.setStudy(study);
+					checkpoint.setCreatedBy(null);
+					checkpoint.setStatus(studyStatusService.getStudyStatus(12L));
+					study.getCheckpoints().add(checkpoint);
+				}
 			}
-		}, 30L * 24 * 60 * 60 * 1000);
+		}, thirtyDaysLaterAsDate);
 	}
 
 }
