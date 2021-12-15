@@ -65,4 +65,10 @@ public class StudyController {
 		studyService.downloadBudgetFile(studyID, response);
 	}
 
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/status")
+	public void listWaitingForPayment() {
+		studyService.cancelStudy();
+	}
+
 }

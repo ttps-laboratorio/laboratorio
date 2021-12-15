@@ -14,13 +14,11 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -150,21 +148,20 @@ public class StudyService {
 		response.setHeader(headerKey, headerValue);
 
 		fileDownloadService.exportBudget(response, study);
+	}
 
-		LocalDateTime thirtyDaysLater = LocalDateTime.now().plusDays(30);
-		Date thirtyDaysLaterAsDate = Date.from(thirtyDaysLater.atZone(ZoneId.systemDefault()).toInstant());
-		new Timer().schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (study.getActualStatus().getId() == 1L) {
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void cancelStudy() {
+		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(1L);
+		studyRepository.findAllByActualState(statusWaitingForPayment).stream()
+				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0).forEach(study -> {
 					Checkpoint checkpoint = new Checkpoint();
 					checkpoint.setStudy(study);
 					checkpoint.setCreatedBy(null);
 					checkpoint.setStatus(studyStatusService.getStudyStatus(12L));
 					study.getCheckpoints().add(checkpoint);
-				}
-			}
-		}, thirtyDaysLaterAsDate);
+					studyRepository.save(study);
+				});
 	}
 
 }
