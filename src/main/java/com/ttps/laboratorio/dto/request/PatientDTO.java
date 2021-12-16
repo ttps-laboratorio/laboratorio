@@ -1,15 +1,19 @@
 package com.ttps.laboratorio.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.validation.annotation.Validated;
 
 @Validated
 @Getter
@@ -39,6 +43,6 @@ public class PatientDTO {
 
 	private String affiliateNumber;
 
-	private Integer healthInsuranceId;
+	private HealthInsuranceDTO healthInsurance;
 
 }

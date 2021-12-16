@@ -1,6 +1,23 @@
 package com.ttps.laboratorio.service;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
 import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Checkpoint;
 import com.ttps.laboratorio.entity.Patient;
@@ -10,18 +27,6 @@ import com.ttps.laboratorio.entity.User;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IStudyRepository;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
 @Service
 public class StudyService {
@@ -42,6 +47,8 @@ public class StudyService {
 
 	private final FileDownloadService fileDownloadService;
 
+	private final ModelMapper mapper;
+
 	public StudyService(IStudyRepository studyRepository,
 											PatientService patientService,
 											UserService userService,
@@ -58,6 +65,8 @@ public class StudyService {
 		this.studyTypeService = studyTypeService;
 		this.presumptiveDiagnosisService = presumptiveDiagnosisService;
 		this.fileDownloadService = fileDownloadService;
+		this.mapper = new ModelMapper();
+		this.mapper.getConfiguration().setSkipNullEnabled(true);
 	}
 
 	public Study getStudy(Long studyId) {
@@ -70,8 +79,14 @@ public class StudyService {
 	 *
 	 * @return List of all the studies
 	 */
-	public List<Study> getAllStudies() {
-		return new ArrayList<>(studyRepository.findAll());
+	public List<StudyItemResponseDTO> getAllStudies() {
+		return studyRepository.findAll().stream().map(s -> {
+			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+			item.setFirstName(s.getPatient().getFirstName());
+			item.setLastName(s.getPatient().getLastName());
+			return item;
+		})
+				.collect(Collectors.toList());
 	}
 
 	public Study createStudy(Long patientId, StudyDTO request) {
@@ -80,34 +95,36 @@ public class StudyService {
 		patient.addStudy(study);
 		study.setBudget(request.getBudget());
 		study.setExtractionAmount(request.getExtractionAmount());
-		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctorId().longValue()));
-		study.setType(studyTypeService.getStudyType(request.getStudyTypeId().longValue()));
-		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosisId().longValue()));
+		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctor().getId()));
+		study.setType(studyTypeService.getStudyType(request.getStudyType().getId()));
+		study.setPresumptiveDiagnosis(
+				presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosis().getId()));
 		setCheckpointWithStatus(1L, study);
 		return studyRepository.save(study);
 	}
 
-	public void updateStudy(Long studyId, StudyDTO request) {
+	public void updateStudy(Long studyId, StudyDTO studyDTO) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio con el id " + studyId + "."));
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getOrder() == 1) {
-			study.setBudget(request.getBudget());
+			study.setBudget(studyDTO.getBudget());
 		} else {
 			throw new BadRequestException("El paciente ya abono el presupuesto.");
 		}
 		if (!study.getPaidExtractionAmount()) {
-			study.setExtractionAmount(request.getExtractionAmount());
+			study.setExtractionAmount(studyDTO.getExtractionAmount());
 		} else {
 			throw new BadRequestException("El laboratorio ya abono el monto extraccionista.");
 		}
 		if (actualStatus.getOrder() <= 2) {
-			study.setType(studyTypeService.getStudyType(request.getStudyTypeId().longValue()));
+			study.setType(studyTypeService.getStudyType(studyDTO.getStudyType().getId()));
 		} else {
 			throw new BadRequestException("Ya se envio el consentimiento informado al paciente.");
 		}
-		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctorId().longValue()));
-		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosisId().longValue()));
+		study.setReferringDoctor(doctorService.getDoctor(studyDTO.getReferringDoctor().getId()));
+		study.setPresumptiveDiagnosis(
+				presumptiveDiagnosisService.getPresumptiveDiagnosis(studyDTO.getPresumptiveDiagnosis().getId()));
 	}
 
 	public void downloadBudgetFile(Long id, HttpServletResponse response) throws IOException {

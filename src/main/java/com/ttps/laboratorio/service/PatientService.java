@@ -1,13 +1,15 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.ttps.laboratorio.dto.request.PatientDTO;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IPatientRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
 
 @Service
 public class PatientService {
@@ -68,15 +70,15 @@ public class PatientService {
 		setPatient(patient, request);
 	}
 
-	private void setPatient(Patient patient, PatientDTO request) {
-		patient.setDni(request.getDni());
-		patient.setFirstName(request.getFirstName());
-		patient.setLastName(request.getLastName());
-		patient.setBirthDate(request.getBirthDate());
-		patient.setClinicHistory(request.getClinicHistory());
-		patient.setAffiliateNumber(request.getAffiliateNumber());
-		patient.setContact(contactService.createContact(request.getContact()));
-		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(request.getHealthInsuranceId().longValue()));
+	private void setPatient(Patient patient, PatientDTO dto) {
+		patient.setDni(dto.getDni());
+		patient.setFirstName(dto.getFirstName());
+		patient.setLastName(dto.getLastName());
+		patient.setBirthDate(dto.getBirthDate());
+		patient.setClinicHistory(dto.getClinicHistory());
+		patient.setAffiliateNumber(dto.getAffiliateNumber());
+		patient.setContact(contactService.createContact(dto.getContact()));
+		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
 		patientRepository.save(patient);
 	}
 
