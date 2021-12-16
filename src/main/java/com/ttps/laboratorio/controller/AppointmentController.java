@@ -1,10 +1,7 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.request.AppointmentDTO;
-import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.service.AppointmentService;
 import java.time.LocalDate;
-import javax.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +28,7 @@ public class AppointmentController {
 	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping(path = "/")
 	public ResponseEntity<?> listAppointments() {
 		return ResponseEntity.ok(appointmentService.getAllAppointments());
@@ -45,7 +40,7 @@ public class AppointmentController {
 	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping(path = "/free-appointments/{date}")
 	public ResponseEntity<?> listFreeAppointmentDaysByMonth(
 			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
@@ -58,7 +53,7 @@ public class AppointmentController {
 	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping(path = "/appointments/{date}")
 	public ResponseEntity<?> listAppointmentsByDate(
 			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
@@ -70,29 +65,17 @@ public class AppointmentController {
 	 *
 	 * @return Returns a list of all appointments with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping(path = "/available-appointments/{date}")
 	public ResponseEntity<?> listAvailableAppointmentsByDate(
 			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 		return ResponseEntity.ok(appointmentService.getAvailableAppointmentsByDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
 	}
 
-	/**
-	 * Registers a new Appointment on the database.
-	 *
-	 * @param appointmentDTO appointment information
-	 * @return status
-	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
-	@PostMapping(path = "/")
-	public ResponseEntity<Appointment> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
-		return new ResponseEntity<>(appointmentService.createAppointment(appointmentDTO), HttpStatus.CREATED);
-	}
-
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<?> deleteAppointment(@PathVariable(name = "id") @NonNull Long appointmentID) {
-		appointmentService.deleteAppointment(appointmentID);
+	public ResponseEntity<?> deleteAppointment(@PathVariable(name = "id") @NonNull Long appointmentId) {
+		appointmentService.deleteAppointment(appointmentId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

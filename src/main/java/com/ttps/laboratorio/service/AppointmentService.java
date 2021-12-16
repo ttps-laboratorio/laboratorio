@@ -4,6 +4,7 @@ import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.BlockedDay;
 import com.ttps.laboratorio.entity.ScheduleConfigurator;
+import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IAppointmentRepository;
@@ -26,9 +27,12 @@ public class AppointmentService {
 
 	private final BlockedDayService blockedDayService;
 
-	public AppointmentService(IAppointmentRepository appointmentRepository, BlockedDayService blockedDayService) {
+	private final StudyService studyService;
+
+	public AppointmentService(IAppointmentRepository appointmentRepository, BlockedDayService blockedDayService, StudyService studyService) {
 		this.appointmentRepository = appointmentRepository;
 		this.blockedDayService = blockedDayService;
+		this.studyService = studyService;
 	}
 
 	/**
@@ -76,7 +80,12 @@ public class AppointmentService {
 	 *
 	 * @param request appointment information
 	 */
-	public Appointment createAppointment(AppointmentDTO request) {
+	public Appointment createAppointment(Long studyId, AppointmentDTO request) {
+		Study study = studyService.getStudy(studyId);
+		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(4L)) {
+			throw new BadRequestException(
+					"El estudio no se encuentra en el estado correspondiente para sacar turno.");
+		}
 		ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
 		List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(request.getDate().getYear(),
 				request.getDate().getMonthValue());
@@ -98,6 +107,9 @@ public class AppointmentService {
 		appointment.setDate(request.getDate());
 		appointment.setTime(request.getTime());
 		appointmentRepository.save(appointment);
+		study.setAppointment(appointment);
+		studyService.setCheckpointWithStatus(5L, study);
+		studyService.saveStudy(study);
 		return appointment;
 	}
 
@@ -107,8 +119,17 @@ public class AppointmentService {
 	 * @param appointmentID id from the appointment to delete
 	 */
 	public void deleteAppointment(Long appointmentID) {
-		appointmentRepository.delete(appointmentRepository.findById(appointmentID)
-				.orElseThrow(() -> new NotFoundException("No existe un turno con el id " + appointmentID + ".")));
+		Appointment appointment = appointmentRepository.findById(appointmentID)
+				.orElseThrow(() -> new NotFoundException("No existe un turno con el id " + appointmentID + "."));
+		Study study = studyService.getStudyByAppointment(appointment);
+		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(5L)) {
+			throw new BadRequestException(
+					"El estudio no se encuentra en el estado correspondiente para eliminar el turno.");
+		}
+		study.setAppointment(null);
+		studyService.setCheckpointWithStatus(4L, study);
+		studyService.saveStudy(study);
+		appointmentRepository.delete(appointment);
 	}
 
 	private List<Boolean> getBooleanFreeAppointmentDaysByMonth(Integer year, Integer month) {

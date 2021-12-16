@@ -32,7 +32,7 @@ public class PatientController {
 		this.studyService = studyService;
 	}
 
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping("/{id}")
 	public ResponseEntity<Patient> getPatient(@PathVariable(name = "id") @NonNull Long patientId) {
 		Patient patient = patientService.getPatient(patientId);
@@ -56,7 +56,7 @@ public class PatientController {
 	 * @param patientDTO patient information
 	 * @return status
 	 */
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@PostMapping
 	public ResponseEntity<Patient> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
 		return new ResponseEntity<>(patientService.createPatient(patientDTO), HttpStatus.CREATED);
@@ -68,7 +68,7 @@ public class PatientController {
 	 * @param patientDTO patient information
 	 * @return status
 	 */
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updatePatient(@PathVariable(name = "id") @NonNull Long patientID,
 																				 @Valid @RequestBody @NonNull PatientDTO patientDTO) {

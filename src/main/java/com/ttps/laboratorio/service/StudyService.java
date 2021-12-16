@@ -1,8 +1,8 @@
 package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Checkpoint;
-import com.ttps.laboratorio.entity.Employee;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
@@ -13,6 +13,7 @@ import com.ttps.laboratorio.repository.IStudyRepository;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +45,8 @@ public class StudyService {
 
 	private final FileDownloadService fileDownloadService;
 
+	private final AppointmentService appointmentService;
+
 	public StudyService(IStudyRepository studyRepository,
 											PatientService patientService,
 											UserService userService,
@@ -52,7 +55,8 @@ public class StudyService {
 											DoctorService doctorService,
 											StudyTypeService studyTypeService,
 											PresumptiveDiagnosisService presumptiveDiagnosisService,
-											FileDownloadService fileDownloadService) {
+											FileDownloadService fileDownloadService,
+											AppointmentService appointmentService) {
 		this.studyRepository = studyRepository;
 		this.patientService = patientService;
 		this.userService = userService;
@@ -62,6 +66,7 @@ public class StudyService {
 		this.studyTypeService = studyTypeService;
 		this.presumptiveDiagnosisService = presumptiveDiagnosisService;
 		this.fileDownloadService = fileDownloadService;
+		this.appointmentService = appointmentService;
 	}
 
 	public Study getStudy(Long studyId) {
@@ -87,20 +92,7 @@ public class StudyService {
 		study.setReferringDoctor(doctorService.getDoctor(request.getReferringDoctorId().longValue()));
 		study.setType(studyTypeService.getStudyType(request.getStudyTypeId().longValue()));
 		study.setPresumptiveDiagnosis(presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosisId().longValue()));
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String username;
-		if (principal instanceof UserDetails) {
-			username = ((UserDetails) principal).getUsername();
-		} else {
-			username = principal.toString();
-		}
-		User queriedUser = userService.getUserByUsername(username);
-		Employee employee = employeeService.getByUser(queriedUser);
-		Checkpoint checkpoint = new Checkpoint();
-		checkpoint.setStudy(study);
-		checkpoint.setCreatedBy(employee);
-		checkpoint.setStatus(studyStatusService.getStudyStatus(1L));
-		study.getCheckpoints().add(checkpoint);
+		setCheckpointWithStatus(1L, study);
 		return studyRepository.save(study);
 	}
 
@@ -150,6 +142,30 @@ public class StudyService {
 		fileDownloadService.exportBudget(response, study);
 	}
 
+	public Study getStudyByAppointment(Appointment appointment) {
+		return studyRepository.findByAppointment(appointment);
+	}
+
+	public void saveStudy(Study study) {
+		studyRepository.save(study);
+	}
+
+	public void setCheckpointWithStatus(Long status, Study study) {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username;
+		if (principal instanceof UserDetails) {
+			username = ((UserDetails) principal).getUsername();
+		} else {
+			username = principal.toString();
+		}
+		User queriedUser = userService.getUserByUsername(username);
+		Checkpoint checkpoint = new Checkpoint();
+		checkpoint.setStudy(study);
+		checkpoint.setCreatedBy(queriedUser);
+		checkpoint.setStatus(studyStatusService.getStudyStatus(status));
+		study.getCheckpoints().add(checkpoint);
+	}
+
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void cancelStudy() {
 		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(1L);
@@ -159,6 +175,21 @@ public class StudyService {
 					checkpoint.setStudy(study);
 					checkpoint.setCreatedBy(null);
 					checkpoint.setStatus(studyStatusService.getStudyStatus(12L));
+					study.getCheckpoints().add(checkpoint);
+					studyRepository.save(study);
+				});
+	}
+
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void cancelAppointment() {
+		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(5L);
+		studyRepository.findAllByActualState(statusWaitingAppointmentSelection).stream()
+				.filter(s -> s.getAppointment().getDate().plusDays(30).compareTo(LocalDate.now()) < 0).forEach(study -> {
+					Checkpoint checkpoint = new Checkpoint();
+					checkpoint.setStudy(study);
+					checkpoint.setCreatedBy(null);
+					appointmentService.deleteAppointment(study.getAppointment().getId());
+					checkpoint.setStatus(studyStatusService.getStudyStatus(4L));
 					study.getCheckpoints().add(checkpoint);
 					studyRepository.save(study);
 				});

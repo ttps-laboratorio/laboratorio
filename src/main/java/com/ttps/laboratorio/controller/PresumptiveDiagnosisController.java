@@ -22,7 +22,7 @@ public class PresumptiveDiagnosisController {
 	 *
 	 * @return Returns a list of all presumptive diagnosis with "200 OK".
 	 */
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping()
 	public ResponseEntity<?> listPresumptiveDiagnosis() {
 		return ResponseEntity.ok(presumptiveDiagnosisService.getAllPresumptiveDiagnosis());

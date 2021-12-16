@@ -26,7 +26,7 @@ public class DoctorController {
 		this.doctorService = doctorService;
 	}
 
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping("/{id}")
 	public ResponseEntity<Doctor> getDoctor(@PathVariable(name = "id") @NonNull Long doctorId) {
 		return ResponseEntity.ok(doctorService.getDoctor(doctorId));
@@ -37,7 +37,7 @@ public class DoctorController {
 	 *
 	 * @return Returns a list of all doctors with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping()
 	public ResponseEntity<?> listDoctors() {
 		return ResponseEntity.ok(doctorService.getAllDoctors());

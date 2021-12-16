@@ -77,7 +77,7 @@ public class Study implements Serializable {
 	/**
 	 * A study may have one appointment
 	 */
-	@OneToOne(optional = true)
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	private Appointment appointment;
 
 	/**

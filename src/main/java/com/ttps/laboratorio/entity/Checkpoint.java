@@ -46,7 +46,7 @@ public class Checkpoint implements Serializable {
 	private StudyStatus status;
 
 	@ManyToOne
-	private Employee createdBy;
+	private User createdBy;
 
 	@ManyToOne
 	@JsonIgnore

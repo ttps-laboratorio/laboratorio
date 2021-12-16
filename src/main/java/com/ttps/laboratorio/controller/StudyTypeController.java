@@ -20,7 +20,7 @@ public class StudyTypeController {
 		this.studyTypeService = studyTypeService;
 	}
 
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping("/{id}")
 	public ResponseEntity<StudyType> getStudyType(@PathVariable(name = "id") @NonNull Long studyTypeId) {
 		return ResponseEntity.ok(studyTypeService.getStudyType(studyTypeId));
@@ -31,7 +31,7 @@ public class StudyTypeController {
 	 *
 	 * @return Returns a list of all studyTypes with "200 OK".
 	 */
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping()
 	public ResponseEntity<?> listStudyTypes() {
 		return ResponseEntity.ok(studyTypeService.getAllStudyTypes());

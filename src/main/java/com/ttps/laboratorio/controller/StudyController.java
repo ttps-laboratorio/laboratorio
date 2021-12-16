@@ -1,7 +1,10 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.service.AppointmentService;
 import com.ttps.laboratorio.service.StudyService;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +15,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +27,11 @@ public class StudyController {
 
 	private final StudyService studyService;
 
-	public StudyController(StudyService studyService) {
+	private final AppointmentService appointmentService;
+
+	public StudyController(StudyService studyService, AppointmentService appointmentService) {
 		this.studyService = studyService;
+		this.appointmentService = appointmentService;
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
@@ -69,6 +76,19 @@ public class StudyController {
 	@GetMapping("/status")
 	public void listWaitingForPayment() {
 		studyService.cancelStudy();
+	}
+
+	/**
+	 * Registers a new Appointment on the database.
+	 *
+	 * @param appointmentDTO appointment information
+	 * @return status
+	 */
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PostMapping(path = "/{studyId}/appointment")
+	public ResponseEntity<Appointment> createAppointment(@PathVariable(name = "studyId") @NonNull Long studyId,
+																											 @Valid @RequestBody AppointmentDTO appointmentDTO) {
+		return new ResponseEntity<>(appointmentService.createAppointment(studyId, appointmentDTO), HttpStatus.CREATED);
 	}
 
 }

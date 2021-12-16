@@ -5,5 +5,5 @@ package com.ttps.laboratorio.entity;
  */
 public enum RoleEnum {
 
-	EMPLOYEE, CONFIGURATOR, ADMINISTRATOR
+	EMPLOYEE, CONFIGURATOR, ADMINISTRATOR, PATIENT
 }
