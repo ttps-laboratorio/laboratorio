@@ -22,12 +22,12 @@ public class StudyDTO {
 	private BigDecimal extractionAmount;
 
 	@NotNull(message = "Study referring doctor is required")
-	private Integer referringDoctorId;
+	private DoctorDTO referringDoctor;
 
 	@NotNull(message = "Study type is required")
-	private Integer studyTypeId;
+	private StudyTypeDTO studyType;
 
 	@NotNull(message = "Study's presumptive diagnosis is required")
-	private Integer presumptiveDiagnosisId;
+	private PresumptiveDiagnosisDTO presumptiveDiagnosis;
 
 }

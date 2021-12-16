@@ -1,9 +1,7 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.request.HealthInsuranceDTO;
-import com.ttps.laboratorio.entity.HealthInsurance;
-import com.ttps.laboratorio.service.HealthInsuranceService;
 import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -17,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ttps.laboratorio.dto.request.HealthInsuranceDTO;
+import com.ttps.laboratorio.entity.HealthInsurance;
+import com.ttps.laboratorio.service.HealthInsuranceService;
 
 @RestController
 @RequestMapping(path = "/health-insurance")
@@ -33,13 +35,13 @@ public class HealthInsuranceController {
 	 *
 	 * @return Returns a list of all health insurances with "200 OK".
 	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping
 	public ResponseEntity<?> listHealthInsurance() {
 		return ResponseEntity.ok(healthInsuranceService.getAllHealthInsurances());
 	}
 
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping("/{id}")
 	public ResponseEntity<HealthInsurance> getHealthInsurance(
 			@PathVariable(name = "id") @NonNull Long healthInsuranceID) {

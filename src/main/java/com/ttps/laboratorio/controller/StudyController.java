@@ -1,17 +1,10 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.request.AppointmentDTO;
-import com.ttps.laboratorio.dto.request.SampleDTO;
-import com.ttps.laboratorio.dto.request.StudyDTO;
-import com.ttps.laboratorio.entity.Appointment;
-import com.ttps.laboratorio.entity.Sample;
-import com.ttps.laboratorio.entity.Study;
-import com.ttps.laboratorio.service.AppointmentService;
-import com.ttps.laboratorio.service.SampleService;
-import com.ttps.laboratorio.service.StudyService;
 import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -23,6 +16,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.SampleDTO;
+import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Sample;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.service.AppointmentService;
+import com.ttps.laboratorio.service.SampleService;
+import com.ttps.laboratorio.service.StudyService;
 
 @RestController
 @RequestMapping(path = "study")
