@@ -3,8 +3,10 @@ package com.ttps.laboratorio.service;
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.BlockedDay;
+import com.ttps.laboratorio.entity.Checkpoint;
 import com.ttps.laboratorio.entity.ScheduleConfigurator;
 import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IAppointmentRepository;
@@ -18,6 +20,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,10 +32,14 @@ public class AppointmentService {
 
 	private final StudyService studyService;
 
-	public AppointmentService(IAppointmentRepository appointmentRepository, BlockedDayService blockedDayService, StudyService studyService) {
+	private final StudyStatusService studyStatusService;
+
+	public AppointmentService(IAppointmentRepository appointmentRepository, BlockedDayService blockedDayService, StudyService studyService,
+														StudyStatusService studyStatusService) {
 		this.appointmentRepository = appointmentRepository;
 		this.blockedDayService = blockedDayService;
 		this.studyService = studyService;
+		this.studyStatusService = studyStatusService;
 	}
 
 	/**
@@ -192,6 +199,21 @@ public class AppointmentService {
 			aux = aux.plusMinutes(scheduleConfigurator.getFrequency().getMinute());
 		}
 		return rawAppointmentList;
+	}
+
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void cancelAppointment() {
+		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(5L);
+		studyService.getStudiesByActualStatus(statusWaitingAppointmentSelection).stream()
+				.filter(s -> s.getAppointment().getDate().plusDays(30).compareTo(LocalDate.now()) < 0).forEach(study -> {
+					Checkpoint checkpoint = new Checkpoint();
+					checkpoint.setStudy(study);
+					checkpoint.setCreatedBy(null);
+					deleteAppointment(study.getAppointment().getId());
+					checkpoint.setStatus(studyStatusService.getStudyStatus(4L));
+					study.getCheckpoints().add(checkpoint);
+					studyService.saveStudy(study);
+				});
 	}
 
 }

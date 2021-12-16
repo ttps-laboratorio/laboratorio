@@ -1,5 +1,7 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
 /**
  * Represents the blood extraction of a patient for a study
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +44,7 @@ public class Sample implements Serializable {
 	@Column(name = "freezer", nullable = false)
 	private Integer freezer;
 
+	@JsonIgnore
 	@OneToOne(optional = false)
 	@JoinColumn(name = "study_id")
 	private Study study;

@@ -20,8 +20,4 @@ public class SampleDTO {
 	@NotNull(message = "Sample's freezer is required")
 	private Integer freezer;
 
-	private long study;
-
-	private long sampleBatch;
-
 }

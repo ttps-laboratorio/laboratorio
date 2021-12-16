@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface IStudyRepository extends JpaRepository<Study, Long> {
 
 	@Query("SELECT s FROM Study s JOIN s.checkpoints ch WHERE ch.createdAt IN (SELECT MAX(c.createdAt) FROM Checkpoint c WHERE c.study=s AND c.status= :status)")
-	List<Study> findAllByActualState(@Param("status") StudyStatus status);
+	List<Study> findAllByActualStatus(@Param("status") StudyStatus status);
 
 	Study findByAppointment(Appointment appointment);
 

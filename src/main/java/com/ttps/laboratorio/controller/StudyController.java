@@ -1,10 +1,13 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.SampleDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.service.AppointmentService;
+import com.ttps.laboratorio.service.SampleService;
 import com.ttps.laboratorio.service.StudyService;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -29,9 +32,12 @@ public class StudyController {
 
 	private final AppointmentService appointmentService;
 
-	public StudyController(StudyService studyService, AppointmentService appointmentService) {
+	private final SampleService sampleService;
+
+	public StudyController(StudyService studyService, AppointmentService appointmentService, SampleService sampleService) {
 		this.studyService = studyService;
 		this.appointmentService = appointmentService;
+		this.sampleService = sampleService;
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
@@ -73,22 +79,17 @@ public class StudyController {
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	@GetMapping("/status")
-	public void listWaitingForPayment() {
-		studyService.cancelStudy();
-	}
-
-	/**
-	 * Registers a new Appointment on the database.
-	 *
-	 * @param appointmentDTO appointment information
-	 * @return status
-	 */
-	@PreAuthorize("hasRole('CONFIGURATOR') OR hasRole('EMPLOYEE')")
 	@PostMapping(path = "/{studyId}/appointment")
 	public ResponseEntity<Appointment> createAppointment(@PathVariable(name = "studyId") @NonNull Long studyId,
 																											 @Valid @RequestBody AppointmentDTO appointmentDTO) {
 		return new ResponseEntity<>(appointmentService.createAppointment(studyId, appointmentDTO), HttpStatus.CREATED);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PostMapping(path = "/{studyId}/sample")
+	public ResponseEntity<Sample> createSample(@PathVariable(name = "studyId") @NonNull Long studyId,
+																									@Valid @RequestBody SampleDTO sampleDTO) {
+		return new ResponseEntity<>(sampleService.createSample(studyId, sampleDTO), HttpStatus.CREATED);
 	}
 
 }

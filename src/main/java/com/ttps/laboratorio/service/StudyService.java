@@ -13,7 +13,6 @@ import com.ttps.laboratorio.repository.IStudyRepository;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,8 +32,6 @@ public class StudyService {
 
 	private final UserService userService;
 
-	private final EmployeeService employeeService;
-
 	private final StudyStatusService studyStatusService;
 
 	private final DoctorService doctorService;
@@ -45,28 +42,22 @@ public class StudyService {
 
 	private final FileDownloadService fileDownloadService;
 
-	private final AppointmentService appointmentService;
-
 	public StudyService(IStudyRepository studyRepository,
 											PatientService patientService,
 											UserService userService,
-											EmployeeService employeeService,
 											StudyStatusService studyStatusService,
 											DoctorService doctorService,
 											StudyTypeService studyTypeService,
 											PresumptiveDiagnosisService presumptiveDiagnosisService,
-											FileDownloadService fileDownloadService,
-											AppointmentService appointmentService) {
+											FileDownloadService fileDownloadService) {
 		this.studyRepository = studyRepository;
 		this.patientService = patientService;
 		this.userService = userService;
-		this.employeeService = employeeService;
 		this.studyStatusService = studyStatusService;
 		this.doctorService = doctorService;
 		this.studyTypeService = studyTypeService;
 		this.presumptiveDiagnosisService = presumptiveDiagnosisService;
 		this.fileDownloadService = fileDownloadService;
-		this.appointmentService = appointmentService;
 	}
 
 	public Study getStudy(Long studyId) {
@@ -166,30 +157,19 @@ public class StudyService {
 		study.getCheckpoints().add(checkpoint);
 	}
 
+	public List<Study> getStudiesByActualStatus(StudyStatus studyStatus) {
+		return studyRepository.findAllByActualStatus(studyStatus);
+	}
+
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void cancelStudy() {
 		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(1L);
-		studyRepository.findAllByActualState(statusWaitingForPayment).stream()
+		getStudiesByActualStatus(statusWaitingForPayment).stream()
 				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0).forEach(study -> {
 					Checkpoint checkpoint = new Checkpoint();
 					checkpoint.setStudy(study);
 					checkpoint.setCreatedBy(null);
 					checkpoint.setStatus(studyStatusService.getStudyStatus(12L));
-					study.getCheckpoints().add(checkpoint);
-					studyRepository.save(study);
-				});
-	}
-
-	@Scheduled(cron = "0 0 0 * * ?")
-	public void cancelAppointment() {
-		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(5L);
-		studyRepository.findAllByActualState(statusWaitingAppointmentSelection).stream()
-				.filter(s -> s.getAppointment().getDate().plusDays(30).compareTo(LocalDate.now()) < 0).forEach(study -> {
-					Checkpoint checkpoint = new Checkpoint();
-					checkpoint.setStudy(study);
-					checkpoint.setCreatedBy(null);
-					appointmentService.deleteAppointment(study.getAppointment().getId());
-					checkpoint.setStatus(studyStatusService.getStudyStatus(4L));
 					study.getCheckpoints().add(checkpoint);
 					studyRepository.save(study);
 				});
