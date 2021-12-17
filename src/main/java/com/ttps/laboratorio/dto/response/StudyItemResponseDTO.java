@@ -30,8 +30,6 @@ public class StudyItemResponseDTO {
 
 	private String lastName;
 
-	private DoctorResponseDTO referringDoctor;
-
 	private StudyType type;
 
 	private StudyStatusResponseDTO actualStatus;
