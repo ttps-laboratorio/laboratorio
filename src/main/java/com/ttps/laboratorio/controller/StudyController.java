@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.dto.request.SampleDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
@@ -57,8 +58,8 @@ public class StudyController {
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@GetMapping()
-	public ResponseEntity<?> listStudies() {
-		return ResponseEntity.ok(studyService.getAllStudies());
+	public ResponseEntity<?> listStudies(@Valid StudySearchFilterDTO filter) {
+		return ResponseEntity.ok(studyService.getAllStudies(filter));
 	}
 
 	/**

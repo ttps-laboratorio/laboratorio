@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
 import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Checkpoint;
@@ -27,6 +28,7 @@ import com.ttps.laboratorio.entity.User;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IStudyRepository;
+import com.ttps.laboratorio.repository.specification.StudySpecifications;
 
 @Service
 public class StudyService {
@@ -91,6 +93,15 @@ public class StudyService {
 			return item;
 		})
 				.collect(Collectors.toList());
+	}
+
+	public List<StudyItemResponseDTO> getAllStudies(StudySearchFilterDTO filter) {
+		return studyRepository.findAll(StudySpecifications.all(filter)).stream().map(s -> {
+			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+			item.setFirstName(s.getPatient().getFirstName());
+			item.setLastName(s.getPatient().getLastName());
+			return item;
+		}).collect(Collectors.toList());
 	}
 
 	public Study createStudy(Long patientId, StudyDTO request) {
