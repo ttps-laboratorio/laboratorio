@@ -1,9 +1,13 @@
 spring:
+  main:
+    lazy-initialization: true
   jpa:
     database: postgresql
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+    properties:
+      hibernate.format_sql: false
   datasource:
     platform: postgres
     url: jdbc:postgresql://localhost:5432/laboratorio
@@ -15,3 +19,14 @@ security:
   jwt:
     secret: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1YSFhzcW9pVk9fOA==
     validity: 43200 # 30 days in minutes: 30 * 24 * 60
+
+laboratory:
+  properties:
+    save-files-path: /home/ignacio/Facultad/TTPS/laboratory-files
+logging:
+  file: /tmp/laboratorio.log
+  level:
+    root: INFO
+    org.springframework.web: ERROR
+    com.ttps.laboratorio: DEBUG
+    org.hibernate: INFO

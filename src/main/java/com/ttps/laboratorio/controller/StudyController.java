@@ -1,10 +1,13 @@
 package com.ttps.laboratorio.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -76,10 +79,15 @@ public class StudyController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@PreAuthorize("hasRole('EMPLOYEE')")
-	@GetMapping("/pdf/budget/{id}")
-	public void generateBudgetPDF(@PathVariable(name = "id") @NonNull Long studyID, HttpServletResponse response) throws IOException {
-		studyService.downloadBudgetFile(studyID, response);
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@GetMapping("/{id}/budget")
+	public ResponseEntity<Resource> downloadBudgetPDF(@PathVariable(name = "id") @NonNull Long studyID)
+			throws IOException {
+		Resource file = studyService.downloadBudgetFile(studyID);
+		Path path = file.getFile().toPath();
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.body(file);
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")

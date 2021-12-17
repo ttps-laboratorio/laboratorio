@@ -1,20 +1,19 @@
 package com.ttps.laboratorio.service;
 
+import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
@@ -26,11 +25,16 @@ import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.entity.User;
 import com.ttps.laboratorio.exception.BadRequestException;
+import com.ttps.laboratorio.exception.LaboratoryException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IStudyRepository;
 import com.ttps.laboratorio.repository.specification.StudySpecifications;
+import com.ttps.laboratorio.utils.LaboratoryFileUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class StudyService {
 
 	private final IStudyRepository studyRepository;
@@ -47,21 +51,18 @@ public class StudyService {
 
 	private final PresumptiveDiagnosisService presumptiveDiagnosisService;
 
-	private final FileDownloadService fileDownloadService;
+	private final PdfGeneratorService pdfGeneratorService;
 
 	private final ModelMapper mapper;
 
 	private final ExtractionistService extractionistService;
 
-	public StudyService(IStudyRepository studyRepository,
-											PatientService patientService,
-											UserService userService,
-											StudyStatusService studyStatusService,
-											DoctorService doctorService,
-											StudyTypeService studyTypeService,
-											PresumptiveDiagnosisService presumptiveDiagnosisService,
-											FileDownloadService fileDownloadService,
-											ExtractionistService extractionistService) {
+	private final LaboratoryFileUtils laboratoryFileUtils;
+
+	public StudyService(IStudyRepository studyRepository, PatientService patientService, UserService userService,
+			StudyStatusService studyStatusService, DoctorService doctorService, StudyTypeService studyTypeService,
+			PresumptiveDiagnosisService presumptiveDiagnosisService, PdfGeneratorService pdfGeneratorService,
+			ExtractionistService extractionistService, LaboratoryFileUtils fileNameUtils) {
 		this.studyRepository = studyRepository;
 		this.patientService = patientService;
 		this.userService = userService;
@@ -69,10 +70,11 @@ public class StudyService {
 		this.doctorService = doctorService;
 		this.studyTypeService = studyTypeService;
 		this.presumptiveDiagnosisService = presumptiveDiagnosisService;
-		this.fileDownloadService = fileDownloadService;
+		this.pdfGeneratorService = pdfGeneratorService;
 		this.mapper = new ModelMapper();
 		this.mapper.getConfiguration().setSkipNullEnabled(true);
 		this.extractionistService = extractionistService;
+		this.laboratoryFileUtils = fileNameUtils;
 	}
 
 	public Study getStudy(Long studyId) {
@@ -91,8 +93,7 @@ public class StudyService {
 			item.setFirstName(s.getPatient().getFirstName());
 			item.setLastName(s.getPatient().getLastName());
 			return item;
-		})
-				.collect(Collectors.toList());
+		}).collect(Collectors.toList());
 	}
 
 	public List<StudyItemResponseDTO> getAllStudies(StudySearchFilterDTO filter) {
@@ -104,6 +105,7 @@ public class StudyService {
 		}).collect(Collectors.toList());
 	}
 
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public Study createStudy(Long patientId, StudyDTO request) {
 		Study study = new Study();
 		Patient patient = patientService.getPatient(patientId);
@@ -115,7 +117,15 @@ public class StudyService {
 		study.setPresumptiveDiagnosis(
 				presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosis().getId()));
 		setCheckpointWithStatus(1L, study);
-		return studyRepository.save(study);
+		study = studyRepository.save(study);
+		try {
+			String filename = laboratoryFileUtils.getFilenameBudget(study.getPatient().getId(), study.getId());
+			pdfGeneratorService.generateBudget(study, filename);
+		} catch (IOException e) {
+			log.error("No se pudo generar el pdf del presupuesto del paciente [dni: " + patient.getDni() + "]", e);
+			throw new LaboratoryException("No se pudo generar el presupuesto del paciente");
+		}
+		return study;
 	}
 
 	public void updateStudy(Long studyId, StudyDTO studyDTO) {
@@ -142,27 +152,29 @@ public class StudyService {
 				presumptiveDiagnosisService.getPresumptiveDiagnosis(studyDTO.getPresumptiveDiagnosis().getId()));
 	}
 
-	public void downloadBudgetFile(Long id, HttpServletResponse response) throws IOException {
-		Study study = studyRepository.findById(id)
-				.orElseThrow(() -> new NotFoundException("No existe un estudio con el id " + id + "."));
-		if (study.getActualStatus().getId() != 1L) {
-			if (study.getActualStatus().getId() == 12L) {
-				throw new BadRequestException("El estudio con id " + id + " fue anulado. Deberá crear un nuevo estudio.");
-			} else {
-				throw new BadRequestException("El presupuesto del estudio con id " + id + " ya fue abonado.");
-			}
+	public Resource downloadBudgetFile(Long studyId) {
+		// org.springframework.security.core.userdetails.User currentUser =
+		// (org.springframework.security.core.userdetails.User)
+		// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		// here we have to check if the user is a PATIENT that the studyId is his own
+
+		// if (currentUser.getAuthorities().stream().anyMatch(a ->
+		// a.getAuthority().equals("ROLE_PATIENT"))) {
+		// User user = userService.getUserByUsername(currentUser.getUsername());
+		// }
+
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio con el id " + studyId + "."));
+		if (study.getActualStatus().getId() == 12L) {
+			throw new BadRequestException(
+					"El estudio con id " + studyId + " fue anulado. Deberá crear un nuevo estudio.");
 		}
-		response.setContentType("application/pdf");
-		DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
-		String currentDateTime = dateFormatter.format(new Date());
-
-		String headerKey = "Content-Disposition";
-		String headerValue =
-				"attachment; filename=" + study.getPatient().getLastName() + study.getPatient().getFirstName() + currentDateTime +
-						".pdf";
-		response.setHeader(headerKey, headerValue);
-
-		fileDownloadService.exportBudget(response, study);
+		String filename = laboratoryFileUtils.getFilenameBudget(study.getPatient().getId(), study.getId());
+		File file = new File(filename);
+		if (!file.exists())
+			throw new LaboratoryException("No existe el presupuesto del estudio con id " + studyId);
+		return new FileSystemResource(file);
 	}
 
 	public Study getStudyByAppointment(Appointment appointment) {
@@ -197,7 +209,8 @@ public class StudyService {
 	public void cancelStudy() {
 		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(1L);
 		getStudiesByActualStatus(statusWaitingForPayment).stream()
-				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0).forEach(study -> {
+				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0)
+				.forEach(study -> {
 					Checkpoint checkpoint = new Checkpoint();
 					checkpoint.setStudy(study);
 					checkpoint.setCreatedBy(null);
