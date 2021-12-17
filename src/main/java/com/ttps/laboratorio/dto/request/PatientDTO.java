@@ -2,7 +2,6 @@ package com.ttps.laboratorio.dto.request;
 
 import java.time.LocalDate;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -38,7 +37,6 @@ public class PatientDTO {
 	@NotBlank(message = "Patient clinic history is required")
 	private String clinicHistory;
 
-	@Valid
 	private ContactDTO contact;
 
 	private String affiliateNumber;

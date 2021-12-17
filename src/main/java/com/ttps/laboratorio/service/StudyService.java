@@ -49,6 +49,8 @@ public class StudyService {
 
 	private final ModelMapper mapper;
 
+	private final ExtractionistService extractionistService;
+
 	public StudyService(IStudyRepository studyRepository,
 											PatientService patientService,
 											UserService userService,
@@ -56,7 +58,8 @@ public class StudyService {
 											DoctorService doctorService,
 											StudyTypeService studyTypeService,
 											PresumptiveDiagnosisService presumptiveDiagnosisService,
-											FileDownloadService fileDownloadService) {
+											FileDownloadService fileDownloadService,
+											ExtractionistService extractionistService) {
 		this.studyRepository = studyRepository;
 		this.patientService = patientService;
 		this.userService = userService;
@@ -67,6 +70,7 @@ public class StudyService {
 		this.fileDownloadService = fileDownloadService;
 		this.mapper = new ModelMapper();
 		this.mapper.getConfiguration().setSkipNullEnabled(true);
+		this.extractionistService = extractionistService;
 	}
 
 	public Study getStudy(Long studyId) {
@@ -190,6 +194,17 @@ public class StudyService {
 					study.getCheckpoints().add(checkpoint);
 					studyRepository.save(study);
 				});
+	}
+
+	public Study setExtractionistById(Long studyId, Long extractionistId) {
+		Study study = getStudy(studyId);
+		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(6L)) {
+			throw new BadRequestException(
+					"El estudio no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
+		}
+		study.setExtractionist(extractionistService.getExtractionist(extractionistId));
+		setCheckpointWithStatus(7L, study);
+		return studyRepository.save(study);
 	}
 
 }

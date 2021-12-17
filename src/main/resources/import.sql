@@ -46,6 +46,10 @@ INSERT INTO employees (first_name,last_name,user_id) VALUES ('Ignacio','Vacca',1
 INSERT INTO employees (first_name,last_name,user_id) VALUES ('Sofia','Scotto',2);
 INSERT INTO employees (first_name,last_name,user_id) VALUES ('Agustina','Garcia',5);
 
+INSERT INTO extractionists (fullname) VALUES ('Star Lord');
+INSERT INTO extractionists (fullname) VALUES ('Iron Man');
+INSERT INTO extractionists (fullname) VALUES ('The Hulk');
+
 INSERT INTO presumptive_diagnoses (description) VALUES ('Acidez de estómago');
 INSERT INTO presumptive_diagnoses (description) VALUES ('Acné');
 INSERT INTO presumptive_diagnoses (description) VALUES ('Acúfenos');

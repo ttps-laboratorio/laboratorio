@@ -95,4 +95,11 @@ public class StudyController {
 		return new ResponseEntity<>(sampleService.createSample(studyId, sampleDTO), HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PostMapping(path = "/{studyId}/extractionist/{extractionistId}")
+	public ResponseEntity<Study> selectExtractionist(@PathVariable(name = "studyId") @NonNull Long studyId,
+																										@PathVariable(name = "extractionistId") @NonNull Long extractionistId) {
+		return new ResponseEntity<>(studyService.setExtractionistById(studyId, extractionistId), HttpStatus.CREATED);
+	}
+
 }
