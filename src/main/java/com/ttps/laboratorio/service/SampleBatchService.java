@@ -23,7 +23,7 @@ public class SampleBatchService {
 
 	public void createBatch(List<Study> studiesReadyForProcess) {
 		SampleBatch sampleBatch = new SampleBatch();
-		studiesReadyForProcess.forEach(study -> sampleBatch.getSamples().add(study.getSample()));
+		studiesReadyForProcess.forEach(study -> sampleBatch.addSample(study.getSample()));
 		sampleBatchRepository.save(sampleBatch);
 	}
 

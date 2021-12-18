@@ -22,6 +22,8 @@ public class ExtractionistService {
 
 	private final SampleBatchService sampleBatchService;
 
+	private static final Integer SAMPLE_BATCH_COUNT = 10;
+
 	public ExtractionistService(IExtractionistRepository extractionistRepository, StudyService studyService,
 															StudyStatusService studyStatusService, SampleBatchService sampleBatchService) {
 		this.extractionistRepository = extractionistRepository;
@@ -39,27 +41,28 @@ public class ExtractionistService {
 		return new ArrayList<>(extractionistRepository.findAll());
 	}
 
-	public Study setExtractionistById(Long studyId, Long extractionistId) {
+	public void setExtractionistById(Long studyId, Long extractionistId) {
 		Study study = studyService.getStudy(studyId);
 		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA)) {
 			throw new BadRequestException("El estudio #" + studyId + " no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
 		}
 		study.setExtractionist(getExtractionist(extractionistId));
 		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO, study);
+		studyService.saveFlushStudy(study);
 		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO);
 		List<Study> studiesReadyForProcess = studyService.getStudiesByActualStatus(statusWaitingForPayment);
-		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == 10) {
+		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == SAMPLE_BATCH_COUNT) {
 			studiesReadyForProcess.forEach(s -> {
 				Checkpoint checkpoint = new Checkpoint();
 				checkpoint.setStudy(s);
 				checkpoint.setCreatedBy(null);
-				checkpoint.setStatus(studyStatusService.getStudyStatus(8L));
+				checkpoint.setStatus(studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_RESULTADO_BIOTECNOLOGICO));
 				s.getCheckpoints().add(checkpoint);
 				studyService.saveStudy(s);
 			});
 			sampleBatchService.createBatch(studiesReadyForProcess);
 		}
-		return studyService.saveStudy(study);
+		studyService.saveStudy(study);
 	}
 
 }

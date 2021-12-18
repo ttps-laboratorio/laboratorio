@@ -23,7 +23,7 @@ public class SampleService {
 
 	public Sample createSample(Long studyId, SampleDTO request) {
 		Study study = studyService.getStudy(studyId);
-		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(5L)) {
+		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA)) {
 			throw new BadRequestException(
 					"El estudio #" + studyId
 							+ " no se encuentra en el estado correspondiente para ingresar datos de muestra.");

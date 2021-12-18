@@ -206,7 +206,7 @@ public class AppointmentService {
 
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void cancelAppointment() {
-		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(5L);
+		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA);
 		studyService.getStudiesByActualStatus(statusWaitingAppointmentSelection).stream()
 				.filter(s -> s.getAppointment().getDate().plusDays(30).compareTo(LocalDate.now()) < 0).forEach(study -> {
 					Checkpoint checkpoint = new Checkpoint();

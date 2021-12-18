@@ -303,11 +303,6 @@ public class StudyService {
 		}
 
 		try {
-			String contentType = Files.probeContentType(paymentProofPdf.getResource().getFile().toPath());
-			log.info("Tipo de documento " + contentType);
-			if (!"application/pdf".equals(contentType)) {
-				throw new BadRequestException("El comprobante de pago debe ser un pdf");
-			}
 			String filename = laboratoryFileUtils.getFilenamePaymentProof(study.getPatient().getId(), study.getId());
 			File file = new File(filename);
 			Files.copy(paymentProofPdf.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -320,7 +315,7 @@ public class StudyService {
 		return study;
 	}
 
-	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public Study uploadSignedConsentFile(Long studyId, MultipartFile signedConsentPdf) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
@@ -355,6 +350,10 @@ public class StudyService {
 
 	public Study saveStudy(Study study) {
 		return studyRepository.save(study);
+	}
+
+	public Study saveFlushStudy(Study study) {
+		return studyRepository.saveAndFlush(study);
 	}
 
 	public void setCheckpointWithStatus(Long status, Study study) {

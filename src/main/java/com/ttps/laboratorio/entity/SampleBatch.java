@@ -48,4 +48,9 @@ public class SampleBatch implements Serializable {
 	@Column(name = "final_report_url")
 	private String FinalReportsUrl;
 
+	public void addSample(Sample sample) {
+		samples.add(sample);
+		sample.setSampleBatch(this);
+	}
+
 }
