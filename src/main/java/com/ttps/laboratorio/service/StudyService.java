@@ -2,6 +2,8 @@ package com.ttps.laboratorio.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
@@ -79,7 +82,7 @@ public class StudyService {
 
 	public Study getStudy(Long studyId) {
 		return this.studyRepository.findById(studyId)
-				.orElseThrow(() -> new NotFoundException("No existe un estudio con el id " + studyId + "."));
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 	}
 
 	/**
@@ -116,23 +119,30 @@ public class StudyService {
 		study.setType(studyTypeService.getStudyType(request.getStudyType().getId()));
 		study.setPresumptiveDiagnosis(
 				presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosis().getId()));
-		setCheckpointWithStatus(1L, study);
+		setCheckpointWithStatus(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO, study);
 		study = studyRepository.save(study);
 		try {
 			String filename = laboratoryFileUtils.getFilenameBudget(study.getPatient().getId(), study.getId());
 			pdfGeneratorService.generateBudget(study, filename);
 		} catch (IOException e) {
 			log.error("No se pudo generar el pdf del presupuesto del paciente [dni: " + patient.getDni() + "]", e);
-			throw new LaboratoryException("No se pudo generar el presupuesto del paciente");
+			throw new LaboratoryException("No se pudo generar el presupuesto del paciente #" + patientId);
+		}
+		try {
+			String filename = laboratoryFileUtils.getFilenameConsent(study.getPatient().getId(), study.getId());
+			pdfGeneratorService.generateConsent(study, filename);
+		} catch (IOException e) {
+			log.error("No se pudo generar el pdf del consentimiento del paciente [dni: " + patient.getDni() + "]", e);
+			throw new LaboratoryException("No se pudo generar el consentimiento del paciente #" + patientId);
 		}
 		return study;
 	}
 
 	public void updateStudy(Long studyId, StudyDTO studyDTO) {
 		Study study = studyRepository.findById(studyId)
-				.orElseThrow(() -> new NotFoundException("No existe un estudio con el id " + studyId + "."));
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 		StudyStatus actualStatus = study.getActualStatus();
-		if (actualStatus.getOrder() == 1) {
+		if (actualStatus.getId().equals(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO)) {
 			study.setBudget(studyDTO.getBudget());
 		} else {
 			throw new BadRequestException("El paciente ya abono el presupuesto.");
@@ -142,7 +152,7 @@ public class StudyService {
 		} else {
 			throw new BadRequestException("El laboratorio ya abono el monto extraccionista.");
 		}
-		if (actualStatus.getOrder() <= 2) {
+		if (actualStatus.getId().intValue() <= StudyStatus.ENVIAR_CONSENTIMIENTO_INFORMADO) {
 			study.setType(studyTypeService.getStudyType(studyDTO.getStudyType().getId()));
 		} else {
 			throw new BadRequestException("Ya se envio el consentimiento informado al paciente.");
@@ -150,6 +160,36 @@ public class StudyService {
 		study.setReferringDoctor(doctorService.getDoctor(studyDTO.getReferringDoctor().getId()));
 		study.setPresumptiveDiagnosis(
 				presumptiveDiagnosisService.getPresumptiveDiagnosis(studyDTO.getPresumptiveDiagnosis().getId()));
+	}
+
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
+	public Study confirmPayment(Long studyId, boolean confirm) {
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+		StudyStatus actualStatus = study.getActualStatus();
+
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		// if actual status is before ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO can't
+		// accept or cancel the payment proof
+		if (actualStatus.getId().intValue() < StudyStatus.ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO.intValue()) {
+			throw new BadRequestException("Aún no se ha subido el comprobante de pago del estudio #" + studyId);
+		}
+
+		// if actual status is after throw operation not permitted
+		if (actualStatus.getId().intValue() > StudyStatus.ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO.intValue()) {
+			throw new BadRequestException("Operación no permitida para el estudio #" + studyId);
+		}
+		// from here actual status is ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO
+
+		// if confirm valid payment set status to ENVIAR_CONSENTIMIENTO_INFORMADO
+		// else change status to back (ESPERANDO_COMPROBANTE_DE_PAGO)
+		Long studyStatus = confirm ? StudyStatus.ENVIAR_CONSENTIMIENTO_INFORMADO
+				: StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO;
+		setCheckpointWithStatus(studyStatus, study);
+		return studyRepository.save(study);
 	}
 
 	public Resource downloadBudgetFile(Long studyId) {
@@ -165,16 +205,147 @@ public class StudyService {
 		// }
 
 		Study study = studyRepository.findById(studyId)
-				.orElseThrow(() -> new NotFoundException("No existe un estudio con el id " + studyId + "."));
-		if (study.getActualStatus().getId() == 12L) {
-			throw new BadRequestException(
-					"El estudio con id " + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
 		}
+
 		String filename = laboratoryFileUtils.getFilenameBudget(study.getPatient().getId(), study.getId());
 		File file = new File(filename);
 		if (!file.exists())
-			throw new LaboratoryException("No existe el presupuesto del estudio con id " + studyId);
+			throw new LaboratoryException("No existe el presupuesto del estudio #" + studyId);
 		return new FileSystemResource(file);
+	}
+
+	public Resource downloadPaymentProofFile(Long studyId) {
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		if (actualStatus.getId().intValue() < StudyStatus.ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO) {
+			throw new BadRequestException("El estudio #" + studyId + " no tiene comprobante de pago");
+		}
+
+		String filename = laboratoryFileUtils.getFilenamePaymentProof(study.getPatient().getId(), study.getId());
+		File file = new File(filename);
+		if (!file.exists())
+			throw new LaboratoryException("No existe el documento de consentimiento del estudio #" + studyId);
+		return new FileSystemResource(file);
+	}
+
+	public Resource downloadConsentFile(Long studyId) {
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		if (actualStatus.getId().intValue() < StudyStatus.ENVIAR_CONSENTIMIENTO_INFORMADO.intValue()) {
+			throw new BadRequestException("El estudio #" + studyId + " aún no fue abonado.");
+		}
+		// from here the study should have a consent file
+
+		String filename = laboratoryFileUtils.getFilenameConsent(study.getPatient().getId(), study.getId());
+		File file = new File(filename);
+		if (!file.exists())
+			throw new LaboratoryException("No existe el documento de consentimiento del estudio #" + studyId);
+
+		// Change state only if actual state is Enviar consentimiento informado
+		if (study.getActualStatus().getId().equals(StudyStatus.ENVIAR_CONSENTIMIENTO_INFORMADO)) {
+			setCheckpointWithStatus(StudyStatus.ESPERANDO_CONSENTIMIENTO_INFORMADO_FIRMADO, study);
+			study = studyRepository.save(study);
+		}
+		return new FileSystemResource(file);
+	}
+
+	public Resource downloadSignedConsentFile(Long studyId) {
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		if (actualStatus.getId().intValue() <= StudyStatus.ESPERANDO_CONSENTIMIENTO_INFORMADO_FIRMADO.intValue()) {
+			throw new BadRequestException("El estudio #" + studyId + " aún no tiene consentimiento informado firmado.");
+		}
+		// from here the study should have a signed consent file
+
+		String filename = laboratoryFileUtils.getFilenameSignedConsent(study.getPatient().getId(), study.getId());
+		File file = new File(filename);
+		if (!file.exists())
+			throw new LaboratoryException(
+					"No existe el documento de consentimiento firmado del estudio #" + studyId);
+		return new FileSystemResource(file);
+	}
+
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
+	public Study uploadPaymentProofFile(Long studyId, MultipartFile paymentProofPdf) {
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		if (actualStatus.getId().intValue() != StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO.intValue()) {
+			throw new BadRequestException(
+					"No se puede subir el comprobante de pago. Operación no permitida para el estudio #" + studyId);
+		}
+
+		try {
+			String contentType = Files.probeContentType(paymentProofPdf.getResource().getFile().toPath());
+			log.info("Tipo de documento ", contentType);
+			if (!"application/pdf".equals(contentType))
+				throw new BadRequestException("El comprobante de pago debe ser un pdf");
+			String filename = laboratoryFileUtils.getFilenamePaymentProof(study.getPatient().getId(), study.getId());
+			File file = new File(filename);
+			Files.copy(paymentProofPdf.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			setCheckpointWithStatus(StudyStatus.ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO, study);
+			study = studyRepository.save(study);
+		} catch (IOException e) {
+			throw new LaboratoryException(
+					"Error al guardar el documento de consentimiento informado firmado del estudio con id: " + studyId);
+		}
+		return study;
+	}
+
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
+	public Study uploadSignedConsentFile(Long studyId, MultipartFile signedConsentPdf) {
+		Study study = studyRepository.findById(studyId)
+				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		if (actualStatus.getId().intValue() != StudyStatus.ESPERANDO_CONSENTIMIENTO_INFORMADO_FIRMADO.intValue()) {
+			throw new BadRequestException(
+					"No se puede subir el consentimiento informado firmado. Operación no permitida para el estudio #"
+							+ studyId);
+		}
+
+		try {
+			String filename = laboratoryFileUtils.getFilenameSignedConsent(study.getPatient().getId(), study.getId());
+			File file = new File(filename);
+			Files.copy(signedConsentPdf.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
+			study = studyRepository.save(study);
+		} catch (IOException e) {
+			throw new LaboratoryException(
+					"Error al guardar el documento de consentimiento informado firmado del estudio con id: " + studyId);
+		}
+		return study;
 	}
 
 	public Study getStudyByAppointment(Appointment appointment) {
@@ -207,14 +378,15 @@ public class StudyService {
 
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void cancelStudy() {
-		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(1L);
+		StudyStatus statusWaitingForPayment = studyStatusService
+				.getStudyStatus(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO);
 		getStudiesByActualStatus(statusWaitingForPayment).stream()
 				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0)
 				.forEach(study -> {
 					Checkpoint checkpoint = new Checkpoint();
 					checkpoint.setStudy(study);
 					checkpoint.setCreatedBy(null);
-					checkpoint.setStatus(studyStatusService.getStudyStatus(12L));
+					checkpoint.setStatus(studyStatusService.getStudyStatus(StudyStatus.ANULADO));
 					study.getCheckpoints().add(checkpoint);
 					studyRepository.save(study);
 				});
@@ -222,12 +394,14 @@ public class StudyService {
 
 	public Study setExtractionistById(Long studyId, Long extractionistId) {
 		Study study = getStudy(studyId);
-		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(6L)) {
+		if (study.getActualStatus() != null
+				&& !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA)) {
 			throw new BadRequestException(
-					"El estudio no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
+					"El estudio #" + studyId
+							+ " no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
 		}
 		study.setExtractionist(extractionistService.getExtractionist(extractionistId));
-		setCheckpointWithStatus(7L, study);
+		setCheckpointWithStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO, study);
 		return studyRepository.save(study);
 	}
 

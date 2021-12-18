@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.ConfirmPaymentDTO;
 import com.ttps.laboratorio.dto.request.SampleDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
@@ -41,15 +43,16 @@ public class StudyController {
 
 	private final SampleService sampleService;
 
-	public StudyController(StudyService studyService, AppointmentService appointmentService, SampleService sampleService) {
+	public StudyController(StudyService studyService, AppointmentService appointmentService,
+			SampleService sampleService) {
 		this.studyService = studyService;
 		this.appointmentService = appointmentService;
 		this.sampleService = sampleService;
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	@GetMapping("/{id}")
-	public ResponseEntity<Study> getStudy(@PathVariable(name = "id") @NonNull Long studyId) {
+	@GetMapping("/{studyId}")
+	public ResponseEntity<Study> getStudy(@PathVariable(name = "studyId") @NonNull Long studyId) {
 		Study study = studyService.getStudy(studyId);
 		return ResponseEntity.ok(study);
 	}
@@ -72,18 +75,37 @@ public class StudyController {
 	 * @return status
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateStudy(@PathVariable(name = "id") @NonNull Long studyID,
-																			 @Valid @RequestBody @NonNull StudyDTO studyDTO) {
-		studyService.updateStudy(studyID, studyDTO);
+	@PutMapping("/{studyId}")
+	public ResponseEntity<?> updateStudy(@PathVariable(name = "studyId") @NonNull Long studyId,
+			@Valid @RequestBody @NonNull StudyDTO studyDTO) {
+		studyService.updateStudy(studyId, studyDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
-	@GetMapping("/{id}/budget")
-	public ResponseEntity<Resource> downloadBudgetPDF(@PathVariable(name = "id") @NonNull Long studyID)
+	@GetMapping("/{studyId}/budget")
+	public ResponseEntity<Resource> downloadBudgetPDF(@PathVariable(name = "studyId") @NonNull Long studyId)
 			throws IOException {
-		Resource file = studyService.downloadBudgetFile(studyID);
+		Resource file = studyService.downloadBudgetFile(studyId);
+		Path path = file.getFile().toPath();
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.body(file);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@PostMapping("/{studyId}/payment-proof")
+	public ResponseEntity<Resource> uploadPaymentProofPDF(@PathVariable(name = "studyId") @NonNull Long studyId,
+			MultipartFile paymentProofPdf) {
+		Study study = studyService.uploadPaymentProofFile(studyId, paymentProofPdf);
+		return ResponseEntity.ok(null);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@GetMapping("/{studyId}/payment-proof")
+	public ResponseEntity<Resource> downloadPaymentProofPDF(@PathVariable(name = "studyId") @NonNull Long studyId)
+			throws IOException {
+		Resource file = studyService.downloadPaymentProofFile(studyId);
 		Path path = file.getFile().toPath();
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
@@ -91,23 +113,61 @@ public class StudyController {
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PostMapping("/{studyId}/confirm-payment")
+	public ResponseEntity<Resource> confirmPayment(@PathVariable(name = "studyId") @NonNull Long studyId,
+			@RequestBody ConfirmPaymentDTO confirmPayment) {
+		Study study = studyService.confirmPayment(studyId, confirmPayment.isConfirm());
+		return ResponseEntity.ok(null);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@GetMapping("/{studyId}/consent")
+	public ResponseEntity<Resource> downloadConsentPDF(@PathVariable(name = "studyId") @NonNull Long studyId)
+			throws IOException {
+		Resource file = studyService.downloadConsentFile(studyId);
+		Path path = file.getFile().toPath();
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.body(file);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@PostMapping("/{studyId}/signed-consent")
+	public ResponseEntity<Resource> uploadSignedConsentPDF(@PathVariable(name = "studyId") @NonNull Long studyId,
+			MultipartFile signedConsentPdf) {
+		Study study = studyService.uploadSignedConsentFile(studyId, signedConsentPdf);
+		return ResponseEntity.ok(null);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@GetMapping("/{studyId}/signed-consent")
+	public ResponseEntity<Resource> downloadSignedConsentPDF(@PathVariable(name = "studyId") @NonNull Long studyId)
+			throws IOException {
+		Resource file = studyService.downloadSignedConsentFile(studyId);
+		Path path = file.getFile().toPath();
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.body(file);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@PostMapping(path = "/{studyId}/appointment")
 	public ResponseEntity<Appointment> createAppointment(@PathVariable(name = "studyId") @NonNull Long studyId,
-																											 @Valid @RequestBody AppointmentDTO appointmentDTO) {
+			@Valid @RequestBody AppointmentDTO appointmentDTO) {
 		return new ResponseEntity<>(appointmentService.createAppointment(studyId, appointmentDTO), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping(path = "/{studyId}/sample")
 	public ResponseEntity<Sample> createSample(@PathVariable(name = "studyId") @NonNull Long studyId,
-																									@Valid @RequestBody SampleDTO sampleDTO) {
+			@Valid @RequestBody SampleDTO sampleDTO) {
 		return new ResponseEntity<>(sampleService.createSample(studyId, sampleDTO), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping(path = "/{studyId}/extractionist/{extractionistId}")
 	public ResponseEntity<Study> selectExtractionist(@PathVariable(name = "studyId") @NonNull Long studyId,
-																										@PathVariable(name = "extractionistId") @NonNull Long extractionistId) {
+			@PathVariable(name = "extractionistId") @NonNull Long extractionistId) {
 		return new ResponseEntity<>(studyService.setExtractionistById(studyId, extractionistId), HttpStatus.CREATED);
 	}
 

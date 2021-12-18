@@ -10,18 +10,19 @@ INSERT INTO study_types (consent,name) VALUES ('','Carrier de enfermedades monog
 INSERT INTO study_types (consent,name) VALUES ('','Cariotipo');
 INSERT INTO study_types (consent,name) VALUES ('','Array CGH');
 
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando comprobante de pago',1);
-INSERT INTO study_statuses (name,num_order) VALUES ('Enviar consentimiento informado',2);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando consentimiento informado firmado',3);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando seleccion de turno para extracción',4);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando toma de muestra',5);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando retiro de muestra desde sección de extracción',6);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando lote de muestra para iniciar procesamiento biotecnológico',7);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando resultado biotecnológico',8);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando interpretación de resultados e informes',9);
-INSERT INTO study_statuses (name,num_order) VALUES ('Esperando ser entregado a médico derivante',10);
-INSERT INTO study_statuses (name,num_order) VALUES ('Resultado entregado',11);
-INSERT INTO study_statuses (name,num_order) VALUES ('Anulado por falta de pago', 12);
+INSERT INTO study_statuses (id, name, num_order) VALUES (1,'Esperando comprobante de pago',1);
+INSERT INTO study_statuses (id, name,num_order) VALUES (2,'Esperando validacion comprobante de pago',2);
+INSERT INTO study_statuses (id, name,num_order) VALUES (3,'Enviar consentimiento informado',3);
+INSERT INTO study_statuses (id, name,num_order) VALUES (4,'Esperando consentimiento informado firmado',4);
+INSERT INTO study_statuses (id, name,num_order) VALUES (5,'Esperando seleccion de turno para extracción',5);
+INSERT INTO study_statuses (id, name,num_order) VALUES (6,'Esperando toma de muestra',6);
+INSERT INTO study_statuses (id, name,num_order) VALUES (7,'Esperando retiro de muestra desde sección de extracción',7);
+INSERT INTO study_statuses (id, name,num_order) VALUES (8,'Esperando lote de muestra para iniciar procesamiento biotecnológico',8);
+INSERT INTO study_statuses (id, name,num_order) VALUES (9,'Esperando resultado biotecnológico',9);
+INSERT INTO study_statuses (id, name,num_order) VALUES (10,'Esperando interpretación de resultados e informes',10);
+INSERT INTO study_statuses (id, name,num_order) VALUES (11,'Esperando ser entregado a médico derivante',11);
+INSERT INTO study_statuses (id, name,num_order) VALUES (12,'Resultado entregado',12);
+INSERT INTO study_statuses (id, name,num_order) VALUES (13,'Anulado por falta de pago', 13);
 
 UPDATE study_statuses SET next_id=2 WHERE id=1;
 UPDATE study_statuses SET next_id=3,previous_id=1 WHERE id=2;
@@ -33,7 +34,9 @@ UPDATE study_statuses SET next_id=8,previous_id=6 WHERE id=7;
 UPDATE study_statuses SET next_id=9,previous_id=7 WHERE id=8;
 UPDATE study_statuses SET next_id=10,previous_id=8 WHERE id=9;
 UPDATE study_statuses SET next_id=11,previous_id=9 WHERE id=10;
-UPDATE study_statuses SET previous_id=10 WHERE id=11;
+UPDATE study_statuses SET next_id=12,previous_id=10 WHERE id=11;
+UPDATE study_statuses SET previous_id=11 WHERE id=12;
+UPDATE study_statuses SET previous_id=1 WHERE id=13;
 
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('osde@email.com', 'OSDE', '111');
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('ioma@email.com', 'IOMA', '222');

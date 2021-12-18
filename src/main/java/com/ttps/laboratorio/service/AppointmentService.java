@@ -1,15 +1,5 @@
 package com.ttps.laboratorio.service;
 
-import com.ttps.laboratorio.dto.request.AppointmentDTO;
-import com.ttps.laboratorio.entity.Appointment;
-import com.ttps.laboratorio.entity.BlockedDay;
-import com.ttps.laboratorio.entity.Checkpoint;
-import com.ttps.laboratorio.entity.ScheduleConfigurator;
-import com.ttps.laboratorio.entity.Study;
-import com.ttps.laboratorio.entity.StudyStatus;
-import com.ttps.laboratorio.exception.BadRequestException;
-import com.ttps.laboratorio.exception.NotFoundException;
-import com.ttps.laboratorio.repository.IAppointmentRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -20,8 +10,20 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.BlockedDay;
+import com.ttps.laboratorio.entity.Checkpoint;
+import com.ttps.laboratorio.entity.ScheduleConfigurator;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.entity.StudyStatus;
+import com.ttps.laboratorio.exception.BadRequestException;
+import com.ttps.laboratorio.exception.NotFoundException;
+import com.ttps.laboratorio.repository.IAppointmentRepository;
 
 @Service
 public class AppointmentService {
@@ -89,9 +91,10 @@ public class AppointmentService {
 	 */
 	public Appointment createAppointment(Long studyId, AppointmentDTO request) {
 		Study study = studyService.getStudy(studyId);
-		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(4L)) {
+		if (study.getActualStatus() != null
+				&& !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_SELECCION_DE_TURNO)) {
 			throw new BadRequestException(
-					"El estudio no se encuentra en el estado correspondiente para sacar turno.");
+					"El estudio #" + studyId + " no se encuentra en el estado correspondiente para sacar turno.");
 		}
 		ScheduleConfigurator scheduleConfigurator = new ScheduleConfigurator();
 		List<Boolean> booleanMonthList = getBooleanFreeAppointmentDaysByMonth(request.getDate().getYear(),
@@ -115,7 +118,7 @@ public class AppointmentService {
 		appointment.setTime(request.getTime());
 		appointmentRepository.save(appointment);
 		study.setAppointment(appointment);
-		studyService.setCheckpointWithStatus(5L, study);
+		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA, study);
 		studyService.saveStudy(study);
 		return appointment;
 	}
@@ -134,7 +137,7 @@ public class AppointmentService {
 					"El estudio no se encuentra en el estado correspondiente para eliminar el turno.");
 		}
 		study.setAppointment(null);
-		studyService.setCheckpointWithStatus(4L, study);
+		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
 		studyService.saveStudy(study);
 		appointmentRepository.delete(appointment);
 	}
@@ -210,7 +213,8 @@ public class AppointmentService {
 					checkpoint.setStudy(study);
 					checkpoint.setCreatedBy(null);
 					deleteAppointment(study.getAppointment().getId());
-					checkpoint.setStatus(studyStatusService.getStudyStatus(4L));
+					checkpoint.setStatus(
+							studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO));
 					study.getCheckpoints().add(checkpoint);
 					studyService.saveStudy(study);
 				});
