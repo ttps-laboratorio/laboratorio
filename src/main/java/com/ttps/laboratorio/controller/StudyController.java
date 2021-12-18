@@ -1,10 +1,19 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.SampleDTO;
+import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Sample;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.service.AppointmentService;
+import com.ttps.laboratorio.service.ExtractionistService;
+import com.ttps.laboratorio.service.SampleBatchService;
+import com.ttps.laboratorio.service.SampleService;
+import com.ttps.laboratorio.service.StudyService;
 import java.io.IOException;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -17,16 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ttps.laboratorio.dto.request.AppointmentDTO;
-import com.ttps.laboratorio.dto.request.SampleDTO;
-import com.ttps.laboratorio.dto.request.StudyDTO;
-import com.ttps.laboratorio.entity.Appointment;
-import com.ttps.laboratorio.entity.Sample;
-import com.ttps.laboratorio.entity.Study;
-import com.ttps.laboratorio.service.AppointmentService;
-import com.ttps.laboratorio.service.SampleService;
-import com.ttps.laboratorio.service.StudyService;
-
 @RestController
 @RequestMapping(path = "study")
 public class StudyController {
@@ -37,10 +36,14 @@ public class StudyController {
 
 	private final SampleService sampleService;
 
-	public StudyController(StudyService studyService, AppointmentService appointmentService, SampleService sampleService) {
+	private final ExtractionistService extractionistService;
+
+	public StudyController(StudyService studyService, AppointmentService appointmentService, SampleService sampleService,
+												 ExtractionistService extractionistService) {
 		this.studyService = studyService;
 		this.appointmentService = appointmentService;
 		this.sampleService = sampleService;
+		this.extractionistService = extractionistService;
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
@@ -91,15 +94,15 @@ public class StudyController {
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping(path = "/{studyId}/sample")
 	public ResponseEntity<Sample> createSample(@PathVariable(name = "studyId") @NonNull Long studyId,
-																									@Valid @RequestBody SampleDTO sampleDTO) {
+																						 @Valid @RequestBody SampleDTO sampleDTO) {
 		return new ResponseEntity<>(sampleService.createSample(studyId, sampleDTO), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping(path = "/{studyId}/extractionist/{extractionistId}")
 	public ResponseEntity<Study> selectExtractionist(@PathVariable(name = "studyId") @NonNull Long studyId,
-																										@PathVariable(name = "extractionistId") @NonNull Long extractionistId) {
-		return new ResponseEntity<>(studyService.setExtractionistById(studyId, extractionistId), HttpStatus.CREATED);
+																									 @PathVariable(name = "extractionistId") @NonNull Long extractionistId) {
+		return new ResponseEntity<>(extractionistService.setExtractionistById(studyId, extractionistId), HttpStatus.CREATED);
 	}
 
 }

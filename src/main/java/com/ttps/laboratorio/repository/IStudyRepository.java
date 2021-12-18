@@ -1,9 +1,11 @@
 package com.ttps.laboratorio.repository;
 
 import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +18,7 @@ public interface IStudyRepository extends JpaRepository<Study, Long> {
 	List<Study> findAllByActualStatus(@Param("status") StudyStatus status);
 
 	Study findByAppointment(Appointment appointment);
+
+	Optional<Study> findBySample(Sample sample);
 
 }

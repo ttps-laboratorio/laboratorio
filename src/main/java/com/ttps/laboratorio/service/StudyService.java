@@ -1,5 +1,17 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
+import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Checkpoint;
+import com.ttps.laboratorio.entity.Patient;
+import com.ttps.laboratorio.entity.Sample;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.entity.StudyStatus;
+import com.ttps.laboratorio.entity.User;
+import com.ttps.laboratorio.exception.BadRequestException;
+import com.ttps.laboratorio.exception.NotFoundException;
+import com.ttps.laboratorio.repository.IStudyRepository;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -7,26 +19,12 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import com.ttps.laboratorio.dto.request.StudyDTO;
-import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
-import com.ttps.laboratorio.entity.Appointment;
-import com.ttps.laboratorio.entity.Checkpoint;
-import com.ttps.laboratorio.entity.Patient;
-import com.ttps.laboratorio.entity.Study;
-import com.ttps.laboratorio.entity.StudyStatus;
-import com.ttps.laboratorio.entity.User;
-import com.ttps.laboratorio.exception.BadRequestException;
-import com.ttps.laboratorio.exception.NotFoundException;
-import com.ttps.laboratorio.repository.IStudyRepository;
 
 @Service
 public class StudyService {
@@ -49,8 +47,6 @@ public class StudyService {
 
 	private final ModelMapper mapper;
 
-	private final ExtractionistService extractionistService;
-
 	public StudyService(IStudyRepository studyRepository,
 											PatientService patientService,
 											UserService userService,
@@ -58,8 +54,7 @@ public class StudyService {
 											DoctorService doctorService,
 											StudyTypeService studyTypeService,
 											PresumptiveDiagnosisService presumptiveDiagnosisService,
-											FileDownloadService fileDownloadService,
-											ExtractionistService extractionistService) {
+											FileDownloadService fileDownloadService) {
 		this.studyRepository = studyRepository;
 		this.patientService = patientService;
 		this.userService = userService;
@@ -70,7 +65,6 @@ public class StudyService {
 		this.fileDownloadService = fileDownloadService;
 		this.mapper = new ModelMapper();
 		this.mapper.getConfiguration().setSkipNullEnabled(true);
-		this.extractionistService = extractionistService;
 	}
 
 	public Study getStudy(Long studyId) {
@@ -85,11 +79,11 @@ public class StudyService {
 	 */
 	public List<StudyItemResponseDTO> getAllStudies() {
 		return studyRepository.findAll().stream().map(s -> {
-			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
-			item.setFirstName(s.getPatient().getFirstName());
-			item.setLastName(s.getPatient().getLastName());
-			return item;
-		})
+					StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+					item.setFirstName(s.getPatient().getFirstName());
+					item.setLastName(s.getPatient().getLastName());
+					return item;
+				})
 				.collect(Collectors.toList());
 	}
 
@@ -158,8 +152,8 @@ public class StudyService {
 		return studyRepository.findByAppointment(appointment);
 	}
 
-	public void saveStudy(Study study) {
-		studyRepository.save(study);
+	public Study saveStudy(Study study) {
+		return studyRepository.save(study);
 	}
 
 	public void setCheckpointWithStatus(Long status, Study study) {
@@ -196,15 +190,9 @@ public class StudyService {
 				});
 	}
 
-	public Study setExtractionistById(Long studyId, Long extractionistId) {
-		Study study = getStudy(studyId);
-		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(6L)) {
-			throw new BadRequestException(
-					"El estudio no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
-		}
-		study.setExtractionist(extractionistService.getExtractionist(extractionistId));
-		setCheckpointWithStatus(7L, study);
-		return studyRepository.save(study);
+	public Study getStudyBySample(Sample sample) {
+		return studyRepository.findBySample(sample)
+				.orElseThrow(() -> new BadRequestException("No existe un estudio para la muestra con id " + sample.getId() + "."));
 	}
 
 }
