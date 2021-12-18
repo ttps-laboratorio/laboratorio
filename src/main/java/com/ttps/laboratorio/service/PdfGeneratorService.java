@@ -1,5 +1,10 @@
 package com.ttps.laboratorio.service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.springframework.stereotype.Service;
+
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
@@ -7,23 +12,20 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
 import com.ttps.laboratorio.entity.Study;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Service
-public class FileDownloadService {
+public class PdfGeneratorService {
 
-	public void exportBudget(HttpServletResponse response, Study study) throws IOException {
+	public String generateBudget(Study study, String filename) throws IOException {
 		Document document = new Document(PageSize.A4);
-		PdfWriter.getInstance(document, response.getOutputStream());
+		PdfWriter.getInstance(document, new FileOutputStream(filename));
 		document.open();
 
-		//title
+		// title
 		Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
 		fontTitle.setSize(40);
-		Paragraph title = new Paragraph(study.getPatient().getFirstName() + " " + study.getPatient().getLastName(), fontTitle);
+		Paragraph title = new Paragraph(study.getPatient().getFirstName() + " " + study.getPatient().getLastName(),
+				fontTitle);
 		title.setAlignment(Paragraph.ALIGN_CENTER);
 		document.add(title);
 
@@ -32,17 +34,18 @@ public class FileDownloadService {
 		document.add(new Paragraph("\n"));
 		document.add(new Paragraph("\n"));
 
-		//content
+		// content
 		Font boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
 		boldFont.setSize(20);
 
 		Font regularFont = FontFactory.getFont(FontFactory.HELVETICA);
 		regularFont.setSize(16);
 
-		//health insurance
+		// health insurance
 		document.add(new Paragraph("Obra social: ", boldFont));
 		if (study.getPatient().getHealthInsurance() != null) {
-			document.add(new Paragraph("    - " + study.getPatient().getHealthInsurance().getName() + ".", regularFont));
+			document.add(
+					new Paragraph("    - " + study.getPatient().getHealthInsurance().getName() + ".", regularFont));
 		} else {
 			document.add(new Paragraph("    - No tiene.", regularFont));
 		}
@@ -50,26 +53,26 @@ public class FileDownloadService {
 		document.add(new Paragraph("\n"));
 		document.add(new Paragraph("\n"));
 
-		//Presumptive diagnosis
+		// Presumptive diagnosis
 		document.add(new Paragraph("Diagnóstico presuntivo: ", boldFont));
 		document.add(new Paragraph("    - " + study.getPresumptiveDiagnosis().getDescription() + ".", regularFont));
 
 		document.add(new Paragraph("\n"));
 		document.add(new Paragraph("\n"));
 
-		//Study type
+		// Study type
 		document.add(new Paragraph("Tipo de estudio: ", boldFont));
 		document.add(new Paragraph("    - " + study.getType().getName() + ".", regularFont));
 
 		document.add(new Paragraph("\n"));
 		document.add(new Paragraph("\n"));
 
-		//Budget
+		// Budget
 		document.add(new Paragraph("Presupuesto: ", boldFont));
 		document.add(new Paragraph("    - " + study.getBudget().toString() + ".", regularFont));
 
 		document.close();
-
+		return filename;
 	}
 
 }

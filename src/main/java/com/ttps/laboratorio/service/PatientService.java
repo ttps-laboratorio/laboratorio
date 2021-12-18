@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ttps.laboratorio.dto.request.PatientDTO;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.exception.BadRequestException;
+import com.ttps.laboratorio.exception.LaboratoryException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IPatientRepository;
+import com.ttps.laboratorio.utils.LaboratoryFileUtils;
 
 @Service
 public class PatientService {
@@ -22,7 +25,7 @@ public class PatientService {
 
 	public PatientService(IPatientRepository patientRepository,
 												HealthInsuranceService healthInsuranceService,
-												ContactService contactService) {
+			ContactService contactService, LaboratoryFileUtils laboratoryFileUtils) {
 		this.patientRepository = patientRepository;
 		this.healthInsuranceService = healthInsuranceService;
 		this.contactService = contactService;
@@ -46,12 +49,13 @@ public class PatientService {
 	 *
 	 * @param request patient information
 	 */
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public Patient createPatient(PatientDTO request) {
 		if (patientRepository.existsByDni(request.getDni())) {
 			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
 		}
 		Patient patient = new Patient();
-		setPatient(patient, request);
+		patient = setPatient(patient, request);
 		return patient;
 	}
 
@@ -70,7 +74,7 @@ public class PatientService {
 		setPatient(patient, request);
 	}
 
-	private void setPatient(Patient patient, PatientDTO dto) {
+	private Patient setPatient(Patient patient, PatientDTO dto) {
 		patient.setDni(dto.getDni());
 		patient.setFirstName(dto.getFirstName());
 		patient.setLastName(dto.getLastName());
@@ -79,7 +83,7 @@ public class PatientService {
 		patient.setAffiliateNumber(dto.getAffiliateNumber());
 		patient.setContact(contactService.createContact(dto.getContact()));
 		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
-		patientRepository.save(patient);
+		return patientRepository.save(patient);
 	}
 
 }
