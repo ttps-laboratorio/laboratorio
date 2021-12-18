@@ -303,10 +303,6 @@ public class StudyService {
 		}
 
 		try {
-			String contentType = Files.probeContentType(paymentProofPdf.getResource().getFile().toPath());
-			log.info("Tipo de documento ", contentType);
-			if (!"application/pdf".equals(contentType))
-				throw new BadRequestException("El comprobante de pago debe ser un pdf");
 			String filename = laboratoryFileUtils.getFilenamePaymentProof(study.getPatient().getId(), study.getId());
 			File file = new File(filename);
 			Files.copy(paymentProofPdf.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);

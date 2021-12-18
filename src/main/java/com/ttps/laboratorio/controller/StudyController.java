@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -94,9 +95,9 @@ public class StudyController {
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
-	@PostMapping("/{studyId}/payment-proof")
+	@PostMapping(value = "/{studyId}/payment-proof")
 	public ResponseEntity<Resource> uploadPaymentProofPDF(@PathVariable(name = "studyId") @NonNull Long studyId,
-			MultipartFile paymentProofPdf) {
+			@RequestPart MultipartFile paymentProofPdf) {
 		Study study = studyService.uploadPaymentProofFile(studyId, paymentProofPdf);
 		return ResponseEntity.ok(null);
 	}
@@ -134,7 +135,7 @@ public class StudyController {
 	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@PostMapping("/{studyId}/signed-consent")
 	public ResponseEntity<Resource> uploadSignedConsentPDF(@PathVariable(name = "studyId") @NonNull Long studyId,
-			MultipartFile signedConsentPdf) {
+			@RequestPart MultipartFile signedConsentPdf) {
 		Study study = studyService.uploadSignedConsentFile(studyId, signedConsentPdf);
 		return ResponseEntity.ok(null);
 	}
