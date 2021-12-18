@@ -41,13 +41,12 @@ public class ExtractionistService {
 
 	public Study setExtractionistById(Long studyId, Long extractionistId) {
 		Study study = studyService.getStudy(studyId);
-		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(6L)) {
-			throw new BadRequestException(
-					"El estudio no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
+		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA)) {
+			throw new BadRequestException("El estudio #" + studyId + " no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
 		}
 		study.setExtractionist(getExtractionist(extractionistId));
-		studyService.setCheckpointWithStatus(7L, study);
-		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(7L);
+		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO, study);
+		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO);
 		List<Study> studiesReadyForProcess = studyService.getStudiesByActualStatus(statusWaitingForPayment);
 		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == 10) {
 			studiesReadyForProcess.forEach(s -> {
@@ -62,4 +61,5 @@ public class ExtractionistService {
 		}
 		return studyService.saveStudy(study);
 	}
+
 }
