@@ -48,8 +48,8 @@ public class StudyController {
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	@GetMapping("/{id}")
-	public ResponseEntity<Study> getStudy(@PathVariable(name = "id") @NonNull Long studyId) {
+	@GetMapping("/{studyId}")
+	public ResponseEntity<Study> getStudy(@PathVariable(name = "studyId") @NonNull Long studyId) {
 		Study study = studyService.getStudy(studyId);
 		return ResponseEntity.ok(study);
 	}
@@ -72,18 +72,18 @@ public class StudyController {
 	 * @return status
 	 */
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateStudy(@PathVariable(name = "id") @NonNull Long studyID,
+	@PutMapping("/{studyId}")
+	public ResponseEntity<?> updateStudy(@PathVariable(name = "studyId") @NonNull Long studyId,
 																			 @Valid @RequestBody @NonNull StudyDTO studyDTO) {
-		studyService.updateStudy(studyID, studyDTO);
+		studyService.updateStudy(studyId, studyDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
-	@GetMapping("/{id}/budget")
-	public ResponseEntity<Resource> downloadBudgetPDF(@PathVariable(name = "id") @NonNull Long studyID)
+	@GetMapping("/{studyId}/budget")
+	public ResponseEntity<Resource> downloadBudgetPDF(@PathVariable(name = "studyId") @NonNull Long studyId)
 			throws IOException {
-		Resource file = studyService.downloadBudgetFile(studyID);
+		Resource file = studyService.downloadBudgetFile(studyId);
 		Path path = file.getFile().toPath();
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
