@@ -24,4 +24,16 @@ public class LaboratoryFileUtils {
 	public String getFilenameBudget(Long patientId, Long studyId) {
 		return patientStudyBaseName(patientId, studyId) + FileNameConstants.BUDGET_PDF;
 	}
+
+	public String getFilenamePaymentProof(Long patientId, Long studyId) {
+		return patientStudyBaseName(patientId, studyId) + FileNameConstants.PAYMENT_PROOF_PDF;
+	}
+
+	public String getFilenameConsent(Long patientId, Long studyId) {
+		return patientStudyBaseName(patientId, studyId) + FileNameConstants.CONSENT_PDF;
+	}
+
+	public String getFilenameSignedConsent(Long patientId, Long studyId) {
+		return patientStudyBaseName(patientId, studyId) + FileNameConstants.CONSENT_SIGN_PDF;
+	}
 }

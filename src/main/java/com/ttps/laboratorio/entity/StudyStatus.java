@@ -1,7 +1,7 @@
 package com.ttps.laboratorio.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +33,20 @@ import lombok.Setter;
 public class StudyStatus implements Serializable {
 
 	private static final long serialVersionUID = 5117918220377026223L;
+
+	public static final Long ESPERANDO_COMPROBANTE_DE_PAGO = 1l;
+	public static final Long ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO = 2l;
+	public static final Long ENVIAR_CONSENTIMIENTO_INFORMADO = 3l;
+	public static final Long ESPERANDO_CONSENTIMIENTO_INFORMADO_FIRMADO = 4l;
+	public static final Long ESPERANDO_SELECCION_DE_TURNO = 5l;
+	public static final Long ESPERANDO_TOMA_DE_MUESTRA = 6l;
+	public static final Long ESPERANDO_RETIRO_DE_MUESTRA = 7l;
+	public static final Long ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO = 8l;
+	public static final Long ESPERANDO_RESULTADO_BIOTECNOLOGICO = 9l;
+	public static final Long ESPERANDO_INTERPRETACION_DE_RESULTADOS = 10l;
+	public static final Long ESPERANDO_SER_ENTREGADO_A_MEDICO_DERIVANTE = 11l;
+	public static final Long RESULTADO_ENTREGADO = 12l;
+	public static final Long ANULADO = 13l;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

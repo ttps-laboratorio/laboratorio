@@ -11,6 +11,7 @@ import com.lowagie.text.FontFactory;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
+import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Study;
 
 @Service
@@ -75,4 +76,58 @@ public class PdfGeneratorService {
 		return filename;
 	}
 
+	public String generateConsent(Study study, String filename) throws IOException {
+
+		Patient patient = study.getPatient();
+		Document document = new Document(PageSize.A4);
+		PdfWriter.getInstance(document, new FileOutputStream(filename));
+		document.open();
+
+		// title
+		Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+		fontTitle.setSize(40);
+		Paragraph title = new Paragraph("Consentimiento de estudio", fontTitle);
+		title.setAlignment(Paragraph.ALIGN_CENTER);
+		document.add(title);
+
+		// content
+		Font boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+		boldFont.setSize(20);
+
+		Font regularFont = FontFactory.getFont(FontFactory.HELVETICA);
+		regularFont.setSize(16);
+
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+
+		document.add(new Paragraph(patient.getFirstName() + " " + patient.getLastName() + " con dni " + patient.getDni()
+				+ " presto conformidad para realizarme el estudio médico.", regularFont));
+
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+
+		// Study type
+		document.add(new Paragraph("Tipo de estudio: ", boldFont));
+		document.add(new Paragraph("    - " + study.getType().getName() + ".", regularFont));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		// Study type
+		document.add(new Paragraph("Firma: ", boldFont));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("Aclaración: ", boldFont));
+		document.add(new Paragraph("\n"));
+		document.add(new Paragraph("\n"));
+		document.close();
+		return filename;
+	}
 }
