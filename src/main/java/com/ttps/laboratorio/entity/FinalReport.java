@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,8 +36,10 @@ public class FinalReport implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "timestamp")
-	private LocalDateTime timestamp;
+	@Builder.Default
+	@NotNull
+	@Column(name = "created_at", unique = true, nullable = false)
+	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@Column(name = "positive_result")
 	private Boolean positiveResult;
@@ -49,6 +53,7 @@ public class FinalReport implements Serializable {
 
 	@JoinColumn(name = "study_id")
 	@OneToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	private Study study;
 
 }

@@ -36,4 +36,8 @@ public class LaboratoryFileUtils {
 	public String getFilenameSignedConsent(Long patientId, Long studyId) {
 		return patientStudyBaseName(patientId, studyId) + FileNameConstants.CONSENT_SIGN_PDF;
 	}
+
+	public String getFilenameFinalReport(Long patientId, Long studyId) {
+		return patientStudyBaseName(patientId, studyId) + FileNameConstants.FINAL_REPORT_PDF;
+	}
 }

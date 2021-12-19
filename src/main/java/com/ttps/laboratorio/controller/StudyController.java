@@ -2,6 +2,7 @@ package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.dto.request.ConfirmPaymentDTO;
+import com.ttps.laboratorio.dto.request.FinalReportDTO;
 import com.ttps.laboratorio.dto.request.SampleDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
@@ -10,6 +11,7 @@ import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.service.AppointmentService;
 import com.ttps.laboratorio.service.ExtractionistService;
+import com.ttps.laboratorio.service.FinalReportService;
 import com.ttps.laboratorio.service.SampleService;
 import com.ttps.laboratorio.service.StudyService;
 import java.io.IOException;
@@ -44,12 +46,15 @@ public class StudyController {
 
 	private final ExtractionistService extractionistService;
 
+	private final FinalReportService finalReportService;
+
 	public StudyController(StudyService studyService, AppointmentService appointmentService, SampleService sampleService,
-												 ExtractionistService extractionistService) {
+												 ExtractionistService extractionistService, FinalReportService finalReportService) {
 		this.studyService = studyService;
 		this.appointmentService = appointmentService;
 		this.sampleService = sampleService;
 		this.extractionistService = extractionistService;
+		this.finalReportService = finalReportService;
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
@@ -170,6 +175,13 @@ public class StudyController {
 																									 @PathVariable(name = "extractionistId") @NonNull Long extractionistId) {
 		extractionistService.setExtractionistById(studyId, extractionistId);
 		return ResponseEntity.ok(null);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PostMapping(path = "/{id}/final-report")
+	public ResponseEntity<?> createFinalReport(@PathVariable(name = "id") @NonNull Long studyId,
+																						 @Valid @RequestBody FinalReportDTO finalReportDTO) {
+		return new ResponseEntity<>(finalReportService.createFinalReport(studyId, finalReportDTO), HttpStatus.CREATED);
 	}
 
 }
