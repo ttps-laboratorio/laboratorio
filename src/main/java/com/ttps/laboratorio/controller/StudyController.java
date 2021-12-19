@@ -184,4 +184,15 @@ public class StudyController {
 		return new ResponseEntity<>(finalReportService.createFinalReport(studyId, finalReportDTO), HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/{id}/final-report")
+	public ResponseEntity<Resource> downloadFinalReportPDF(@PathVariable(name = "id") @NonNull Long studyId)
+			throws IOException {
+		Resource file = studyService.downloadFinalReportFile(studyId);
+		Path path = file.getFile().toPath();
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.body(file);
+	}
+
 }

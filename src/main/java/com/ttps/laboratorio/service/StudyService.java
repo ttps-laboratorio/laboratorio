@@ -288,6 +288,34 @@ public class StudyService {
 		return new FileSystemResource(file);
 	}
 
+	public Resource downloadFinalReportFile(Long studyId) {
+		Study study = getStudy(studyId);
+
+		StudyStatus actualStatus = study.getActualStatus();
+		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
+			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
+		}
+
+		if (actualStatus.getId().intValue() < StudyStatus.ESPERANDO_SER_ENTREGADO_A_MEDICO_DERIVANTE.intValue()) {
+			throw new BadRequestException("El estudio #" + studyId + " aún no tiene generado el resultado final.");
+		}
+		// from here the study should have a final report file
+
+		String filename = laboratoryFileUtils.getFilenameFinalReport(study.getPatient().getId(), study.getId());
+		File file = new File(filename);
+		if (!file.exists()) {
+			throw new LaboratoryException(
+					"No existe el documento de reporte final del estudio #" + studyId);
+		}
+
+		// Change state only if actual state is Esperando ser entregado a medico derivante
+		if (study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_SER_ENTREGADO_A_MEDICO_DERIVANTE)) {
+			setCheckpointWithStatus(StudyStatus.RESULTADO_ENTREGADO, study);
+			studyRepository.save(study);
+		}
+		return new FileSystemResource(file);
+	}
+
 	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
 	public Study uploadPaymentProofFile(Long studyId, MultipartFile paymentProofPdf) {
 		Study study = studyRepository.findById(studyId)
