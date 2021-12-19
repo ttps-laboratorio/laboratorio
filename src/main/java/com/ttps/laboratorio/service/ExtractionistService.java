@@ -22,8 +22,6 @@ public class ExtractionistService {
 
 	private final SampleBatchService sampleBatchService;
 
-	private static final Integer SAMPLE_BATCH_COUNT = 10;
-
 	public ExtractionistService(IExtractionistRepository extractionistRepository, StudyService studyService,
 															StudyStatusService studyStatusService, SampleBatchService sampleBatchService) {
 		this.extractionistRepository = extractionistRepository;
@@ -51,7 +49,7 @@ public class ExtractionistService {
 		studyService.saveFlushStudy(study);
 		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO);
 		List<Study> studiesReadyForProcess = studyService.getStudiesByActualStatus(statusWaitingForPayment);
-		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == SAMPLE_BATCH_COUNT) {
+		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == SampleBatchService.SAMPLE_BATCH_COUNT) {
 			studiesReadyForProcess.forEach(s -> {
 				Checkpoint checkpoint = new Checkpoint();
 				checkpoint.setStudy(s);

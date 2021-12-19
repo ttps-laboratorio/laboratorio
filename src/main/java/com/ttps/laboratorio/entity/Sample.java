@@ -49,6 +49,7 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "study_id")
 	private Study study;
 
+	@JsonIgnore
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "sample_batch_id", nullable = true)
 	private SampleBatch sampleBatch;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.SampleBatchStatus;
 import com.ttps.laboratorio.entity.Study;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,10 +22,10 @@ public class SampleBatchDTO {
 
 	private SampleBatchStatus status;
 
-	private List<Study> studies;
+	private List<Study> studies = new ArrayList<>();
 
 	private String FinalReportsUrl;
 
-	private List<Sample> samples;
+	private List<Sample> samples = new ArrayList<>();
 
 }
