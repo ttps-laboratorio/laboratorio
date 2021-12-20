@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.auth.CustomAuthenticationProvider;
 import com.ttps.laboratorio.dto.request.EmployeeRequestDTO;
 import com.ttps.laboratorio.dto.request.UserRequestDTO;
 import com.ttps.laboratorio.dto.response.EmployeeResponseDTO;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,13 +20,13 @@ public class EmployeeService {
 
 	private final IEmployeeRepository employeeRepository;
 
-	private final PasswordEncoder passwordEncoder;
+	private final CustomAuthenticationProvider customAuthenticationProvider;
 
 	@Autowired
-	public EmployeeService(IEmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
+	public EmployeeService(IEmployeeRepository employeeRepository, CustomAuthenticationProvider customAuthenticationProvider) {
 		super();
 		this.employeeRepository = employeeRepository;
-		this.passwordEncoder = passwordEncoder;
+		this.customAuthenticationProvider = customAuthenticationProvider;
 	}
 
 	public EmployeeResponseDTO get(Long id) {
@@ -41,7 +41,7 @@ public class EmployeeService {
 
 	public EmployeeResponseDTO create(EmployeeRequestDTO request) {
 		UserRequestDTO userDTO = request.getUser();
-		User user = new User(null, userDTO.getUsername(), passwordEncoder.encode(userDTO.getPassword()),
+		User user = new User(null, userDTO.getUsername(), customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()),
 				userDTO.getEmail(), RoleEnum.EMPLOYEE);
 		Employee employee = new Employee(null, request.getFirstName(), request.getLastName(), user);
 		employee = employeeRepository.save(employee);
@@ -57,7 +57,7 @@ public class EmployeeService {
 		User user = employee.getUser();
 		user.setUsername(userDTO.getUsername());
 		user.setEmail(userDTO.getEmail());
-		user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+		user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
 		employee = employeeRepository.save(employee);
 		return new ModelMapper().map(employee, EmployeeResponseDTO.class);
 	}

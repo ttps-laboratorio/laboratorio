@@ -12,8 +12,6 @@ import com.ttps.laboratorio.repository.IFinalReportRepository;
 import com.ttps.laboratorio.utils.LaboratoryFileUtils;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -49,14 +47,7 @@ public class FinalReportService {
 		}
 		FinalReport finalReport = new FinalReport();
 		finalReport.setPositiveResult(finalReportDTO.getPositiveResult());
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String username;
-		if (principal instanceof UserDetails) {
-			username = ((UserDetails) principal).getUsername();
-		} else {
-			username = principal.toString();
-		}
-		User queriedUser = userService.getUserByUsername(username);
+		User queriedUser = userService.getLoggedUser();
 		Employee employee = employeeService.getByUser(queriedUser);
 		finalReport.setMedicalInformant(employee);
 		finalReport.setReport(finalReportDTO.getReport());

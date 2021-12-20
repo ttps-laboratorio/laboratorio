@@ -22,6 +22,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Represents a patient.
@@ -32,6 +33,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 @Entity
 @Table(name = "patients")
@@ -76,6 +78,9 @@ public class Patient implements Serializable {
 	@OneToMany(mappedBy = "patient", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Study> studies;
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	protected User user;
 
 	public boolean addStudy(Study study) {
 		study.setPatient(this);

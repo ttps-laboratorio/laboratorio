@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.repository;
 
 import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
@@ -21,5 +22,9 @@ public interface IStudyRepository extends JpaRepository<Study, Long>, JpaSpecifi
 	Study findByAppointment(Appointment appointment);
 
 	Optional<Study> findBySample(Sample sample);
+
+	List<Study> findByPatient(Patient patient);
+
+	List<Study> findByPaidExtractionAmountFalse();
 
 }

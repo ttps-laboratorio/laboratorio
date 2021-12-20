@@ -43,4 +43,7 @@ public class PatientDTO {
 
 	private HealthInsuranceDTO healthInsurance;
 
+	@NotNull(message = "Patient user is required")
+	private UserRequestDTO user;
+
 }

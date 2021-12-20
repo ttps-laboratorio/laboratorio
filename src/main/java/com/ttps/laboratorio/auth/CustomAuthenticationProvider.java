@@ -24,6 +24,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	public PasswordEncoder getPasswordEncoder() {
+		return passwordEncoder;
+	}
+
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		User user = userRepository.findByUsername(authentication.getPrincipal().toString())

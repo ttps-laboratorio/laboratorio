@@ -2,6 +2,7 @@ package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
+import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
 import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Checkpoint;
@@ -18,6 +19,7 @@ import com.ttps.laboratorio.repository.specification.StudySpecifications;
 import com.ttps.laboratorio.utils.LaboratoryFileUtils;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -28,8 +30,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -385,14 +385,7 @@ public class StudyService {
 	}
 
 	public void setCheckpointWithStatus(Long status, Study study) {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String username;
-		if (principal instanceof UserDetails) {
-			username = ((UserDetails) principal).getUsername();
-		} else {
-			username = principal.toString();
-		}
-		User queriedUser = userService.getUserByUsername(username);
+		User queriedUser = userService.getLoggedUser();
 		Checkpoint checkpoint = new Checkpoint();
 		checkpoint.setStudy(study);
 		checkpoint.setCreatedBy(queriedUser);
@@ -425,4 +418,29 @@ public class StudyService {
 				.orElseThrow(() -> new BadRequestException("No existe un estudio para la muestra con id " + sample.getId() + "."));
 	}
 
+
+	public List<StudyItemResponseDTO> getAllPatientStudies(Long patientId) {
+		patientService.validateLoggedPatient(patientId);
+		return studyRepository.findByPatient(patientService.getPatient(patientId)).stream().map(s -> {
+			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+			item.setFirstName(s.getPatient().getFirstName());
+			item.setLastName(s.getPatient().getLastName());
+			return item;
+		}).collect(Collectors.toList());
+	}
+
+	public List<StudyItemResponseDTO> getAllUnpaidStudies() {
+		return studyRepository.findByPaidExtractionAmountFalse().stream().map(s -> {
+			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+			item.setFirstName(s.getPatient().getFirstName());
+			item.setLastName(s.getPatient().getLastName());
+			return item;
+		}).collect(Collectors.toList());
+	}
+
+	public BigDecimal payExtractionAmountStudies(UnpaidStudiesDTO unpaidStudiesDTO) {
+		unpaidStudiesDTO.getUnpaidStudies().forEach(studyId -> getStudy(studyId.longValue()).setPaidExtractionAmount(true));
+		return unpaidStudiesDTO.getUnpaidStudies().stream().map(studyId -> getStudy(studyId.longValue()).getExtractionAmount())
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
 }

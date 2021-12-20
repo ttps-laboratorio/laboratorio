@@ -6,6 +6,7 @@ import com.ttps.laboratorio.dto.request.FinalReportDTO;
 import com.ttps.laboratorio.dto.request.SampleDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
+import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
@@ -193,6 +194,18 @@ public class StudyController {
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
 				.body(file);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/unpaid-extraction")
+	public ResponseEntity<?> listUnpaidExtractionStudies() {
+		return ResponseEntity.ok(studyService.getAllUnpaidStudies());
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PostMapping(path = "/unpaid-extraction")
+	public ResponseEntity<?> paySelectedExtractionStudies(@Valid @RequestBody UnpaidStudiesDTO unpaidStudiesDTO) {
+		return ResponseEntity.ok(studyService.payExtractionAmountStudies(unpaidStudiesDTO));
 	}
 
 }

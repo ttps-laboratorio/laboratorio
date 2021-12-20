@@ -89,4 +89,10 @@ public class PatientController {
 		return new ResponseEntity<>(studyService.createStudy(patientID, studyDTO), HttpStatus.CREATED);
 	}
 
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@GetMapping("/{id}/study-list")
+	public ResponseEntity<?> listPatientStudies(@PathVariable(name = "id") @NonNull Long patientId) {
+		return ResponseEntity.ok(studyService.getAllPatientStudies(patientId));
+	}
+
 }
