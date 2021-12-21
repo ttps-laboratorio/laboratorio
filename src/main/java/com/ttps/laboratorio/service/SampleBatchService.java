@@ -59,13 +59,13 @@ public class SampleBatchService {
 		sampleBatch.setFinalReportsUrl(urlDTO.getUrl());
 		List<Sample> failedSamples = new ArrayList<>();
 		List<Sample> successfulSamples = new ArrayList<>();
-		for (int i = 0; i < SAMPLE_BATCH_COUNT; i++) {
-			if (urlDTO.getFailedSamples().contains(i)) {
-				failedSamples.add(sampleBatch.getSamples().get(i));
+		sampleBatch.getSamples().forEach(sample -> {
+			if (urlDTO.getFailedSamples().contains(sample.getId())) {
+				failedSamples.add(sample);
 			} else {
-				successfulSamples.add(sampleBatch.getSamples().get(i));
+				successfulSamples.add(sample);
 			}
-		}
+		});
 		List<Study> failedStudies = new ArrayList<>();
 		List<Study> successfulStudies = new ArrayList<>();
 		failedSamples.forEach(sample -> failedStudies.add(studyService.getStudyBySample(sample)));

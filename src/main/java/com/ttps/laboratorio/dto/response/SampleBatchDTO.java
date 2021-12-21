@@ -24,7 +24,7 @@ public class SampleBatchDTO {
 
 	private List<Study> studies = new ArrayList<>();
 
-	private String FinalReportsUrl;
+	private String finalReportsUrl;
 
 	private List<Sample> samples = new ArrayList<>();
 

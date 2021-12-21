@@ -19,6 +19,6 @@ public class UrlDTO {
 	@NotBlank(message = "Url is required.")
 	private String url;
 
-	private List<Integer> failedSamples = new ArrayList<>();
+	private List<Long> failedSamples = new ArrayList<>();
 
 }
