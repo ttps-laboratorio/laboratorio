@@ -1,8 +1,7 @@
 package com.ttps.laboratorio.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +12,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,7 +52,6 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "study_id")
 	private Study study;
 
-	@JsonIgnore
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "sample_batch_id", nullable = true)
 	private SampleBatch sampleBatch;

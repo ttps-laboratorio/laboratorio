@@ -1,5 +1,11 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.ttps.laboratorio.dto.request.UrlDTO;
 import com.ttps.laboratorio.dto.response.SampleBatchDTO;
 import com.ttps.laboratorio.entity.Sample;
@@ -10,9 +16,6 @@ import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.ISampleBatchRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SampleBatchService {
@@ -41,8 +44,7 @@ public class SampleBatchService {
 		response.setStatus(sampleBatch.getStatus());
 		response.setId(sampleBatch.getId());
 		response.setFinalReportsUrl(sampleBatch.getFinalReportsUrl());
-		response.setSamples(sampleBatch.getSamples());
-		sampleBatch.getSamples().forEach(sample -> response.getStudies().add(studyService.getStudyBySample(sample)));
+		response.setStudies(sampleBatch.getSamples().stream().map(s -> s.getStudy()).collect(Collectors.toList()));
 		return response;
 	}
 
@@ -57,30 +59,24 @@ public class SampleBatchService {
 			throw new BadRequestException("El lote #" + sampleBatchId + " ya tiene cargado los resultados.");
 		}
 		sampleBatch.setFinalReportsUrl(urlDTO.getUrl());
-		List<Sample> failedSamples = new ArrayList<>();
-		List<Sample> successfulSamples = new ArrayList<>();
-		for (int i = 0; i < SAMPLE_BATCH_COUNT; i++) {
-			if (urlDTO.getFailedSamples().contains(i)) {
-				failedSamples.add(sampleBatch.getSamples().get(i));
-			} else {
-				successfulSamples.add(sampleBatch.getSamples().get(i));
-			}
-		}
-		List<Study> failedStudies = new ArrayList<>();
-		List<Study> successfulStudies = new ArrayList<>();
-		failedSamples.forEach(sample -> failedStudies.add(studyService.getStudyBySample(sample)));
-		failedStudies.forEach(study -> {
-			studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
-			studyService.saveStudy(study);
+		sampleBatch = sampleBatchRepository.save(sampleBatch);
+
+		List<Sample> failedSamples = sampleBatch.getSamples().stream()
+				.filter(s -> urlDTO.getFailedSamples().contains(s.getId())).collect(Collectors.toList());
+		List<Sample> successfulSamples = sampleBatch.getSamples().stream()
+				.filter(s -> !urlDTO.getFailedSamples().contains(s.getId())).collect(Collectors.toList());
+
+		failedSamples.forEach(sample -> {
+			studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, sample.getStudy());
+			studyService.saveStudy(sample.getStudy());
 		});
-		successfulSamples.forEach(sample -> successfulStudies.add(studyService.getStudyBySample(sample)));
-		successfulStudies.forEach(study -> {
-			studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_INTERPRETACION_DE_RESULTADOS, study);
-			studyService.saveStudy(study);
+		successfulSamples.forEach(sample -> {
+			studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_INTERPRETACION_DE_RESULTADOS, sample.getStudy());
+			studyService.saveStudy(sample.getStudy());
 		});
 		sampleBatch.setStatus(SampleBatchStatus.PROCESSED);
 		sampleBatchRepository.save(sampleBatch);
-		return getSampleBatch(sampleBatchId);
+		return null;
 	}
 
 }
