@@ -29,14 +29,25 @@ public class SampleService {
 							+ " no se encuentra en el estado correspondiente para ingresar datos de muestra.");
 		}
 		Sample sample = new Sample();
-		sample.setMilliliters(request.getMilliliters());
-		sample.setFreezer(request.getFreezer());
-		sample.setStudy(study);
+		if (study.getSample() != null) {
+			sample = updateSample(study, request);
+		} else {
+			sample.setMilliliters(request.getMilliliters());
+			sample.setFreezer(request.getFreezer());
+			sample.setStudy(study);
+			study.setSample(sample);
+		}
 		sampleRepository.save(sample);
-		study.setSample(sample);
 		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA, study);
 		studyService.saveStudy(study);
 		return sample;
+	}
+
+	private Sample updateSample(Study study, SampleDTO request) {
+		study.getSample().setFreezer(request.getFreezer());
+		study.getSample().setMilliliters(request.getMilliliters());
+		study.getSample().setSampleBatch(null);
+		return study.getSample();
 	}
 
 }
