@@ -10,6 +10,7 @@ import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
+import com.ttps.laboratorio.entity.StudyType;
 import com.ttps.laboratorio.entity.User;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.LaboratoryException;
@@ -443,4 +444,15 @@ public class StudyService {
 		return unpaidStudiesDTO.getUnpaidStudies().stream().map(studyId -> getStudy(studyId.longValue()).getExtractionAmount())
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
+
+	public Integer studiesByStudyType(StudyType studyType) {
+		return studyRepository.findByType(studyType).size();
+	}
+
+	public Integer studiesByMonthOfYear(Integer month, Integer year) {
+		LocalDateTime from = LocalDateTime.of(year,month,1,0,0);
+		LocalDateTime to = from.plusMonths(1);
+		return studyRepository.findByCreatedAtBetween(from, to).size();
+	}
+
 }

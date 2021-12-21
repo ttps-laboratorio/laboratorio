@@ -69,10 +69,12 @@ public class PatientService {
 			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
 		}
 		Patient patient = new Patient();
-		UserRequestDTO userDTO = request.getUser();
-		User user = new User(null, userDTO.getUsername(), customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()),
-				userDTO.getEmail(), RoleEnum.PATIENT);
-		patient.setUser(user);
+		if (request.getUser() != null) {
+			UserRequestDTO userDTO = request.getUser();
+			User user = new User(null, userDTO.getUsername(), customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()),
+					userDTO.getEmail(), RoleEnum.PATIENT);
+			patient.setUser(user);
+		}
 		return setPatient(patient, request);
 	}
 

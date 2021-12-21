@@ -5,6 +5,8 @@ import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
+import com.ttps.laboratorio.entity.StudyType;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,5 +28,9 @@ public interface IStudyRepository extends JpaRepository<Study, Long>, JpaSpecifi
 	List<Study> findByPatient(Patient patient);
 
 	List<Study> findByPaidExtractionAmountFalse();
+
+	List<Study> findByType(StudyType type);
+
+	List<Study> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
 
 }
