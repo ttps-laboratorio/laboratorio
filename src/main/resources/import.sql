@@ -3,6 +3,13 @@ INSERT INTO users (email,password,role,username) VALUES ('sscotto@mail.com','$2a
 INSERT INTO users (email,password,role,username) VALUES ('admin@admin.com','$2a$10$0mYnz1wsa.KV28mgcHWWoufVEs7R0XF0ktYYGY1mWIwcGAUHZSWKG','ADMINISTRATOR','admin');
 INSERT INTO users (email,password,role,username) VALUES ('config@config.com','$2a$10$0HMf1ttRdbbfeSbkKRBHXOoC79Efn2GezAM9VUG1wqQJdSz4la/VG','CONFIGURATOR','config');
 INSERT INTO users (email,password,role,username) VALUES ('agus@mail.com','$2a$10$4sMYAK8IV6KPrUUyspwNaO3qX2R2RWIBueFfMoS4qyIPudoEaAe4K','EMPLOYEE','agus');
+INSERT INTO users (email,password,role,username) VALUES ('ron@email.com','$2a$10$S2.HN4NEN748hN90Zlq59.pb9ie42hEmROdGqdhbiKZi8cBmsVJcK','PATIENT','rweasley');
+INSERT INTO users (email,password,role,username) VALUES ('severus@email.com','$2a$10$S2.HN4NEN748hN90Zlq59.pb9ie42hEmROdGqdhbiKZi8cBmsVJcK','PATIENT','ssnape');
+INSERT INTO users (email,password,role,username) VALUES ('harry@email.com','$2a$10$S2.HN4NEN748hN90Zlq59.pb9ie42hEmROdGqdhbiKZi8cBmsVJcK','PATIENT','hpotter');
+
+INSERT INTO contacts (email,name,phone_number) VALUES ('ron@email.com','Ron','2211111111');
+INSERT INTO contacts (email,name,phone_number) VALUES ('severus@email.com','Severus','2212222222');
+INSERT INTO contacts (email,name,phone_number) VALUES ('harry@email.com','Harry','2213333333');
 
 INSERT INTO study_types (consent,name) VALUES ('','Exoma');
 INSERT INTO study_types (consent,name) VALUES ('','Genoma mitocondrial completo');
@@ -41,6 +48,10 @@ UPDATE study_statuses SET previous_id=1 WHERE id=13;
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('osde@email.com', 'OSDE', '111');
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('ioma@email.com', 'IOMA', '222');
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('galeno@email.com', 'Galeno', '333');
+
+INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,contact_id,health_insurance_id,user_id) VALUES ('567','1980-03-01','paciente colorado','11111111','Ron','Weasley',1,1,6);
+INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,contact_id,health_insurance_id,user_id) VALUES ('123','1960-01-09','paciente malhumorado','11111112','Severus','Snape',2,1,7);
+INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,contact_id,health_insurance_id,user_id) VALUES ('111','1980-07-30','paciente peligroso','11111113','Harry','Potter',3,1,8);
 
 INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_uno@email.com','Doctor','Uno',111,'111');
 INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_dos@email.com','Doctor','Dos',222,'222');
