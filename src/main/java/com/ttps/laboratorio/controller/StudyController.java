@@ -1,24 +1,11 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.request.AppointmentDTO;
-import com.ttps.laboratorio.dto.request.ConfirmPaymentDTO;
-import com.ttps.laboratorio.dto.request.FinalReportDTO;
-import com.ttps.laboratorio.dto.request.SampleDTO;
-import com.ttps.laboratorio.dto.request.StudyDTO;
-import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
-import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
-import com.ttps.laboratorio.entity.Appointment;
-import com.ttps.laboratorio.entity.Sample;
-import com.ttps.laboratorio.entity.Study;
-import com.ttps.laboratorio.service.AppointmentService;
-import com.ttps.laboratorio.service.ExtractionistService;
-import com.ttps.laboratorio.service.FinalReportService;
-import com.ttps.laboratorio.service.SampleService;
-import com.ttps.laboratorio.service.StudyService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import javax.validation.Valid;
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +21,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ttps.laboratorio.dto.request.AppointmentDTO;
+import com.ttps.laboratorio.dto.request.ConfirmPaymentDTO;
+import com.ttps.laboratorio.dto.request.FinalReportDTO;
+import com.ttps.laboratorio.dto.request.SampleDTO;
+import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
+import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
+import com.ttps.laboratorio.entity.Appointment;
+import com.ttps.laboratorio.entity.Sample;
+import com.ttps.laboratorio.entity.Study;
+import com.ttps.laboratorio.service.AppointmentService;
+import com.ttps.laboratorio.service.ExtractionistService;
+import com.ttps.laboratorio.service.FinalReportService;
+import com.ttps.laboratorio.service.SampleService;
+import com.ttps.laboratorio.service.StudyService;
 
 @RestController
 @RequestMapping(path = "study")
@@ -185,7 +188,7 @@ public class StudyController {
 		return new ResponseEntity<>(finalReportService.createFinalReport(studyId, finalReportDTO), HttpStatus.CREATED);
 	}
 
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping("/{id}/final-report")
 	public ResponseEntity<Resource> downloadFinalReportPDF(@PathVariable(name = "id") @NonNull Long studyId)
 			throws IOException {
