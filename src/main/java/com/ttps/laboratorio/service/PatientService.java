@@ -90,11 +90,13 @@ public class PatientService {
 		if (patientRepository.existsByDniAndIdNot(request.getDni(), patientID)) {
 			throw new BadRequestException("Existe otro paciente con dni " + request.getDni());
 		}
-		UserRequestDTO userDTO = request.getUser();
-		User user = patient.getUser();
-		user.setUsername(userDTO.getUsername());
-		user.setEmail(userDTO.getEmail());
-		user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
+		if (request.getUser() != null) {
+			UserRequestDTO userDTO = request.getUser();
+			User user = patient.getUser();
+			user.setUsername(userDTO.getUsername());
+			user.setEmail(userDTO.getEmail());
+			user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
+		}
 		setPatient(patient, request);
 	}
 
