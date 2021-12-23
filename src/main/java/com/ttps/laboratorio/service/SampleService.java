@@ -8,17 +8,13 @@ import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.exception.BadRequestException;
-import com.ttps.laboratorio.repository.ISampleRepository;
 
 @Service
 public class SampleService {
 
-	private final ISampleRepository sampleRepository;
-
 	private final StudyService studyService;
 
-	public SampleService(ISampleRepository sampleRepository, StudyService studyService) {
-		this.sampleRepository = sampleRepository;
+	public SampleService(StudyService studyService) {
 		this.studyService = studyService;
 	}
 

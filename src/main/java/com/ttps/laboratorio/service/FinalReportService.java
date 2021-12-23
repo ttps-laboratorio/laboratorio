@@ -13,7 +13,6 @@ import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.entity.User;
 import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.LaboratoryException;
-import com.ttps.laboratorio.repository.IFinalReportRepository;
 import com.ttps.laboratorio.utils.LaboratoryFileUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class FinalReportService {
-
-	private final IFinalReportRepository finalReportRepository;
 
 	private final StudyService studyService;
 
@@ -34,8 +31,8 @@ public class FinalReportService {
 
 	private final PdfGeneratorService pdfGeneratorService;
 
-	public FinalReportService(IFinalReportRepository finalReportRepository, StudyService studyService, UserService userService, EmployeeService employeeService, LaboratoryFileUtils laboratoryFileUtils, PdfGeneratorService pdfGeneratorService) {
-		this.finalReportRepository = finalReportRepository;
+	public FinalReportService(StudyService studyService, UserService userService, EmployeeService employeeService,
+			LaboratoryFileUtils laboratoryFileUtils, PdfGeneratorService pdfGeneratorService) {
 		this.studyService = studyService;
 		this.userService = userService;
 		this.employeeService = employeeService;
