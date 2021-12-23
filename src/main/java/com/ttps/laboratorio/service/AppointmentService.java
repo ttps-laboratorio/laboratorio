@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ttps.laboratorio.dto.request.AppointmentDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.BlockedDay;
-import com.ttps.laboratorio.entity.Checkpoint;
 import com.ttps.laboratorio.entity.ScheduleConfigurator;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
@@ -118,7 +118,7 @@ public class AppointmentService {
 		appointment.setTime(request.getTime());
 		appointmentRepository.save(appointment);
 		study.setAppointment(appointment);
-		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA, study);
+		studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA, study);
 		studyService.saveStudy(study);
 		return appointment;
 	}
@@ -128,6 +128,7 @@ public class AppointmentService {
 	 *
 	 * @param appointmentID id from the appointment to delete
 	 */
+	@Transactional
 	public void deleteAppointment(Long appointmentID) {
 		Appointment appointment = appointmentRepository.findById(appointmentID)
 				.orElseThrow(() -> new NotFoundException("No existe un turno con el id " + appointmentID + "."));
@@ -137,7 +138,7 @@ public class AppointmentService {
 					"El estudio no se encuentra en el estado correspondiente para eliminar el turno.");
 		}
 		study.setAppointment(null);
-		studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
+		studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
 		studyService.saveStudy(study);
 		appointmentRepository.delete(appointment);
 	}
@@ -205,17 +206,14 @@ public class AppointmentService {
 	}
 
 	@Scheduled(cron = "0 0 0 * * ?")
+	@Transactional
 	public void cancelAppointment() {
 		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA);
 		studyService.getStudiesByActualStatus(statusWaitingAppointmentSelection).stream()
 				.filter(s -> s.getAppointment().getDate().plusDays(30).compareTo(LocalDate.now()) < 0).forEach(study -> {
-					Checkpoint checkpoint = new Checkpoint();
-					checkpoint.setStudy(study);
-					checkpoint.setCreatedBy(null);
-					deleteAppointment(study.getAppointment().getId());
-					checkpoint.setStatus(
-							studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO));
-					study.getCheckpoints().add(checkpoint);
+					// deleteAppointment(study.getAppointment().getId());
+					study.setAppointment(null);
+					studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
 					studyService.saveStudy(study);
 				});
 	}

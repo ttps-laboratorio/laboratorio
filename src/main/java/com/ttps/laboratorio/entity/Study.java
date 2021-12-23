@@ -1,13 +1,12 @@
 package com.ttps.laboratorio.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,11 +14,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +49,7 @@ public class Study implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Builder.Default
 	@Column(name = "created_at")
 	private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -56,6 +61,7 @@ public class Study implements Serializable {
 	@Column(name = "extraction_amount", nullable = false)
 	private BigDecimal extractionAmount;
 
+	@Builder.Default
 	@Column(name = "paid_extraction_amount")
 	private Boolean paidExtractionAmount = false;
 
@@ -65,6 +71,7 @@ public class Study implements Serializable {
 	/**
 	 * Maybe this has to be deleted and calculated.
 	 */
+	@Builder.Default
 	@Column(name = "delay")
 	private Boolean delay = false;
 
@@ -108,7 +115,8 @@ public class Study implements Serializable {
 	/**
 	 * Sample represents the blood extraction of the study
 	 */
-	@OneToOne(mappedBy = "study", optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
+	@ManyToOne(optional = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "sample_id", referencedColumnName = "id")
 	private Sample sample;
 
 	@Builder.Default
@@ -132,6 +140,22 @@ public class Study implements Serializable {
 	 */
 	public StudyStatus getActualStatus() {
 		return Optional.ofNullable(getRecentCheckpoint()).map(Checkpoint::getStatus).orElse(null);
+	}
+
+	public void setFinalReport(FinalReport finalReport) {
+		this.finalReport = finalReport;
+		finalReport.setStudy(this);
+	}
+
+	public void setSample(Sample sample) {
+		this.sample = sample;
+		if (sample != null)
+			sample.setStudy(this);
+	}
+
+	public boolean addCheckpoint(Checkpoint checkpoint) {
+		checkpoint.setStudy(this);
+		return this.checkpoints.add(checkpoint);
 	}
 
 }
