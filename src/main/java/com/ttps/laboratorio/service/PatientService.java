@@ -124,6 +124,9 @@ public class PatientService {
 			throw new BadRequestException("No existe un paciente con el dni " + request.getDni());
 		}
 		Patient patient = patientRepository.findByDni(request.getDni().longValue());
+		if (patient.getUser() != null) {
+			throw new BadRequestException("El paciente con dni " + request.getDni() + " ya se encuentra registrado.");
+		}
 		UserRequestDTO userDTO = request.getUser();
 		User user = new User(null, userDTO.getUsername(), customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()),
 				userDTO.getEmail(), RoleEnum.PATIENT);
