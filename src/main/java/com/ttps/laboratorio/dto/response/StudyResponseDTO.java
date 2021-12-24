@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Doctor;
 import com.ttps.laboratorio.entity.PresumptiveDiagnosis;
-import com.ttps.laboratorio.entity.SampleBatch;
 import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.entity.StudyType;
 import java.math.BigDecimal;
@@ -43,6 +42,6 @@ public class StudyResponseDTO {
 
   private StudyStatus actualStatus;
 
-  private SampleBatch sampleBatch;
+  private SampleResponseDTO sample;
 
 }

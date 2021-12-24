@@ -1,5 +1,7 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.dto.response.SampleBatchResponseDTO;
+import com.ttps.laboratorio.dto.response.SampleResponseDTO;
 import com.ttps.laboratorio.dto.response.StudyStatusResponseDTO;
 import com.ttps.laboratorio.entity.RoleEnum;
 import java.io.File;
@@ -491,13 +493,25 @@ public class StudyService {
 	}
 
 	private StudyResponseDTO createStudyResponseDTO(Study study) {
-		StudyStatus actualStatus = getPatientStatus(study);
 		PatientResponseDTO patientDTO = new PatientResponseDTO(study.getPatient().getId(), study.getPatient().getDni(),
 				study.getPatient().getFirstName(), study.getPatient().getLastName(), study.getPatient().getBirthDate());
 
 		return new StudyResponseDTO(study.getId(), study.getCreatedAt(), study.getBudget(), study.getExtractionAmount(),
 				study.getPaidExtractionAmount(), patientDTO, study.getAppointment(), study.getReferringDoctor(), study.getType(),
-				study.getPresumptiveDiagnosis(), actualStatus, study.getSample().getSampleBatch());
+				study.getPresumptiveDiagnosis(), getPatientStatus(study), getPatientSample(study));
+	}
+
+	private SampleResponseDTO getPatientSample(Study study) {
+		SampleResponseDTO sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(),
+				study.getSample().getFreezer(), study.getSample().getFailed(), study.getId(),
+				new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(), study.getSample().getSampleBatch().getFinalReportsUrl()));
+		patientService.validateLoggedPatient(study.getPatient().getId());
+		User user = userService.getLoggedUser();
+		if (RoleEnum.PATIENT.equals(user.getRole())) {
+			sample.setFreezer(null);
+			sample.getSampleBatch().setFinalReportsUrl(null);
+		}
+		return sample;
 	}
 
 	private StudyStatus getPatientStatus(Study study) {
