@@ -56,9 +56,7 @@ public class ExtractionistService {
 		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == SampleBatchService.SAMPLE_BATCH_COUNT) {
 			studiesReadyForProcess.forEach(s -> {
 				// we register the user that creates the batch
-				studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_RESULTADO_BIOTECNOLOGICO, study);
-				// studyService.addNewCheckpoint(study,
-				// StudyStatus.ESPERANDO_RESULTADO_BIOTECNOLOGICO, null);
+				studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_RESULTADO_BIOTECNOLOGICO, s);
 				studyService.saveStudy(s);
 			});
 			sampleBatchService.createBatch(studiesReadyForProcess);
