@@ -20,15 +20,12 @@ public class ExtractionistService {
 
 	private final StudyService studyService;
 
-	private final StudyStatusService studyStatusService;
-
 	private final SampleBatchService sampleBatchService;
 
 	public ExtractionistService(IExtractionistRepository extractionistRepository, StudyService studyService,
-															StudyStatusService studyStatusService, SampleBatchService sampleBatchService) {
+			SampleBatchService sampleBatchService) {
 		this.extractionistRepository = extractionistRepository;
 		this.studyService = studyService;
-		this.studyStatusService = studyStatusService;
 		this.sampleBatchService = sampleBatchService;
 	}
 
@@ -51,8 +48,8 @@ public class ExtractionistService {
 		studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO,
 				study);
 		studyService.saveFlushStudy(study);
-		StudyStatus statusWaitingForPayment = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO);
-		List<Study> studiesReadyForProcess = studyService.getStudiesByActualStatus(statusWaitingForPayment);
+		List<Study> studiesReadyForProcess = studyService
+				.getStudiesByActualStatus(StudyStatus.ESPERANDO_LOTE_DE_MUESTRA_PARA_INICIAR_PROCESAMIENTO);
 		if (studiesReadyForProcess != null && studiesReadyForProcess.size() == SampleBatchService.SAMPLE_BATCH_COUNT) {
 			studiesReadyForProcess.forEach(s -> {
 				// we register the user that creates the batch
@@ -61,7 +58,6 @@ public class ExtractionistService {
 			});
 			sampleBatchService.createBatch(studiesReadyForProcess);
 		}
-		studyService.saveStudy(study);
 	}
 
 }

@@ -414,16 +414,14 @@ public class StudyService {
 		addNewCheckpoint(study, status, user);
 	}
 
-	public List<Study> getStudiesByActualStatus(StudyStatus studyStatus) {
-		return studyRepository.findAllByActualStatus(studyStatus);
+	public List<Study> getStudiesByActualStatus(Long studyStatus) {
+		return studyRepository.findAll(StudySpecifications.withStatus(studyStatus));
 	}
 
 	@Scheduled(cron = "0 0 0 * * ?")
 	@Transactional
 	public void cancelStudy() {
-		StudyStatus statusWaitingForPayment = studyStatusService
-				.getStudyStatus(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO);
-		getStudiesByActualStatus(statusWaitingForPayment).stream()
+		getStudiesByActualStatus(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO).stream()
 				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0)
 				.forEach(study -> {
 					StudyStatus studyStatus = studyStatusService.getStudyStatus(StudyStatus.ANULADO);

@@ -208,10 +208,8 @@ public class AppointmentService {
 	@Scheduled(cron = "0 0 0 * * ?")
 	@Transactional
 	public void cancelAppointment() {
-		StudyStatus statusWaitingAppointmentSelection = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA);
-		studyService.getStudiesByActualStatus(statusWaitingAppointmentSelection).stream()
+		studyService.getStudiesByActualStatus(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA).stream()
 				.filter(s -> s.getAppointment().getDate().plusDays(30).compareTo(LocalDate.now()) < 0).forEach(study -> {
-					// deleteAppointment(study.getAppointment().getId());
 					study.setAppointment(null);
 					studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
 					studyService.saveStudy(study);
