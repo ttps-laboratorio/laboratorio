@@ -47,6 +47,8 @@ public class StudyStatus implements Serializable {
 	public static final Long ESPERANDO_SER_ENTREGADO_A_MEDICO_DERIVANTE = 11L;
 	public static final Long RESULTADO_ENTREGADO = 12L;
 	public static final Long ANULADO = 13L;
+	public static final Long ESPERANDO_RESULTADO = 14L;
+	public static final Long RESULTADO_COMPLETO = 15L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

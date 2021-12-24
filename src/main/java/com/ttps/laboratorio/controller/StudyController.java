@@ -1,5 +1,6 @@
 package com.ttps.laboratorio.controller;
 
+import com.ttps.laboratorio.dto.response.StudyResponseDTO;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -106,7 +107,7 @@ public class StudyController {
 	@PostMapping(value = "/{studyId}/payment-proof")
 	public ResponseEntity<Resource> uploadPaymentProofPDF(@PathVariable(name = "studyId") @NonNull Long studyId,
 			@RequestPart MultipartFile paymentProofPdf) {
-		Study study = studyService.uploadPaymentProofFile(studyId, paymentProofPdf);
+		StudyResponseDTO study = studyService.uploadPaymentProofFile(studyId, paymentProofPdf);
 		return ResponseEntity.ok(null);
 	}
 
@@ -144,7 +145,7 @@ public class StudyController {
 	@PostMapping("/{studyId}/signed-consent")
 	public ResponseEntity<Resource> uploadSignedConsentPDF(@PathVariable(name = "studyId") @NonNull Long studyId,
 			@RequestPart MultipartFile signedConsentPdf) {
-		Study study = studyService.uploadSignedConsentFile(studyId, signedConsentPdf);
+		StudyResponseDTO study = studyService.uploadSignedConsentFile(studyId, signedConsentPdf);
 		return ResponseEntity.ok(null);
 	}
 

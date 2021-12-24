@@ -1,55 +1,45 @@
 package com.ttps.laboratorio.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ttps.laboratorio.entity.Appointment;
-import com.ttps.laboratorio.entity.Checkpoint;
 import com.ttps.laboratorio.entity.Doctor;
-import com.ttps.laboratorio.entity.Extractionist;
-import com.ttps.laboratorio.entity.FinalReport;
-import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.PresumptiveDiagnosis;
-import com.ttps.laboratorio.entity.Sample;
+import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.entity.StudyType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudyResponseDTO {
 
-	private Long id;
+  private Long id;
 
-	private LocalDateTime createdAt;
+  private LocalDateTime createdAt;
 
-	private BigDecimal budget;
+  private BigDecimal budget;
 
-	private BigDecimal extractionAmount;
+  private BigDecimal extractionAmount;
 
-	private Boolean paidExtractionAmount;
+  private Boolean paidExtractionAmount;
 
-	private FinalReport finalReport;
+  private PatientResponseDTO patient;
 
-	private Boolean delay = false;
+  private Appointment appointment;
 
-	private Patient patient;
+  private Doctor referringDoctor;
 
-	private Appointment appointment;
+  private StudyType type;
 
-	private Doctor referringDoctor;
+  private PresumptiveDiagnosis presumptiveDiagnosis;
 
-	private StudyType type;
+  private StudyStatus actualStatus;
 
-	private Extractionist extractionist;
-
-	private PresumptiveDiagnosis presumptiveDiagnosis;
-
-	private Sample sample;
-
-	private List<Checkpoint> checkpoints;
-
-	private StudyStatusResponseDTO actualStatus;
 }

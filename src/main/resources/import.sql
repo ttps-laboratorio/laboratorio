@@ -30,6 +30,8 @@ INSERT INTO study_statuses (id, name,num_order) VALUES (10,'Esperando interpreta
 INSERT INTO study_statuses (id, name,num_order) VALUES (11,'Esperando ser entregado a médico derivante',11);
 INSERT INTO study_statuses (id, name,num_order) VALUES (12,'Resultado entregado',12);
 INSERT INTO study_statuses (id, name,num_order) VALUES (13,'Anulado por falta de pago', 13);
+INSERT INTO study_statuses (id, name,num_order) VALUES (14,'Esperando resultado', 14);
+INSERT INTO study_statuses (id, name,num_order) VALUES (15,'Resultado completo', 15);
 
 UPDATE study_statuses SET next_id=2 WHERE id=1;
 UPDATE study_statuses SET next_id=3,previous_id=1 WHERE id=2;

@@ -3,7 +3,9 @@ package com.ttps.laboratorio.service;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
 import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
+import com.ttps.laboratorio.dto.response.PatientResponseDTO;
 import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
+import com.ttps.laboratorio.dto.response.StudyResponseDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Checkpoint;
 import com.ttps.laboratorio.entity.Patient;
@@ -105,7 +107,7 @@ public class StudyService {
 	}
 
 	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
-	public Study createStudy(Long patientId, StudyDTO request) {
+	public StudyResponseDTO createStudy(Long patientId, StudyDTO request) {
 		Study study = new Study();
 		Patient patient = patientService.getPatient(patientId);
 		patient.addStudy(study);
@@ -131,10 +133,10 @@ public class StudyService {
 			log.error("No se pudo generar el pdf del consentimiento del paciente [dni: " + patient.getDni() + "]", e);
 			throw new LaboratoryException("No se pudo generar el consentimiento del paciente #" + patientId);
 		}
-		return study;
+		return createStudyResponseDTO(study);
 	}
 
-	public Study updateStudy(Long studyId, StudyDTO studyDTO) {
+	public StudyResponseDTO updateStudy(Long studyId, StudyDTO studyDTO) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 		StudyStatus actualStatus = study.getActualStatus();
@@ -156,7 +158,7 @@ public class StudyService {
 		study.setReferringDoctor(doctorService.getDoctor(studyDTO.getReferringDoctor().getId()));
 		study.setPresumptiveDiagnosis(
 				presumptiveDiagnosisService.getPresumptiveDiagnosis(studyDTO.getPresumptiveDiagnosis().getId()));
-		return study;
+		return createStudyResponseDTO(study);
 	}
 
 	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
@@ -318,7 +320,7 @@ public class StudyService {
 	}
 
 	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
-	public Study uploadPaymentProofFile(Long studyId, MultipartFile paymentProofPdf) {
+	public StudyResponseDTO uploadPaymentProofFile(Long studyId, MultipartFile paymentProofPdf) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 		StudyStatus actualStatus = study.getActualStatus();
@@ -341,11 +343,11 @@ public class StudyService {
 			throw new LaboratoryException(
 					"Error al guardar el documento de consentimiento informado firmado del estudio con id: " + studyId);
 		}
-		return study;
+		return createStudyResponseDTO(study);
 	}
 
 	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
-	public Study uploadSignedConsentFile(Long studyId, MultipartFile signedConsentPdf) {
+	public StudyResponseDTO uploadSignedConsentFile(Long studyId, MultipartFile signedConsentPdf) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 
@@ -370,7 +372,7 @@ public class StudyService {
 			throw new LaboratoryException(
 					"Error al guardar el documento de consentimiento informado firmado del estudio con id: " + studyId);
 		}
-		return study;
+		return createStudyResponseDTO(study);
 	}
 
 	public Study getStudyByAppointment(Appointment appointment) {
@@ -453,6 +455,15 @@ public class StudyService {
 		LocalDateTime from = LocalDateTime.of(year,month,1,0,0);
 		LocalDateTime to = from.plusMonths(1);
 		return studyRepository.findByCreatedAtBetween(from, to).size();
+	}
+
+	private StudyResponseDTO createStudyResponseDTO(Study study) {
+		PatientResponseDTO patientDTO = new PatientResponseDTO(study.getPatient().getId(), study.getPatient().getDni(),
+				study.getPatient().getFirstName(), study.getPatient().getLastName(), study.getPatient().getBirthDate());
+
+		return new StudyResponseDTO(study.getId(), study.getCreatedAt(), study.getBudget(), study.getExtractionAmount(),
+				study.getPaidExtractionAmount(), patientDTO, study.getAppointment(), study.getReferringDoctor(), study.getType(),
+				study.getPresumptiveDiagnosis(), study.getActualStatus());
 	}
 
 }
