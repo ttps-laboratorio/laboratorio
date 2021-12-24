@@ -42,7 +42,7 @@ public class FinalReportService {
 
 	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public FinalReport createFinalReport(Long studyId, FinalReportDTO finalReportDTO) {
-		Study study = studyService.getStudy(studyId);
+		Study study = studyService.getStudyById(studyId);
 		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_INTERPRETACION_DE_RESULTADOS)) {
 			throw new BadRequestException(
 					"El estudio #" + studyId + " no se encuentra en el estado correspondiente para ingresar el reporte final.");

@@ -20,7 +20,7 @@ public class SampleService {
 
 	@Transactional
 	public Sample createSample(Long studyId, SampleDTO request) {
-		Study study = studyService.getStudy(studyId);
+		Study study = studyService.getStudyById(studyId);
 		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA)) {
 			throw new BadRequestException(
 					"El estudio #" + studyId

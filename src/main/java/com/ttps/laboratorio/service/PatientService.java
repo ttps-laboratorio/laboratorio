@@ -46,7 +46,7 @@ public class PatientService {
 	public void validateLoggedPatient(Long id) {
 		User user = userService.getLoggedUser();
 		if (RoleEnum.PATIENT.equals(user.getRole()) && !getByUser(user).getId().equals(id)) {
-			throw new BadRequestException("No puede acceder a este perfil.");
+			throw new BadRequestException("No puede acceder a esta seccion.");
 		}
 	}
 

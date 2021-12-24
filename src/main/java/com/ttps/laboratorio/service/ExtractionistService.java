@@ -43,7 +43,7 @@ public class ExtractionistService {
 
 	@Transactional
 	public void setExtractionistById(Long studyId, Long extractionistId) {
-		Study study = studyService.getStudy(studyId);
+		Study study = studyService.getStudyById(studyId);
 		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA)) {
 			throw new BadRequestException("El estudio #" + studyId + " no se encuentra en el estado correspondiente para seleccionar al extraccionista.");
 		}
