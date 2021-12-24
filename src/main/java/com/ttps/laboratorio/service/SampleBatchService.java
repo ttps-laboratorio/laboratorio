@@ -26,7 +26,7 @@ public class SampleBatchService {
 
 	private final StudyService studyService;
 
-	public static final Integer SAMPLE_BATCH_COUNT = 2;
+	public static final Integer SAMPLE_BATCH_COUNT = 10;
 
 	public SampleBatchService(ISampleBatchRepository sampleBatchRepository, StudyService studyService) {
 		this.sampleBatchRepository = sampleBatchRepository;
