@@ -49,9 +49,9 @@ public class EmployeeController {
 
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
 	@PutMapping("/{id}")
-	public ResponseEntity<EmployeeResponseDTO> updateDoctor(@PathVariable(name = "id") @NonNull Long empployeeId,
+	public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable(name = "id") @NonNull Long employeeId,
 																													@Valid @RequestBody EmployeeRequestDTO employeeRequestDTO) {
-		EmployeeResponseDTO dto = employeeService.update(empployeeId, employeeRequestDTO);
+		EmployeeResponseDTO dto = employeeService.update(employeeId, employeeRequestDTO);
 		return ResponseEntity.ok(dto);
 	}
 }

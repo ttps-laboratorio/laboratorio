@@ -12,6 +12,8 @@ public interface IPatientRepository extends JpaRepository<Patient, Long> {
 
 	boolean existsByDni(Long dni);
 
+	Patient findByDni(Long dni);
+
 	Patient findByUser(User user);
 
 }

@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.request.PatientDTO;
+import com.ttps.laboratorio.dto.request.PatientUserDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.response.StudyResponseDTO;
 import com.ttps.laboratorio.entity.Patient;
@@ -60,6 +61,12 @@ public class PatientController {
 	@PostMapping
 	public ResponseEntity<Patient> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
 		return new ResponseEntity<>(patientService.createPatient(patientDTO), HttpStatus.CREATED);
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
+	@PostMapping("/sign-up")
+	public ResponseEntity<Patient> signUpPatient(@Valid @RequestBody PatientUserDTO patientUserDTO) {
+		return new ResponseEntity<>(patientService.signUpPatient(patientUserDTO), HttpStatus.CREATED);
 	}
 
 	/**

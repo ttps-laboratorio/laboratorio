@@ -2,6 +2,7 @@ package com.ttps.laboratorio.service;
 
 import com.ttps.laboratorio.auth.CustomAuthenticationProvider;
 import com.ttps.laboratorio.dto.request.PatientDTO;
+import com.ttps.laboratorio.dto.request.PatientUserDTO;
 import com.ttps.laboratorio.dto.request.UserRequestDTO;
 import com.ttps.laboratorio.entity.Patient;
 import com.ttps.laboratorio.entity.RoleEnum;
@@ -116,4 +117,17 @@ public class PatientService {
 		return patientRepository.findByUser(user);
 	}
 
+
+	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
+	public Patient signUpPatient(PatientUserDTO request) {
+		if (!patientRepository.existsByDni(request.getDni().longValue())) {
+			throw new BadRequestException("No existe un paciente con el dni " + request.getDni());
+		}
+		Patient patient = patientRepository.findByDni(request.getDni().longValue());
+		UserRequestDTO userDTO = request.getUser();
+		User user = new User(null, userDTO.getUsername(), customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()),
+				userDTO.getEmail(), RoleEnum.PATIENT);
+		patient.setUser(user);
+		return patient;
+	}
 }
