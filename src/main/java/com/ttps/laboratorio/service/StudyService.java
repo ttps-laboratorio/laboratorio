@@ -1,5 +1,22 @@
 package com.ttps.laboratorio.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
 import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
@@ -20,22 +37,8 @@ import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IStudyRepository;
 import com.ttps.laboratorio.repository.specification.StudySpecifications;
 import com.ttps.laboratorio.utils.LaboratoryFileUtils;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -62,9 +65,9 @@ public class StudyService {
 	private final LaboratoryFileUtils laboratoryFileUtils;
 
 	public StudyService(IStudyRepository studyRepository, PatientService patientService, UserService userService,
-											StudyStatusService studyStatusService, DoctorService doctorService, StudyTypeService studyTypeService,
-											PresumptiveDiagnosisService presumptiveDiagnosisService, PdfGeneratorService pdfGeneratorService,
-											LaboratoryFileUtils fileNameUtils) {
+			StudyStatusService studyStatusService, DoctorService doctorService, StudyTypeService studyTypeService,
+			PresumptiveDiagnosisService presumptiveDiagnosisService, PdfGeneratorService pdfGeneratorService,
+			LaboratoryFileUtils fileNameUtils) {
 		this.studyRepository = studyRepository;
 		this.patientService = patientService;
 		this.userService = userService;
@@ -106,7 +109,7 @@ public class StudyService {
 		}).collect(Collectors.toList());
 	}
 
-	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public StudyResponseDTO createStudy(Long patientId, StudyDTO request) {
 		Study study = new Study();
 		Patient patient = patientService.getPatient(patientId);
@@ -117,7 +120,7 @@ public class StudyService {
 		study.setType(studyTypeService.getStudyType(request.getStudyType().getId()));
 		study.setPresumptiveDiagnosis(
 				presumptiveDiagnosisService.getPresumptiveDiagnosis(request.getPresumptiveDiagnosis().getId()));
-		setCheckpointWithStatus(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO, study);
+		addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO, study);
 		study = studyRepository.save(study);
 		try {
 			String filename = laboratoryFileUtils.getFilenameBudget(study.getPatient().getId(), study.getId());
@@ -161,7 +164,7 @@ public class StudyService {
 		return createStudyResponseDTO(study);
 	}
 
-	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public Study confirmPayment(Long studyId, boolean confirm) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
@@ -187,7 +190,7 @@ public class StudyService {
 		// else change status to back (ESPERANDO_COMPROBANTE_DE_PAGO)
 		Long studyStatus = confirm ? StudyStatus.ENVIAR_CONSENTIMIENTO_INFORMADO
 				: StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO;
-		setCheckpointWithStatus(studyStatus, study);
+		addCheckpointWithLoggedUser(studyStatus, study);
 		return studyRepository.save(study);
 	}
 
@@ -262,7 +265,7 @@ public class StudyService {
 
 		// Change state only if actual state is Enviar consentimiento informado
 		if (study.getActualStatus().getId().equals(StudyStatus.ENVIAR_CONSENTIMIENTO_INFORMADO)) {
-			setCheckpointWithStatus(StudyStatus.ESPERANDO_CONSENTIMIENTO_INFORMADO_FIRMADO, study);
+			addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_CONSENTIMIENTO_INFORMADO_FIRMADO, study);
 			study = studyRepository.save(study);
 		}
 		return new FileSystemResource(file);
@@ -285,8 +288,7 @@ public class StudyService {
 		String filename = laboratoryFileUtils.getFilenameSignedConsent(study.getPatient().getId(), study.getId());
 		File file = new File(filename);
 		if (!file.exists()) {
-			throw new LaboratoryException(
-					"No existe el documento de consentimiento firmado del estudio #" + studyId);
+			throw new LaboratoryException("No existe el documento de consentimiento firmado del estudio #" + studyId);
 		}
 		return new FileSystemResource(file);
 	}
@@ -307,19 +309,19 @@ public class StudyService {
 		String filename = laboratoryFileUtils.getFilenameFinalReport(study.getPatient().getId(), study.getId());
 		File file = new File(filename);
 		if (!file.exists()) {
-			throw new LaboratoryException(
-					"No existe el documento de reporte final del estudio #" + studyId);
+			throw new LaboratoryException("No existe el documento de reporte final del estudio #" + studyId);
 		}
 
-		// Change state only if actual state is Esperando ser entregado a medico derivante
+		// Change state only if actual state is Esperando ser entregado a medico
+		// derivante
 		if (study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_SER_ENTREGADO_A_MEDICO_DERIVANTE)) {
-			setCheckpointWithStatus(StudyStatus.RESULTADO_ENTREGADO, study);
+			addCheckpointWithLoggedUser(StudyStatus.RESULTADO_ENTREGADO, study);
 			studyRepository.save(study);
 		}
 		return new FileSystemResource(file);
 	}
 
-	@Transactional(rollbackFor = {LaboratoryException.class, Exception.class})
+	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
 	public StudyResponseDTO uploadPaymentProofFile(Long studyId, MultipartFile paymentProofPdf) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
@@ -337,7 +339,7 @@ public class StudyService {
 			String filename = laboratoryFileUtils.getFilenamePaymentProof(study.getPatient().getId(), study.getId());
 			File file = new File(filename);
 			Files.copy(paymentProofPdf.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			setCheckpointWithStatus(StudyStatus.ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO, study);
+			addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_VALIDACION_COMPROBANTE_DE_PAGO, study);
 			study = studyRepository.save(study);
 		} catch (IOException e) {
 			throw new LaboratoryException(
@@ -366,7 +368,7 @@ public class StudyService {
 			String filename = laboratoryFileUtils.getFilenameSignedConsent(study.getPatient().getId(), study.getId());
 			File file = new File(filename);
 			Files.copy(signedConsentPdf.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
+			addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, study);
 			study = studyRepository.save(study);
 		} catch (IOException e) {
 			throw new LaboratoryException(
@@ -387,13 +389,29 @@ public class StudyService {
 		return studyRepository.saveAndFlush(study);
 	}
 
-	public void setCheckpointWithStatus(Long status, Study study) {
-		User queriedUser = userService.getLoggedUser();
-		Checkpoint checkpoint = new Checkpoint();
-		checkpoint.setStudy(study);
-		checkpoint.setCreatedBy(queriedUser);
-		checkpoint.setStatus(studyStatusService.getStudyStatus(status));
-		study.getCheckpoints().add(checkpoint);
+	/**
+	 * Creates a checkpoint with params and adds to study checkpoints collection
+	 *
+	 * @param study  Owner of the checkpoint
+	 * @param status Id of status of study for checkpoint
+	 * @param user   User that performs the operation or null
+	 */
+	public void addNewCheckpoint(Study study, Long status, User user) {
+		StudyStatus studyStatus = studyStatusService.getStudyStatus(status);
+		Checkpoint checkpoint = Checkpoint.builder().status(studyStatus).createdBy(user).build();
+		study.addCheckpoint(checkpoint);
+	}
+
+	/**
+	 * Creates a checkpoint with params for authenticated user and adds to study
+	 * checkpoints collection
+	 *
+	 * @param status
+	 * @param study
+	 */
+	public void addCheckpointWithLoggedUser(Long status, Study study) {
+		User user = userService.getLoggedUser();
+		addNewCheckpoint(study, status, user);
 	}
 
 	public List<Study> getStudiesByActualStatus(StudyStatus studyStatus) {
@@ -401,26 +419,24 @@ public class StudyService {
 	}
 
 	@Scheduled(cron = "0 0 0 * * ?")
+	@Transactional
 	public void cancelStudy() {
 		StudyStatus statusWaitingForPayment = studyStatusService
 				.getStudyStatus(StudyStatus.ESPERANDO_COMPROBANTE_DE_PAGO);
 		getStudiesByActualStatus(statusWaitingForPayment).stream()
 				.filter(s -> s.getRecentCheckpoint().getCreatedAt().plusDays(30).compareTo(LocalDateTime.now()) < 0)
 				.forEach(study -> {
-					Checkpoint checkpoint = new Checkpoint();
-					checkpoint.setStudy(study);
-					checkpoint.setCreatedBy(null);
-					checkpoint.setStatus(studyStatusService.getStudyStatus(StudyStatus.ANULADO));
-					study.getCheckpoints().add(checkpoint);
+					StudyStatus studyStatus = studyStatusService.getStudyStatus(StudyStatus.ANULADO);
+					Checkpoint checkpoint = Checkpoint.builder().status(studyStatus).createdBy(null).build();
+					study.addCheckpoint(checkpoint);
 					studyRepository.save(study);
 				});
 	}
 
 	public Study getStudyBySample(Sample sample) {
-		return studyRepository.findBySample(sample)
-				.orElseThrow(() -> new BadRequestException("No existe un estudio para la muestra con id " + sample.getId() + "."));
+		return studyRepository.findBySample(sample).orElseThrow(
+				() -> new BadRequestException("No existe un estudio para la muestra con id " + sample.getId() + "."));
 	}
-
 
 	public List<StudyItemResponseDTO> getAllPatientStudies(Long patientId) {
 		patientService.validateLoggedPatient(patientId);
@@ -442,8 +458,10 @@ public class StudyService {
 	}
 
 	public BigDecimal payExtractionAmountStudies(UnpaidStudiesDTO unpaidStudiesDTO) {
-		unpaidStudiesDTO.getUnpaidStudies().forEach(studyId -> getStudy(studyId.longValue()).setPaidExtractionAmount(true));
-		return unpaidStudiesDTO.getUnpaidStudies().stream().map(studyId -> getStudy(studyId.longValue()).getExtractionAmount())
+		unpaidStudiesDTO.getUnpaidStudies()
+				.forEach(studyId -> getStudy(studyId.longValue()).setPaidExtractionAmount(true));
+		return unpaidStudiesDTO.getUnpaidStudies().stream()
+				.map(studyId -> getStudy(studyId.longValue()).getExtractionAmount())
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
@@ -452,7 +470,7 @@ public class StudyService {
 	}
 
 	public Integer studiesByMonthOfYear(Integer month, Integer year) {
-		LocalDateTime from = LocalDateTime.of(year,month,1,0,0);
+		LocalDateTime from = LocalDateTime.of(year, month, 1, 0, 0);
 		LocalDateTime to = from.plusMonths(1);
 		return studyRepository.findByCreatedAtBetween(from, to).size();
 	}

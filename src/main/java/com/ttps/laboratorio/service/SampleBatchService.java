@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ttps.laboratorio.dto.request.UrlDTO;
 import com.ttps.laboratorio.dto.response.SampleBatchDTO;
+import com.ttps.laboratorio.dto.response.SampleDTO;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.SampleBatch;
 import com.ttps.laboratorio.entity.SampleBatchStatus;
@@ -44,7 +46,9 @@ public class SampleBatchService {
 		response.setStatus(sampleBatch.getStatus());
 		response.setId(sampleBatch.getId());
 		response.setFinalReportsUrl(sampleBatch.getFinalReportsUrl());
-		response.setStudies(sampleBatch.getSamples().stream().map(s -> s.getStudy()).collect(Collectors.toList()));
+		response.setSamples(sampleBatch.getSamples().stream().map(
+				s -> new SampleDTO(s.getId(), s.getStudy().getId(), s.getFailed(), s.getMilliliters(), s.getFreezer()))
+				.collect(Collectors.toList()));
 		return response;
 	}
 
@@ -52,6 +56,7 @@ public class SampleBatchService {
 		return new ArrayList<>(sampleBatchRepository.findAll());
 	}
 
+	@Transactional
 	public SampleBatchDTO uploadResults(Long sampleBatchId, UrlDTO urlDTO) {
 		SampleBatch sampleBatch = sampleBatchRepository.findById(sampleBatchId)
 				.orElseThrow(() -> new NotFoundException("No existe un lote con el id " + sampleBatchId + "."));
@@ -67,11 +72,14 @@ public class SampleBatchService {
 				.filter(s -> !urlDTO.getFailedSamples().contains(s.getId())).collect(Collectors.toList());
 
 		failedSamples.forEach(sample -> {
-			studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, sample.getStudy());
+			sample.setFailed(true);
+			sample.getStudy().setSample(null);
+			studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_SELECCION_DE_TURNO, sample.getStudy());
 			studyService.saveStudy(sample.getStudy());
 		});
 		successfulSamples.forEach(sample -> {
-			studyService.setCheckpointWithStatus(StudyStatus.ESPERANDO_INTERPRETACION_DE_RESULTADOS, sample.getStudy());
+			sample.setFailed(false);
+			studyService.addCheckpointWithLoggedUser(StudyStatus.ESPERANDO_INTERPRETACION_DE_RESULTADOS, sample.getStudy());
 			studyService.saveStudy(sample.getStudy());
 		});
 		sampleBatch.setStatus(SampleBatchStatus.PROCESSED);

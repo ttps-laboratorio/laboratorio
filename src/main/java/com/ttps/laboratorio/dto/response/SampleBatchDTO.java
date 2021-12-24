@@ -1,11 +1,11 @@
 package com.ttps.laboratorio.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ttps.laboratorio.entity.Sample;
-import com.ttps.laboratorio.entity.SampleBatchStatus;
-import com.ttps.laboratorio.entity.Study;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ttps.laboratorio.entity.SampleBatchStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,10 +22,8 @@ public class SampleBatchDTO {
 
 	private SampleBatchStatus status;
 
-	private List<Study> studies = new ArrayList<>();
-
 	private String finalReportsUrl;
 
-	private List<Sample> samples = new ArrayList<>();
+	private List<SampleDTO> samples = new ArrayList<>();
 
 }

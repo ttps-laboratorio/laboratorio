@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -47,9 +46,12 @@ public class Sample implements Serializable {
 	@Column(name = "freezer", nullable = false)
 	private Integer freezer;
 
+	@Column(name = "failed", nullable = true)
+	private Boolean failed;
+
 	@JsonIgnore
-	@OneToOne(optional = false)
-	@JoinColumn(name = "study_id")
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "study_id", referencedColumnName = "id")
 	private Study study;
 
 	@ManyToOne(optional = true)
