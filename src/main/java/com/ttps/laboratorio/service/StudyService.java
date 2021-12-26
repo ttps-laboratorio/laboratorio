@@ -495,6 +495,10 @@ public class StudyService {
 		return studyRepository.findAll().stream().map(s -> s.getCreatedAt().getYear()).distinct().sorted().collect(Collectors.toList());
 	}
 
+	public Integer studiesByStudyStatus(StudyStatus studyStatus) {
+		return (int) studyRepository.findAll().stream().filter(study -> studyStatus.equals(study.getActualStatus())).count();
+	}
+
 	private StudyResponseDTO createStudyResponseDTO(Study study) {
 		patientService.validateLoggedPatient(study.getPatient().getId());
 		PatientResponseDTO patientDTO = new PatientResponseDTO(study.getPatient().getId(), study.getPatient().getDni(),

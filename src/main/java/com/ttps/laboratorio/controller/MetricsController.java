@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.controller;
 
 import com.ttps.laboratorio.dto.response.StudiesByMonthOfYearDTO;
+import com.ttps.laboratorio.dto.response.StudiesByStatusDTO;
 import com.ttps.laboratorio.dto.response.StudiesByStudyTypeDTO;
 import com.ttps.laboratorio.service.MetricsService;
 import java.util.List;
@@ -32,6 +33,12 @@ public class MetricsController {
 	@GetMapping("/{year}/studies-by-month")
 	public ResponseEntity<StudiesByMonthOfYearDTO> getStudiesByMonthOfYear(@PathVariable(name = "year") @NonNull Integer year) {
 		return ResponseEntity.ok(metricsService.listStudiesByMonthOfYear(year));
+	}
+
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/studies-by-status")
+	public ResponseEntity<List<StudiesByStatusDTO>> getStudiesByStatus() {
+		return ResponseEntity.ok(metricsService.listStudiesByStatus());
 	}
 
 	@PreAuthorize("hasRole('EMPLOYEE')")

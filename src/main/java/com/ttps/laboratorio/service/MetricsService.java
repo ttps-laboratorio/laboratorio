@@ -1,5 +1,7 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.dto.response.StudiesByStatusDTO;
+import com.ttps.laboratorio.entity.StudyStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +21,12 @@ public class MetricsService {
 
 	private final StudyService studyService;
 
-	public MetricsService(StudyTypeService studyTypeService, StudyService studyService) {
+	private final StudyStatusService studyStatusService;
+
+	public MetricsService(StudyTypeService studyTypeService, StudyService studyService, StudyStatusService studyStatusService) {
 		this.studyTypeService = studyTypeService;
 		this.studyService = studyService;
+		this.studyStatusService = studyStatusService;
 	}
 
 	public List<StudiesByStudyTypeDTO> listStudiesByStudyType() {
@@ -52,4 +57,19 @@ public class MetricsService {
   public List<Integer> listYearsWithStudies() {
 		return studyService.yearsWithStudies();
   }
+
+  public List<StudiesByStatusDTO> listStudiesByStatus() {
+		List<StudiesByStatusDTO> response = new ArrayList<>();
+		List<StudyStatus> studyStatuses = studyStatusService.getAllStudyStatuses();
+		studyStatuses.remove(studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_RESULTADO));
+		studyStatuses.remove(studyStatusService.getStudyStatus(StudyStatus.RESULTADO_COMPLETO));
+		studyStatuses.forEach(studyStatus -> {
+			StudiesByStatusDTO studiesByStatusDTO = new StudiesByStatusDTO();
+			studiesByStatusDTO.setStudyStatusName(studyStatus.getName());
+			studiesByStatusDTO.setStudies(studyService.studiesByStudyStatus(studyStatus));
+			response.add(studiesByStatusDTO);
+		});
+		return response;
+  }
+
 }

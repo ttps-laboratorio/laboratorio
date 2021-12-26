@@ -32,4 +32,9 @@ public class StudyStatusService {
 		return this.studyStatusRepository.findAll(Sort.by("order")).stream()
 				.map(ss -> this.mapper.map(ss, StudyStatusResponseDTO.class)).collect(Collectors.toList());
 	}
+
+	public List<StudyStatus> getAllStudyStatuses() {
+		return this.studyStatusRepository.findAll();
+	}
+
 }
