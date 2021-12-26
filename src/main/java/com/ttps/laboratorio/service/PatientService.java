@@ -107,9 +107,17 @@ public class PatientService {
 		patient.setLastName(dto.getLastName());
 		patient.setBirthDate(dto.getBirthDate());
 		patient.setClinicHistory(dto.getClinicHistory());
-		patient.setAffiliateNumber(dto.getAffiliateNumber());
 		patient.setContact(contactService.createContact(dto.getContact()));
-		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
+		if (dto.getHealthInsurance() != null) {
+			if (dto.getAffiliateNumber() == null) {
+				throw new BadRequestException("Debe ingresar el numero de afiliado de la obra social.");
+			}
+			patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
+			patient.setAffiliateNumber(dto.getAffiliateNumber());
+		} else {
+			patient.setHealthInsurance(null);
+			patient.setAffiliateNumber(null);
+		}
 		return patientRepository.save(patient);
 	}
 
