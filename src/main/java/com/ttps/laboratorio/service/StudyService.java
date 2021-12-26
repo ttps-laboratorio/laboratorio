@@ -3,6 +3,7 @@ package com.ttps.laboratorio.service;
 import com.ttps.laboratorio.dto.response.SampleBatchResponseDTO;
 import com.ttps.laboratorio.dto.response.SampleResponseDTO;
 import com.ttps.laboratorio.dto.response.StudyStatusResponseDTO;
+import com.ttps.laboratorio.entity.Extractionist;
 import com.ttps.laboratorio.entity.RoleEnum;
 import java.io.File;
 import java.io.IOException;
@@ -456,7 +457,7 @@ public class StudyService {
 		patientService.validateLoggedPatient(patientId);
 		return studyRepository.findByPatient(patientService.getPatient(patientId)).stream().map(s -> {
 			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
-			item.setActualStatus(this.mapper.map(getPatientStatus(s), StudyStatusResponseDTO.class));
+			item.setActualStatus(this.mapper.map(getStatusByRole(s), StudyStatusResponseDTO.class));
 			item.setFirstName(s.getPatient().getFirstName());
 			item.setLastName(s.getPatient().getLastName());
 			return item;
@@ -491,34 +492,47 @@ public class StudyService {
 	}
 
 	private StudyResponseDTO createStudyResponseDTO(Study study) {
+		patientService.validateLoggedPatient(study.getPatient().getId());
 		PatientResponseDTO patientDTO = new PatientResponseDTO(study.getPatient().getId(), study.getPatient().getDni(),
 				study.getPatient().getFirstName(), study.getPatient().getLastName(), study.getPatient().getBirthDate());
 
 		return new StudyResponseDTO(study.getId(), study.getCreatedAt(), study.getBudget(), study.getExtractionAmount(),
 				study.getPaidExtractionAmount(), patientDTO, study.getAppointment(), study.getReferringDoctor(), study.getType(),
-				study.getPresumptiveDiagnosis(), getPatientStatus(study), getPatientSample(study));
+				study.getPresumptiveDiagnosis(), getStatusByRole(study), getSampleByRole(study), getExtractionistByRole(study));
 	}
 
-	private SampleResponseDTO getPatientSample(Study study) {
+	private Extractionist getExtractionistByRole(Study study) {
+		Extractionist extractionist = study.getExtractionist();
+		User user = userService.getLoggedUser();
+		if (RoleEnum.PATIENT.equals(user.getRole())) {
+			extractionist = null;
+		}
+		return extractionist;
+	}
+
+	private SampleResponseDTO getSampleByRole(Study study) {
 		SampleResponseDTO sample = null;
 		if (study.getSample() != null) {
-			sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(),
-					study.getSample().getFreezer(), study.getSample().getFailed(), study.getId(),
-					new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(),
-							study.getSample().getSampleBatch().getFinalReportsUrl()));
-			patientService.validateLoggedPatient(study.getPatient().getId());
+			SampleBatchResponseDTO sampleBatch = null;
+			if (study.getSample().getSampleBatch() != null) {
+				sampleBatch = new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(),
+						study.getSample().getSampleBatch().getFinalReportsUrl());
+			}
+			sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(), study.getSample().getFreezer(),
+					study.getSample().getFailed(), study.getId(), sampleBatch);
 			User user = userService.getLoggedUser();
 			if (RoleEnum.PATIENT.equals(user.getRole())) {
 				sample.setFreezer(null);
-				sample.getSampleBatch().setFinalReportsUrl(null);
+				if (sample.getSampleBatch() != null) {
+					sample.getSampleBatch().setFinalReportsUrl(null);
+				}
 			}
 		}
 		return sample;
 	}
 
-	private StudyStatus getPatientStatus(Study study) {
+	private StudyStatus getStatusByRole(Study study) {
 		StudyStatus actualStatus = study.getActualStatus();
-		patientService.validateLoggedPatient(study.getPatient().getId());
 		User user = userService.getLoggedUser();
 		if (RoleEnum.PATIENT.equals(user.getRole())) {
 			if (study.getActualStatus().getId() >= StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA

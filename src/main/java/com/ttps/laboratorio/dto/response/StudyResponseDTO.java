@@ -3,6 +3,7 @@ package com.ttps.laboratorio.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Doctor;
+import com.ttps.laboratorio.entity.Extractionist;
 import com.ttps.laboratorio.entity.PresumptiveDiagnosis;
 import com.ttps.laboratorio.entity.StudyStatus;
 import com.ttps.laboratorio.entity.StudyType;
@@ -43,5 +44,7 @@ public class StudyResponseDTO {
   private StudyStatus actualStatus;
 
   private SampleResponseDTO sample;
+
+  private Extractionist extractionist;
 
 }
