@@ -90,7 +90,7 @@ public class AppointmentService {
 	 * @param request appointment information
 	 */
 	public Appointment createAppointment(Long studyId, AppointmentDTO request) {
-		Study study = studyService.getStudy(studyId);
+		Study study = studyService.getStudyById(studyId);
 		if (study.getActualStatus() != null
 				&& !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_SELECCION_DE_TURNO)) {
 			throw new BadRequestException(
@@ -133,7 +133,7 @@ public class AppointmentService {
 		Appointment appointment = appointmentRepository.findById(appointmentID)
 				.orElseThrow(() -> new NotFoundException("No existe un turno con el id " + appointmentID + "."));
 		Study study = studyService.getStudyByAppointment(appointment);
-		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(5L)) {
+		if (study.getActualStatus() != null && !study.getActualStatus().getId().equals(StudyStatus.ESPERANDO_TOMA_DE_MUESTRA)) {
 			throw new BadRequestException(
 					"El estudio no se encuentra en el estado correspondiente para eliminar el turno.");
 		}

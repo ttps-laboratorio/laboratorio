@@ -62,9 +62,9 @@ public class StudyController {
 		this.finalReportService = finalReportService;
 	}
 
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping("/{id}")
-	public ResponseEntity<Study> getStudy(@PathVariable(name = "id") @NonNull Long studyId) {
+	public ResponseEntity<StudyResponseDTO> getStudy(@PathVariable(name = "id") @NonNull Long studyId) {
 		return ResponseEntity.ok(studyService.getStudy(studyId));
 	}
 
@@ -73,7 +73,7 @@ public class StudyController {
 	 *
 	 * @return Returns a list of all studys with "200 OK".
 	 */
-	@PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@GetMapping()
 	public ResponseEntity<?> listStudies(@Valid StudySearchFilterDTO filter) {
 		return ResponseEntity.ok(studyService.getAllStudies(filter));

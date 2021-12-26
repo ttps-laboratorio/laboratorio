@@ -1,11 +1,17 @@
 package com.ttps.laboratorio.service;
 
+import com.ttps.laboratorio.dto.response.SampleBatchResponseDTO;
+import com.ttps.laboratorio.dto.response.SampleResponseDTO;
+import com.ttps.laboratorio.dto.response.StudyStatusResponseDTO;
+import com.ttps.laboratorio.entity.Extractionist;
+import com.ttps.laboratorio.entity.RoleEnum;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,7 +87,11 @@ public class StudyService {
 		this.laboratoryFileUtils = fileNameUtils;
 	}
 
-	public Study getStudy(Long studyId) {
+	public StudyResponseDTO getStudy(Long studyId) {
+		return createStudyResponseDTO(getStudyById(studyId));
+	}
+
+	public Study getStudyById(Long studyId) {
 		return this.studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 	}
@@ -101,12 +111,19 @@ public class StudyService {
 	}
 
 	public List<StudyItemResponseDTO> getAllStudies(StudySearchFilterDTO filter) {
-		return studyRepository.findAll(StudySpecifications.all(filter)).stream().map(s -> {
-			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
-			item.setFirstName(s.getPatient().getFirstName());
-			item.setLastName(s.getPatient().getLastName());
-			return item;
-		}).collect(Collectors.toList());
+		User user = userService.getLoggedUser();
+		List<StudyItemResponseDTO> studies = new ArrayList<>();
+		if (RoleEnum.EMPLOYEE.equals(user.getRole())) {
+			studies = studyRepository.findAll(StudySpecifications.all(filter)).stream().map(s -> {
+				StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+				item.setFirstName(s.getPatient().getFirstName());
+				item.setLastName(s.getPatient().getLastName());
+				return item;
+			}).collect(Collectors.toList());
+		} else if (RoleEnum.PATIENT.equals(user.getRole())) {
+			studies = getAllPatientStudies(patientService.getByUser(user).getId());
+		}
+		return studies;
 	}
 
 	@Transactional(rollbackFor = { LaboratoryException.class, Exception.class })
@@ -294,7 +311,7 @@ public class StudyService {
 	}
 
 	public Resource downloadFinalReportFile(Long studyId) {
-		Study study = getStudy(studyId);
+		Study study = getStudyById(studyId);
 
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
@@ -440,6 +457,7 @@ public class StudyService {
 		patientService.validateLoggedPatient(patientId);
 		return studyRepository.findByPatient(patientService.getPatient(patientId)).stream().map(s -> {
 			StudyItemResponseDTO item = this.mapper.map(s, StudyItemResponseDTO.class);
+			item.setActualStatus(this.mapper.map(getStatusByRole(s), StudyStatusResponseDTO.class));
 			item.setFirstName(s.getPatient().getFirstName());
 			item.setLastName(s.getPatient().getLastName());
 			return item;
@@ -457,9 +475,9 @@ public class StudyService {
 
 	public BigDecimal payExtractionAmountStudies(UnpaidStudiesDTO unpaidStudiesDTO) {
 		unpaidStudiesDTO.getUnpaidStudies()
-				.forEach(studyId -> getStudy(studyId.longValue()).setPaidExtractionAmount(true));
+				.forEach(studyId -> getStudyById(studyId.longValue()).setPaidExtractionAmount(true));
 		return unpaidStudiesDTO.getUnpaidStudies().stream()
-				.map(studyId -> getStudy(studyId.longValue()).getExtractionAmount())
+				.map(studyId -> getStudyById(studyId.longValue()).getExtractionAmount())
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
@@ -474,12 +492,57 @@ public class StudyService {
 	}
 
 	private StudyResponseDTO createStudyResponseDTO(Study study) {
+		patientService.validateLoggedPatient(study.getPatient().getId());
 		PatientResponseDTO patientDTO = new PatientResponseDTO(study.getPatient().getId(), study.getPatient().getDni(),
 				study.getPatient().getFirstName(), study.getPatient().getLastName(), study.getPatient().getBirthDate());
 
 		return new StudyResponseDTO(study.getId(), study.getCreatedAt(), study.getBudget(), study.getExtractionAmount(),
 				study.getPaidExtractionAmount(), patientDTO, study.getAppointment(), study.getReferringDoctor(), study.getType(),
-				study.getPresumptiveDiagnosis(), study.getActualStatus());
+				study.getPresumptiveDiagnosis(), getStatusByRole(study), getSampleByRole(study), getExtractionistByRole(study));
+	}
+
+	private Extractionist getExtractionistByRole(Study study) {
+		Extractionist extractionist = study.getExtractionist();
+		User user = userService.getLoggedUser();
+		if (RoleEnum.PATIENT.equals(user.getRole())) {
+			extractionist = null;
+		}
+		return extractionist;
+	}
+
+	private SampleResponseDTO getSampleByRole(Study study) {
+		SampleResponseDTO sample = null;
+		if (study.getSample() != null) {
+			SampleBatchResponseDTO sampleBatch = null;
+			if (study.getSample().getSampleBatch() != null) {
+				sampleBatch = new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(),
+						study.getSample().getSampleBatch().getFinalReportsUrl());
+			}
+			sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(), study.getSample().getFreezer(),
+					study.getSample().getFailed(), study.getId(), sampleBatch);
+			User user = userService.getLoggedUser();
+			if (RoleEnum.PATIENT.equals(user.getRole())) {
+				sample.setFreezer(null);
+				if (sample.getSampleBatch() != null) {
+					sample.getSampleBatch().setFinalReportsUrl(null);
+				}
+			}
+		}
+		return sample;
+	}
+
+	private StudyStatus getStatusByRole(Study study) {
+		StudyStatus actualStatus = study.getActualStatus();
+		User user = userService.getLoggedUser();
+		if (RoleEnum.PATIENT.equals(user.getRole())) {
+			if (study.getActualStatus().getId() >= StudyStatus.ESPERANDO_RETIRO_DE_MUESTRA
+					&& study.getActualStatus().getId() <= StudyStatus.ESPERANDO_SER_ENTREGADO_A_MEDICO_DERIVANTE) {
+				actualStatus = studyStatusService.getStudyStatus(StudyStatus.ESPERANDO_RESULTADO);
+			} else if (StudyStatus.RESULTADO_ENTREGADO.equals(study.getActualStatus().getId())) {
+				actualStatus = studyStatusService.getStudyStatus(StudyStatus.RESULTADO_COMPLETO);
+			}
+		}
+		return actualStatus;
 	}
 
 }
