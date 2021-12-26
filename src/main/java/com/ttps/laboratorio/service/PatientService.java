@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PatientService {
 
-	private final ContactService contactService;
+	private final GuardianService guardianService;
 
 	private final HealthInsuranceService healthInsuranceService;
 
@@ -29,11 +29,12 @@ public class PatientService {
 
 	private final UserService userService;
 
-	public PatientService(IPatientRepository patientRepository, HealthInsuranceService healthInsuranceService, ContactService contactService,
-												UserService userService, CustomAuthenticationProvider customAuthenticationProvider) {
+	public PatientService(IPatientRepository patientRepository, HealthInsuranceService healthInsuranceService,
+												GuardianService guardianService, UserService userService,
+												CustomAuthenticationProvider customAuthenticationProvider) {
 		this.patientRepository = patientRepository;
 		this.healthInsuranceService = healthInsuranceService;
-		this.contactService = contactService;
+		this.guardianService = guardianService;
 		this.userService = userService;
 		this.customAuthenticationProvider = customAuthenticationProvider;
 	}
@@ -108,8 +109,24 @@ public class PatientService {
 		patient.setBirthDate(dto.getBirthDate());
 		patient.setClinicHistory(dto.getClinicHistory());
 		patient.setAffiliateNumber(dto.getAffiliateNumber());
-		patient.setContact(contactService.createContact(dto.getContact()));
-		patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
+		if (patient.isAdult()) {
+			if (dto.getEmail() == null || dto.getAddress() == null || dto.getPhoneNumber() == null) {
+				throw new BadRequestException("Debe ingresar email, direccion y telefono.");
+			}
+			patient.setEmail(dto.getEmail());
+			patient.setPhoneNumber(dto.getPhoneNumber());
+			patient.setAddress(dto.getAddress());
+		} else {
+			if (dto.getGuardian() == null) {
+				throw new BadRequestException("Debe ingresar datos del tutor.");
+			}
+			patient.setGuardian(guardianService.createGuardian(dto.getGuardian()));
+		}
+		if (dto.getHealthInsurance() != null) {
+			patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
+		} else {
+			patient.setHealthInsurance(null);
+		}
 		return patientRepository.save(patient);
 	}
 

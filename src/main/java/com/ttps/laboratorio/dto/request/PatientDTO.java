@@ -37,7 +37,13 @@ public class PatientDTO {
 	@NotBlank(message = "Patient clinic history is required")
 	private String clinicHistory;
 
-	private ContactDTO contact;
+	private String phoneNumber;
+
+	private String email;
+
+	private String address;
+
+	private GuardianDTO guardian;
 
 	private String affiliateNumber;
 
