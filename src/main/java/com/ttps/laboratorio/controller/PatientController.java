@@ -1,13 +1,7 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.request.PatientDTO;
-import com.ttps.laboratorio.dto.request.PatientUserDTO;
-import com.ttps.laboratorio.dto.request.StudyDTO;
-import com.ttps.laboratorio.dto.response.StudyResponseDTO;
-import com.ttps.laboratorio.entity.Patient;
-import com.ttps.laboratorio.service.PatientService;
-import com.ttps.laboratorio.service.StudyService;
 import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -19,6 +13,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ttps.laboratorio.dto.request.PatientDTO;
+import com.ttps.laboratorio.dto.request.PatientUserDTO;
+import com.ttps.laboratorio.dto.request.StudyDTO;
+import com.ttps.laboratorio.dto.response.StudyResponseDTO;
+import com.ttps.laboratorio.entity.Patient;
+import com.ttps.laboratorio.service.PatientService;
+import com.ttps.laboratorio.service.StudyService;
 
 @RestController
 @RequestMapping(path = "patient")
@@ -63,7 +65,6 @@ public class PatientController {
 		return new ResponseEntity<>(patientService.createPatient(patientDTO), HttpStatus.CREATED);
 	}
 
-	@PreAuthorize("hasRole('EMPLOYEE') OR hasRole('PATIENT')")
 	@PostMapping("/sign-up")
 	public ResponseEntity<Patient> signUpPatient(@Valid @RequestBody PatientUserDTO patientUserDTO) {
 		return new ResponseEntity<>(patientService.signUpPatient(patientUserDTO), HttpStatus.CREATED);
