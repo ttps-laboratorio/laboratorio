@@ -491,6 +491,10 @@ public class StudyService {
 		return studyRepository.findByCreatedAtBetween(from, to).size();
 	}
 
+	public List<Integer> yearsWithStudies() {
+		return studyRepository.findAll().stream().map(s -> s.getCreatedAt().getYear()).distinct().sorted().collect(Collectors.toList());
+	}
+
 	private StudyResponseDTO createStudyResponseDTO(Study study) {
 		patientService.validateLoggedPatient(study.getPatient().getId());
 		PatientResponseDTO patientDTO = new PatientResponseDTO(study.getPatient().getId(), study.getPatient().getDni(),

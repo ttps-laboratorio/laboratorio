@@ -49,4 +49,7 @@ public class MetricsService {
 		return studiesByMonthOfYearDTO;
 	}
 
+  public List<Integer> listYearsWithStudies() {
+		return studyService.yearsWithStudies();
+  }
 }

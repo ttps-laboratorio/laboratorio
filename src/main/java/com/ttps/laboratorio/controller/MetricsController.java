@@ -34,4 +34,10 @@ public class MetricsController {
 		return ResponseEntity.ok(metricsService.listStudiesByMonthOfYear(year));
 	}
 
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	@GetMapping("/years-with-studies")
+	public ResponseEntity<List<Integer>> getYearsWithStudies() {
+		return ResponseEntity.ok(metricsService.listYearsWithStudies());
+	}
+
 }
