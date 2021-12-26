@@ -500,14 +500,18 @@ public class StudyService {
 	}
 
 	private SampleResponseDTO getPatientSample(Study study) {
-		SampleResponseDTO sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(),
-				study.getSample().getFreezer(), study.getSample().getFailed(), study.getId(),
-				new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(), study.getSample().getSampleBatch().getFinalReportsUrl()));
-		patientService.validateLoggedPatient(study.getPatient().getId());
-		User user = userService.getLoggedUser();
-		if (RoleEnum.PATIENT.equals(user.getRole())) {
-			sample.setFreezer(null);
-			sample.getSampleBatch().setFinalReportsUrl(null);
+		SampleResponseDTO sample = null;
+		if (study.getSample() != null) {
+			sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(),
+					study.getSample().getFreezer(), study.getSample().getFailed(), study.getId(),
+					new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(),
+							study.getSample().getSampleBatch().getFinalReportsUrl()));
+			patientService.validateLoggedPatient(study.getPatient().getId());
+			User user = userService.getLoggedUser();
+			if (RoleEnum.PATIENT.equals(user.getRole())) {
+				sample.setFreezer(null);
+				sample.getSampleBatch().setFinalReportsUrl(null);
+			}
 		}
 		return sample;
 	}
