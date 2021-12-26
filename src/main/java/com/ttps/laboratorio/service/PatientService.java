@@ -108,7 +108,6 @@ public class PatientService {
 		patient.setLastName(dto.getLastName());
 		patient.setBirthDate(dto.getBirthDate());
 		patient.setClinicHistory(dto.getClinicHistory());
-		patient.setAffiliateNumber(dto.getAffiliateNumber());
 		if (patient.isAdult()) {
 			if (dto.getEmail() == null || dto.getAddress() == null || dto.getPhoneNumber() == null) {
 				throw new BadRequestException("Debe ingresar email, direccion y telefono.");
@@ -123,9 +122,14 @@ public class PatientService {
 			patient.setGuardian(guardianService.createGuardian(dto.getGuardian()));
 		}
 		if (dto.getHealthInsurance() != null) {
+			if (dto.getAffiliateNumber() == null) {
+				throw new BadRequestException("Debe ingresar el numero de afiliado de la obra social.");
+			}
 			patient.setHealthInsurance(healthInsuranceService.getHealthInsurance(dto.getHealthInsurance().getId()));
+			patient.setAffiliateNumber(dto.getAffiliateNumber());
 		} else {
 			patient.setHealthInsurance(null);
+			patient.setAffiliateNumber(null);
 		}
 		return patientRepository.save(patient);
 	}
