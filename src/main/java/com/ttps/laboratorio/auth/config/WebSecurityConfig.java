@@ -1,8 +1,7 @@
 package com.ttps.laboratorio.auth.config;
 
-import com.ttps.laboratorio.auth.JwtAuthenticationEntryPoint;
-import com.ttps.laboratorio.auth.JwtRequestFilter;
 import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.ttps.laboratorio.auth.JwtAuthenticationEntryPoint;
+import com.ttps.laboratorio.auth.JwtRequestFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -63,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/auth/login").permitAll()
+				.antMatchers("/patient/sign-up").permitAll()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.anyRequest().authenticated()
 				.and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
