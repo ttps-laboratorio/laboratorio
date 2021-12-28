@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +30,7 @@ import lombok.ToString;
  * <p>
  * Patient is a person that has genetic medical studies in the laboratory
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,6 +42,8 @@ import lombok.ToString;
 public class Patient implements Serializable {
 
 	private static final long serialVersionUID = -6743123046826185125L;
+
+	private static final Integer ADULT_AGE = 18;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,8 +72,17 @@ public class Patient implements Serializable {
 	@Column(name = "affiliate_number")
 	private String affiliateNumber;
 
+	@Column(name = "phone_number")
+	private String phoneNumber;
+
+	@Column(name = "email", length = 30)
+	private String email;
+
+	@Column(name = "address", length = 60)
+	private String address;
+
 	@OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-	private Contact contact;
+	private Guardian guardian;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "health_insurance_id")
@@ -86,4 +99,9 @@ public class Patient implements Serializable {
 		study.setPatient(this);
 		return studies.add(study);
 	}
+
+	public boolean isAdult() {
+		return birthDate.plusYears(ADULT_AGE).isBefore(LocalDate.now());
+	}
+
 }

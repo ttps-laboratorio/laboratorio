@@ -1,5 +1,11 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ttps.laboratorio.auth.CustomAuthenticationProvider;
 import com.ttps.laboratorio.dto.request.PatientDTO;
 import com.ttps.laboratorio.dto.request.PatientUserDTO;
@@ -11,15 +17,11 @@ import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.LaboratoryException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IPatientRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PatientService {
 
-	private final ContactService contactService;
+	private final GuardianService guardianService;
 
 	private final HealthInsuranceService healthInsuranceService;
 
@@ -29,11 +31,12 @@ public class PatientService {
 
 	private final UserService userService;
 
-	public PatientService(IPatientRepository patientRepository, HealthInsuranceService healthInsuranceService, ContactService contactService,
-												UserService userService, CustomAuthenticationProvider customAuthenticationProvider) {
+	public PatientService(IPatientRepository patientRepository, HealthInsuranceService healthInsuranceService,
+												GuardianService guardianService, UserService userService,
+												CustomAuthenticationProvider customAuthenticationProvider) {
 		this.patientRepository = patientRepository;
 		this.healthInsuranceService = healthInsuranceService;
-		this.contactService = contactService;
+		this.guardianService = guardianService;
 		this.userService = userService;
 		this.customAuthenticationProvider = customAuthenticationProvider;
 	}
@@ -96,7 +99,8 @@ public class PatientService {
 			User user = patient.getUser();
 			user.setUsername(userDTO.getUsername());
 			user.setEmail(userDTO.getEmail());
-			user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
+			if (userDTO.getPassword() != null)
+				user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
 		}
 		setPatient(patient, request);
 	}
@@ -107,7 +111,19 @@ public class PatientService {
 		patient.setLastName(dto.getLastName());
 		patient.setBirthDate(dto.getBirthDate());
 		patient.setClinicHistory(dto.getClinicHistory());
-		patient.setContact(contactService.createContact(dto.getContact()));
+		if (patient.isAdult()) {
+			if (dto.getEmail() == null || dto.getAddress() == null || dto.getPhoneNumber() == null) {
+				throw new BadRequestException("Debe ingresar email, direccion y telefono.");
+			}
+			patient.setEmail(dto.getEmail());
+			patient.setPhoneNumber(dto.getPhoneNumber());
+			patient.setAddress(dto.getAddress());
+		} else {
+			if (dto.getGuardian() == null) {
+				throw new BadRequestException("Debe ingresar datos del tutor.");
+			}
+			patient.setGuardian(guardianService.createGuardian(dto.getGuardian()));
+		}
 		if (dto.getHealthInsurance() != null) {
 			if (dto.getAffiliateNumber() == null) {
 				throw new BadRequestException("Debe ingresar el numero de afiliado de la obra social.");

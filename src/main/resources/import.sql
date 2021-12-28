@@ -7,10 +7,6 @@ INSERT INTO users (email,password,role,username) VALUES ('ron@email.com','$2a$10
 INSERT INTO users (email,password,role,username) VALUES ('severus@email.com','$2a$10$S2.HN4NEN748hN90Zlq59.pb9ie42hEmROdGqdhbiKZi8cBmsVJcK','PATIENT','ssnape');
 INSERT INTO users (email,password,role,username) VALUES ('harry@email.com','$2a$10$S2.HN4NEN748hN90Zlq59.pb9ie42hEmROdGqdhbiKZi8cBmsVJcK','PATIENT','hpotter');
 
-INSERT INTO contacts (email,name,phone_number) VALUES ('ron@email.com','Ron','2211111111');
-INSERT INTO contacts (email,name,phone_number) VALUES ('severus@email.com','Severus','2212222222');
-INSERT INTO contacts (email,name,phone_number) VALUES ('harry@email.com','Harry','2213333333');
-
 INSERT INTO study_types (consent,name) VALUES ('','Exoma');
 INSERT INTO study_types (consent,name) VALUES ('','Genoma mitocondrial completo');
 INSERT INTO study_types (consent,name) VALUES ('','Carrier de enfermedades monogénicas recesivas');
@@ -51,9 +47,12 @@ INSERT INTO health_insurances (email,name,phone_number) VALUES ('osde@email.com'
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('ioma@email.com', 'IOMA', '222');
 INSERT INTO health_insurances (email,name,phone_number) VALUES ('galeno@email.com', 'Galeno', '333');
 
-INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,contact_id,health_insurance_id,user_id) VALUES ('567','1980-03-01','paciente colorado','11111111','Ron','Weasley',1,1,6);
-INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,contact_id,health_insurance_id,user_id) VALUES ('123','1960-01-09','paciente malhumorado','11111112','Severus','Snape',2,1,7);
-INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,contact_id,health_insurance_id,user_id) VALUES ('111','1980-07-30','paciente peligroso','11111113','Harry','Potter',3,1,8);
+INSERT INTO guardians (address,email,first_name,last_name,phone_number) VALUES ('5 678','tutor@email.com','Minerva','McGonagall','2215555555');
+
+INSERT INTO patients (address,affiliate_number,birth_date,clinic_history,dni,email,first_name,last_name,phone_number,health_insurance_id,user_id) VALUES ('Calle falsa 123','567','1980-03-01','paciente colorado','11111111','ron@email.com','Ron','Weasley','111',1,6);
+INSERT INTO patients (address,affiliate_number,birth_date,clinic_history,dni,email,first_name,last_name,phone_number,health_insurance_id,user_id) VALUES ('54 124','123','1960-01-09','paciente malhumorado','11111112','severus@email.com','Severus','Snape','222',1,7);
+INSERT INTO patients (address,affiliate_number,birth_date,clinic_history,dni,email,first_name,last_name,phone_number,health_insurance_id,user_id) VALUES ('1 543','111','1980-07-31','paciente peligroso','11111113','harry@email.com','Harry','Potter','333',1,8);
+INSERT INTO patients (affiliate_number,birth_date,clinic_history,dni,first_name,last_name,guardian_id,health_insurance_id) VALUES ('666','2010-07-30','Crecio bien',11111114,'Neville','Longbottom',1,2);
 
 INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_uno@email.com','Doctor','Uno',111,'111');
 INSERT INTO doctors (email,first_name,last_name,license_number,phone_number) VALUES ('doctor_dos@email.com','Doctor','Dos',222,'222');
