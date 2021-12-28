@@ -1,5 +1,11 @@
 package com.ttps.laboratorio.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ttps.laboratorio.auth.CustomAuthenticationProvider;
 import com.ttps.laboratorio.dto.request.PatientDTO;
 import com.ttps.laboratorio.dto.request.PatientUserDTO;
@@ -11,10 +17,6 @@ import com.ttps.laboratorio.exception.BadRequestException;
 import com.ttps.laboratorio.exception.LaboratoryException;
 import com.ttps.laboratorio.exception.NotFoundException;
 import com.ttps.laboratorio.repository.IPatientRepository;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PatientService {
@@ -97,7 +99,8 @@ public class PatientService {
 			User user = patient.getUser();
 			user.setUsername(userDTO.getUsername());
 			user.setEmail(userDTO.getEmail());
-			user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
+			if (userDTO.getPassword() != null)
+				user.setPassword(customAuthenticationProvider.getPasswordEncoder().encode(userDTO.getPassword()));
 		}
 		setPatient(patient, request);
 	}
