@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.ttps</groupId>
 	<artifactId>laboratorio</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>laboratorio</name>
 	<description>Laboratorio</description>
 	<properties>
