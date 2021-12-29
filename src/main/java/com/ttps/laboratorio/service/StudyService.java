@@ -211,19 +211,11 @@ public class StudyService {
 	}
 
 	public Resource downloadBudgetFile(Long studyId) {
-		// org.springframework.security.core.userdetails.User currentUser =
-		// (org.springframework.security.core.userdetails.User)
-		// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-		// here we have to check if the user is a PATIENT that the studyId is his own
-
-		// if (currentUser.getAuthorities().stream().anyMatch(a ->
-		// a.getAuthority().equals("ROLE_PATIENT"))) {
-		// User user = userService.getUserByUsername(currentUser.getUsername());
-		// }
-
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
 
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
@@ -241,6 +233,9 @@ public class StudyService {
 	public Resource downloadPaymentProofFile(Long studyId) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
 
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
@@ -262,6 +257,9 @@ public class StudyService {
 	public Resource downloadConsentFile(Long studyId) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
 
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
@@ -291,6 +289,9 @@ public class StudyService {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
 
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
+
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
 			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
@@ -311,6 +312,9 @@ public class StudyService {
 
 	public Resource downloadFinalReportFile(Long studyId) {
 		Study study = getStudyById(studyId);
+
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
 
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
@@ -341,6 +345,10 @@ public class StudyService {
 	public StudyResponseDTO uploadPaymentProofFile(Long studyId, MultipartFile paymentProofPdf) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
+
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
 			throw new BadRequestException("El estudio #" + studyId + " fue anulado. Deberá crear un nuevo estudio.");
@@ -368,6 +376,9 @@ public class StudyService {
 	public StudyResponseDTO uploadSignedConsentFile(Long studyId, MultipartFile signedConsentPdf) {
 		Study study = studyRepository.findById(studyId)
 				.orElseThrow(() -> new NotFoundException("No existe un estudio #" + studyId + "."));
+
+		// check if user is a patient and has permission
+		patientService.validateLoggedPatient(study.getPatient().getId());
 
 		StudyStatus actualStatus = study.getActualStatus();
 		if (actualStatus.getId().equals(StudyStatus.ANULADO)) {
