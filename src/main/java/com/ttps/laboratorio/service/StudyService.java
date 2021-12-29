@@ -1,13 +1,7 @@
 package com.ttps.laboratorio.service;
 
-import com.ttps.laboratorio.dto.response.SampleBatchResponseDTO;
-import com.ttps.laboratorio.dto.response.SampleResponseDTO;
-import com.ttps.laboratorio.dto.response.StudyStatusResponseDTO;
-import com.ttps.laboratorio.entity.Extractionist;
-import com.ttps.laboratorio.entity.RoleEnum;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
@@ -27,11 +21,16 @@ import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
 import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
 import com.ttps.laboratorio.dto.response.PatientResponseDTO;
+import com.ttps.laboratorio.dto.response.SampleBatchResponseDTO;
+import com.ttps.laboratorio.dto.response.SampleResponseDTO;
 import com.ttps.laboratorio.dto.response.StudyItemResponseDTO;
 import com.ttps.laboratorio.dto.response.StudyResponseDTO;
+import com.ttps.laboratorio.dto.response.StudyStatusResponseDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Checkpoint;
+import com.ttps.laboratorio.entity.Extractionist;
 import com.ttps.laboratorio.entity.Patient;
+import com.ttps.laboratorio.entity.RoleEnum;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
 import com.ttps.laboratorio.entity.StudyStatus;
@@ -473,12 +472,13 @@ public class StudyService {
 		}).collect(Collectors.toList());
 	}
 
-	public BigDecimal payExtractionAmountStudies(UnpaidStudiesDTO unpaidStudiesDTO) {
-		unpaidStudiesDTO.getUnpaidStudies()
-				.forEach(studyId -> getStudyById(studyId.longValue()).setPaidExtractionAmount(true));
-		return unpaidStudiesDTO.getUnpaidStudies().stream()
-				.map(studyId -> getStudyById(studyId.longValue()).getExtractionAmount())
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	@Transactional
+	public void payExtractionAmountStudies(UnpaidStudiesDTO unpaidStudiesDTO) {
+		unpaidStudiesDTO.getUnpaidStudies().forEach(studyId -> {
+			Study study = getStudyById(studyId);
+			study.setPaidExtractionAmount(true);
+			studyRepository.save(study);
+		});
 	}
 
 	public Integer studiesByStudyType(StudyType studyType) {
@@ -492,11 +492,13 @@ public class StudyService {
 	}
 
 	public List<Integer> yearsWithStudies() {
-		return studyRepository.findAll().stream().map(s -> s.getCreatedAt().getYear()).distinct().sorted().collect(Collectors.toList());
+		return studyRepository.findAll().stream().map(s -> s.getCreatedAt().getYear()).distinct().sorted()
+				.collect(Collectors.toList());
 	}
 
 	public Integer studiesByStudyStatus(StudyStatus studyStatus) {
-		return (int) studyRepository.findAll().stream().filter(study -> studyStatus.equals(study.getActualStatus())).count();
+		return (int) studyRepository.findAll().stream().filter(study -> studyStatus.equals(study.getActualStatus()))
+				.count();
 	}
 
 	private StudyResponseDTO createStudyResponseDTO(Study study) {
@@ -505,8 +507,9 @@ public class StudyService {
 				study.getPatient().getFirstName(), study.getPatient().getLastName(), study.getPatient().getBirthDate());
 
 		return new StudyResponseDTO(study.getId(), study.getCreatedAt(), study.getBudget(), study.getExtractionAmount(),
-				study.getPaidExtractionAmount(), patientDTO, study.getAppointment(), study.getReferringDoctor(), study.getType(),
-				study.getPresumptiveDiagnosis(), getStatusByRole(study), getSampleByRole(study), getExtractionistByRole(study));
+				study.getPaidExtractionAmount(), patientDTO, study.getAppointment(), study.getReferringDoctor(),
+				study.getType(), study.getPresumptiveDiagnosis(), getStatusByRole(study), getSampleByRole(study),
+				getExtractionistByRole(study));
 	}
 
 	private Extractionist getExtractionistByRole(Study study) {
@@ -523,11 +526,12 @@ public class StudyService {
 		if (study.getSample() != null) {
 			SampleBatchResponseDTO sampleBatch = null;
 			if (study.getSample().getSampleBatch() != null) {
-				sampleBatch = new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(), study.getSample().getSampleBatch().getStatus(),
+				sampleBatch = new SampleBatchResponseDTO(study.getSample().getSampleBatch().getId(),
+						study.getSample().getSampleBatch().getStatus(),
 						study.getSample().getSampleBatch().getFinalReportsUrl());
 			}
-			sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(), study.getSample().getFreezer(),
-					study.getSample().getFailed(), study.getId(), sampleBatch);
+			sample = new SampleResponseDTO(study.getSample().getId(), study.getSample().getMilliliters(),
+					study.getSample().getFreezer(), study.getSample().getFailed(), study.getId(), sampleBatch);
 			User user = userService.getLoggedUser();
 			if (RoleEnum.PATIENT.equals(user.getRole())) {
 				sample.setFreezer(null);

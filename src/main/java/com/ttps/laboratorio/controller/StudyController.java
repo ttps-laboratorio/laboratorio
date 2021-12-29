@@ -1,6 +1,5 @@
 package com.ttps.laboratorio.controller;
 
-import com.ttps.laboratorio.dto.response.StudyResponseDTO;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +29,7 @@ import com.ttps.laboratorio.dto.request.SampleDTO;
 import com.ttps.laboratorio.dto.request.StudyDTO;
 import com.ttps.laboratorio.dto.request.StudySearchFilterDTO;
 import com.ttps.laboratorio.dto.request.UnpaidStudiesDTO;
+import com.ttps.laboratorio.dto.response.StudyResponseDTO;
 import com.ttps.laboratorio.entity.Appointment;
 import com.ttps.laboratorio.entity.Sample;
 import com.ttps.laboratorio.entity.Study;
@@ -209,7 +209,8 @@ public class StudyController {
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping(path = "/unpaid-extraction")
 	public ResponseEntity<?> paySelectedExtractionStudies(@Valid @RequestBody UnpaidStudiesDTO unpaidStudiesDTO) {
-		return ResponseEntity.ok(studyService.payExtractionAmountStudies(unpaidStudiesDTO));
+		studyService.payExtractionAmountStudies(unpaidStudiesDTO);
+		return ResponseEntity.ok(null);
 	}
 
 }
