@@ -1,6 +1,7 @@
 package com.ttps.laboratorio.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.tomcat.jni.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,22 @@ public class AppointmentService {
 	 */
 	public List<Appointment> getAllAppointments() {
 		return new ArrayList<>(appointmentRepository.findAll());
+	}
+
+	private Integer addFreeAppointmentMonth(int nextMonth, Integer year, List<LocalDate> freeAppointmentDaysByTwoMonths) {
+		if (nextMonth == 1) {
+			year += 1;
+		}
+		freeAppointmentDaysByTwoMonths.addAll(getFreeAppointmentDaysByMonth(year, nextMonth));
+		return year;
+	}
+
+	public List<LocalDate> getFreeAppointmentDaysByThreeMonths(Integer year, Integer month) {
+		List<LocalDate> freeAppointmentDaysByTwoMonths = new ArrayList<>(getFreeAppointmentDaysByMonth(year, month));
+		LocalDate currentMonth = LocalDate.of(year, month, 1);
+		year = addFreeAppointmentMonth(currentMonth.plusMonths(1).getMonthValue(), year, freeAppointmentDaysByTwoMonths);
+		addFreeAppointmentMonth(currentMonth.plusMonths(2).getMonthValue(), year, freeAppointmentDaysByTwoMonths);
+		return freeAppointmentDaysByTwoMonths;
 	}
 
 	public List<LocalDate> getFreeAppointmentDaysByMonth(Integer year, Integer month) {

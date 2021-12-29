@@ -47,7 +47,7 @@ public class AppointmentController {
 	public ResponseEntity<?> listFreeAppointmentDaysByMonth(
 			@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 		return ResponseEntity
-				.ok(appointmentService.getFreeAppointmentDaysByMonth(date.getYear(), date.getMonthValue()));
+				.ok(appointmentService.getFreeAppointmentDaysByThreeMonths(date.getYear(), date.getMonthValue()));
 	}
 
 	/**
